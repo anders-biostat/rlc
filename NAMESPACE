@@ -1,0 +1,5 @@
+exportPattern("^lc_[[:alpha:]]+")
+import( stringr )
+importFrom( utils, browseURL )
+importFrom( httpuv, startDaemonizedServer, stopDaemonizedServer)
+importFrom( jsonlite, fromJSON, toJSON, unbox )
