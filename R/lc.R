@@ -62,28 +62,38 @@ handle_websocket_open <- function( ws ) {
    pageobj$websocket <- ws
 }
 
+lc_stopserver <- function() {
 
-handle_event <- function( chart_id, event_type, event_data ) {
+   if( !is.null(pageobj$httpuv_handle) ) {
+      if( !is.null(pageobj$websocket) ) {
+         pageobj$websocket$close()
+      }
+      stopDaemonizedServer(pageobj$httpuv_handle )
+   }
+   
+   rm( list=ls(pageobj), envir=pageobj )
+}
+
+.onUnload <- function( libpath ) {
+   lc_stopserver()
 }
 
 lc_newpage <- function( use_viewer=TRUE ) {
 
-   if( !is.null(pageobj$httpuv_handle) ) {
-      stopDaemonizedServer(pageobj$httpuv_handle )
-   }
-   
-   rm( list=ls(pageobj),  envir=pageobj )
+   lc_stopserver()
    
    pageobj$app <- list( 
       call = handle_http_request,
       onWSOpen = handle_websocket_open )
 
    pageobj$httpuv_handle <- startDaemonizedServer( "0.0.0.0", 1237, pageobj$app )
-   if( use_viewer )
+   if( use_viewer & !is.null( getOption("viewer") ) )
       getOption("viewer")( "http://localhost:1237/init.html" )
    else
       browseURL( "http://localhost:1237/init.html" )
-      
+   
+   # Wait up to 5 seconds for the a websocket connection
+   # incoming from the client
    for( i in 1:(5/0.05) ) {
       if( !is.null(pageobj$websocket) ) 
          break
@@ -94,7 +104,7 @@ lc_newpage <- function( use_viewer=TRUE ) {
    
    pageobj$charts <- new.env()
    
-   invisible(TRUE)
+   invisible(NULL)
 }
 
 scatterchart_update <- function( id ) {
@@ -161,7 +171,7 @@ place_chart <- function( chart_type, data_expr, callback, place, id ) {
 }
 
 
-lc_scatterchart <- function( data_expr, place, id=place, on_click ) {
+lc_scatterchart <- function( data_expr, place, id=place, on_click=function(k){} ) {
    
    callback <- function( event_type, event_data ) {
       if( event_type == "click" )

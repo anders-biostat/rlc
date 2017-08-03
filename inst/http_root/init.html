@@ -46,6 +46,9 @@ ws.addEventListener( "message", function(event) {
    }
    // ...
 } );
+ws.addEventListener( "close", function(event) { 
+   window.close()
+} ); 
 
 </script>
 

@@ -1,4 +1,4 @@
-exportPattern("^lc_[[:alpha:]]+")
+exportPattern( "^lc_[[:alpha:]]+" )
 import( stringr )
 importFrom( utils, browseURL )
 importFrom( httpuv, startDaemonizedServer, stopDaemonizedServer)
