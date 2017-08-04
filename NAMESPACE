@@ -1,4 +1,5 @@
 exportPattern( "^lc_[[:alpha:]]+" )
+export( dat )
 import( stringr )
 importFrom( utils, browseURL )
 importFrom( httpuv, startDaemonizedServer, stopDaemonizedServer)

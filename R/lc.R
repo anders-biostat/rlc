@@ -111,33 +111,49 @@ scatterchart_update <- function( id ) {
 
    e <- new.env()
    tryCatch(
-      eval( pageobj$charts[[id]]$data_expr, envir=e ),
+      { d <- pageobj$charts[[id]]$data_fun() },
       error = function(e) 
          stop( str_interp( "in data expression for chart '${id}': ${e$message}." ), call.=FALSE ) ) 
    
-   if( !exists( "x", envir=e, inherits=FALSE ) )
+   if( ! "x" %in% names(d) )
       stop( str_interp( "Data expression for chart '${id}': 'x' is missing." ) )
-   if( !exists( "y", envir=e, inherits=FALSE ) )
+   if( ! "y" %in% names(d) )
       stop( str_interp( "Data expression for chart '${id}': 'y' is missing." ) )
-   if( !is.vector( e$x ) || !is.numeric( e$x ) )
+   if( !is.vector( d$x ) || !is.numeric( d$x ) )
       stop( str_interp( "Data expression for chart '${id}': 'x' is not a numeric vector." ) )
-   if( !is.vector( e$y ) || !is.numeric( e$y ) )
+   if( !is.vector( d$y ) || !is.numeric( d$y ) )
       stop( str_interp( "Data expression for chart '${id}': 'y' is not a numeric vector." ) )
-   if( length(e$x) != length(e$y) )
+   if( length(d$x) != length(d$y) )
       stop( str_interp( "Data expression for chart '${id}': 'x' and 'y' differ in length." ) )
 
-   if( !exists( "col", envir=e, inherits=FALSE ) ) 
-      e$col <- rep( "black", length(e$x) )
+   if( ! "col" %in% names(d) ) 
+      d$col <- rep( "black", length(e$x) )
 
-   if( !is.vector( e$col ) || !is.character( e$col ) )
+   if( !is.vector( d$col ) || !is.character( d$col ) )
       stop( str_interp( "Data expression for chart '${id}': 'col' is not a character vector." ) )
    if( length(e$col) != length(e$x) )
       stop( str_interp( "Data expression for chart '${id}': 'col' and 'x' differ in length." ) )
    
    pageobj$websocket$send( toJSON( 
-      list( unbox("NEWDATA"), unbox(id), list( x=e$x, y=e$y, col=e$col ) ) ) )   
+      list( unbox("NEWDATA"), unbox(id), list( x=d$x, y=d$y, col=d$col ) ) ) )   
 
 }
+
+rawhtml_update <- function( id ) {
+   
+   e <- new.env()
+   tryCatch(
+      d <- pageobj$charts[[id]]$data_fun(),
+      error = function(e) 
+         stop( str_interp( "in data expression for chart '${id}': ${e$message}." ), call.=FALSE ) ) 
+
+   if( !is.character(d[[1]]) | length(d[[1]]) != 1 )
+      stop( str_interp( "Data expression for chart '${id}': did not return a single character string" ) ) 
+
+   pageobj$websocket$send( toJSON( 
+      list( unbox("NEWDATA"), unbox(id), unbox(d[[1]]) ) ) )   
+   
+}   
 
 lc_update <- function( id=NULL ) {
    
@@ -150,18 +166,19 @@ lc_update <- function( id=NULL ) {
       stop( str_interp( "There is no chart with id '${id}'." ) )
    if( pageobj$charts[[id]]$type == "scatterChart" ) {
       scatterchart_update( id )
-   } else {
+   } else if( pageobj$charts[[id]]$type == "rawHtml" ) {
+      rawhtml_update( id )
+   } else
       stop( str_interp( "Encountered unknown chart type '${pageobj$charts[[id]]$type}'." ) )
-   }
 }
 
-place_chart <- function( chart_type, data_expr, callback, place, id ) {
+place_chart <- function( chart_type, data_fun, callback, place, id ) {
    
    if( exists( id, envir=pageobj$charts, inherits=FALSE ) )
       stop( str_interp( "There already is a chart with id '${id}'." ) )
    
    pageobj$charts[[id]] <- 
-      list( type = chart_type, data_expr = data_expr, callback = callback )
+      list( type = chart_type, data_fun = data_fun, callback = callback )
    
    pageobj$websocket$send( toJSON( c( 
       "NEWCHART", chart_type, id, str_c( "#", place ) ) ) )
@@ -171,14 +188,29 @@ place_chart <- function( chart_type, data_expr, callback, place, id ) {
 }
 
 
-lc_scatterchart <- function( data_expr, place, id=place, on_click=function(k){} ) {
+lc_scatterchart <- function( data_fun, place, id=place, on_click=function(k){} ) {
    
    callback <- function( event_type, event_data ) {
       if( event_type == "click" )
          on_click( as.integer(event_data) + 1 )
    }
    
-   place_chart( "scatterChart", substitute( data_expr ), callback, place, id )
+   place_chart( "scatterChart", data_fun, callback, place, id )
    
+}
+
+lc_rawhtml <- function( data_fun, place, id=place ) {
+   
+   callback <- function( event_type, event_data ) {
+   }
+   
+   place_chart( "rawHtml", data_fun, callback, place, id )
+   
+}
+
+dat <- function( ... ) {
+   e <- parent.frame()
+   l <- match.call()[-1]
+   function() lapply( l, eval, e )
 }
 
