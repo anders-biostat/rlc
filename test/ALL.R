@@ -2,6 +2,7 @@ library( ALL )
 library( genefilter )
 library( vsn )
 library( hgu95av2.db )
+library( stringr)
 
 data(ALL)
 a <- ALL
@@ -23,19 +24,22 @@ dfrow2html <- function( a ){
 }
 
 
-lc_newpage(FALSE)
+lc_newpage(TRUE)
 selprobe <- 1
+
 lc_scatterchart( place="A1", dat( 
       x = rowMeans(exprs(es)),
       y = ttres$dm,
       col = ifelse( ttres$padj < .1, "red", "black" ) ),
    on_click = function(k) {
       selprobe <<- k
-      lc_update() })
+      lc_update("A2") })
+
 lc_scatterchart( place="A2", dat(
    x = 1:ncol(e),
    y = exprs(e)[selprobe,],
    col = substr( rainbow(6,v=.8)[ as.integer(e$mol.biol) ], 1, 7 ) ) )
+
 lc_rawhtml( place="B1", dat(
    dfrow2html( ttres[selprobe,] ) ) )
 
