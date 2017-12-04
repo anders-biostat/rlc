@@ -6,6 +6,7 @@ new_scatterChart = function( id, place ) {
    charts[id]
     .npoints( 4 )
     .transitionDuration( 0 )
+    .size( 3.5 )
     .x( function( k ) { return charts[id].Data.x[k] } )
     .y( function( k ) { return charts[id].Data.y[k] } )
     .colour( function( k ) { return charts[id].Data.col[k] } )

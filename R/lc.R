@@ -42,7 +42,7 @@ handle_websocket_open <- function( ws ) {
    #      ws$request$HTTP_SEC_WEBSOCKET_PROTOCOL ) )
    ws$onMessage( function( isBinary, msg ) {
       if( isBinary )
-         stop( "Binary message received via WebSocket" )
+         stop( "Unexpected binary message received via WebSocket" )
       msg <- fromJSON( msg, simplifyVector=FALSE )
       if( !is.character( msg[[1]] ) || length(msg[[1]]) != 1 ) {
          stop( "Malformed message received via WebSocket" )
@@ -99,10 +99,11 @@ lc_newpage <- function( use_viewer=TRUE ) {
          break
       Sys.sleep( .05 )
    }
-   if( is.null(pageobj$websocket) ) 
+   if( is.null(pageobj$websocket) ) {
+      lc_stopserver()
       stop( "Timeout waiting for websocket." )
-   
-   pageobj$charts <- new.env()
+   }
+   pageobj$charts <- new.env()   # WRONG: Should be further up!
    
    invisible(NULL)
 }

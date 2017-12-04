@@ -1,5 +1,6 @@
 User code calls lc_newpage to set up a new plot
 - lc_newpage starts a web server
+- lc_newpage stores the web server's handle in 'pageobj$httpuv_handle'
 - lc_newpage directs the viewer/browser to the web server and to request 'init.html'
 - browser requests 'init.html' from server
 - server calls handle_http_request to handle the request
@@ -21,4 +22,8 @@ User code adds a chart by calling, e.g., lc_scatterchart
   the arguments supplied by the user code. The on_click function is wrapped into
   a general "callback" function, which will call on_click only if the event was a click.
 - place_chart first checks that the ID is still free
-- place_chart then
+- place_chart then adds the chart to the 'pageobj$charts' environment, as a named list
+  of chart 'type', 'data_fun', and event 'callback'
+- place_chart then sends via WS a NEWCHART message to the browser, with chart type, id
+  and place (the latter as selector, i.e., with prefixed '#')
+- place_chart finally calls 'lc_update'
