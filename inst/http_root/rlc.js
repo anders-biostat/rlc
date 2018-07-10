@@ -1,55 +1,81 @@
-charts = {}
+charts = {};
+rlc = {};
 
-new_scatterChart = function( id, place ) {
-   charts[id]  = lc.scatterChart();
-   charts[id].Data = { x: [0,0,1,1], y: [0,1,0,1], col: ["black","black","black","black"] };
-   charts[id]
-    .npoints( 4 )
-    .transitionDuration( 0 )
-    .size( 3.5 )
-    .x( function( k ) { return charts[id].Data.x[k] } )
-    .y( function( k ) { return charts[id].Data.y[k] } )
-    .colour( function( k ) { return charts[id].Data.col[k] } )
-    .on_click( function( k ) { ws.send( JSON.stringify(
-        [ "EVENT", id, "click", k ] ) ) } )
-    .place( place );
+rlc.addTable = function(rows, cols) {
+  var table = d3.select("body")
+    .append("table");
+  var rowInd = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+  table.selectAll("tr")
+    .data(d3.range(rows))
+        .enter().append("tr");
+
+  table.selectAll("tr").selectAll("td")
+    .data(function(d) {
+      return d3.range(cols).map(function(e){
+        return rowInd[d] + (e + 1)
+      })    
+    })
+    .enter().append("td")
+      .attr("id", function(d) {return d});
 }
 
-new_rawHtml = function( id, place ) {
-   charts[id] = { 
-      Data: "",
-      update: function(){
-         d3.select( place ).html( charts[id].Data )
-      }
-   } 
+rlc.prepareContainer = function(place) {
+  var container = d3.select("#" + place);
+  if(container.empty()) {
+    d3.select("body")
+      .append("div")
+        .attr("id", place);
+  }
 }
 
-// establish WebSocket link and handlers 
-ws = new WebSocket( "ws://localhost:1237/" ); //, "RLC-0" );
-ws.addEventListener( "open", function(event) { 
-   // ...
-} ); 
-ws.addEventListener( "message", function(event) {
-   msg = JSON.parse( event.data );
-   if( msg[0] == "NEWCHART" ) {
-      // msg[1]: type, msg[2]: id, msg[3]: selector
-      if( msg[1] == "scatterChart" ) {
-         new_scatterChart( msg[2], msg[3] );
-      } else if ( msg[1] == "rawHtml" ) {
-         new_rawHtml( msg[2], msg[3] );
-      }
-   } else if ( msg[0] == "NEWDATA" ) {
-      if( !( msg[1] in charts ) ) {
-         throw "Unknown chart ID"
-      } 
-      charts[ msg[1] ].Data = msg[2]
-      try{ //if( charts[ msg[1] ].type == "scatterChart" ) {  // FIXME
-         charts[ msg[1] ].npoints( msg[2].x.length )
-      } catch(e) {};
-      charts[ msg[1] ].update()
-   }
-   // ...
-} );
-ws.addEventListener( "close", function(event) { 
-   window.close()
-} ); 
+rlc.removeChart = function(id) {
+  charts[id].container.rmemove();
+  charts[id] = null;
+}
+
+
+rlc.addChart = function(id, type, place, layerId) {
+  //if(layerId = "") layerId = undefined;
+  console.log(layerId);
+  charts[id] = lc[type](layerId);
+  charts[id].placeIn = place;
+}
+
+rlc.setProperty = function(name) {
+  var spl = name.split("_");
+  var id = spl[0];
+  if(spl[1])
+    charts[id].activeLayer(charts[id].get_layer(spl[1]));
+  for(pr in window[name]) {
+    charts[id][pr](window[name][pr]);
+  }
+  window[name] = null;
+}
+
+rlc.updateChart = function(id, updateType, layerId) {
+  if(!charts[id]) 
+    throw "Error in 'rlc.updateChart': there is no chart with ID " + id;
+  if(layerId == "") layerId = undefined;
+  if(layerId && !charts[id].layers[layerId])
+    throw "Error in 'rlc.updateChart': chart " + id + " doesn't have layer with " +
+      "ID: " + layerId;
+
+  if(charts[id].placeIn) {
+    if(!d3.select(charts[id].placeIn).empty())
+      charts[id].place(charts[id].placeIn)
+    else
+      charts[id].place("#" + charts[id].placeIn);
+    charts[id].placeIn = undefined;
+  }
+
+  var updateFun = "update" + updateType;
+
+  if(layerId)
+    if(updateType == "")
+      charts[id].updateLayer(layerId)
+    else
+      charts[id].activeLayer(charts[id].get_layer(layerId))[updateFun]();
+  else
+    charts[id][updateFun]();
+}
