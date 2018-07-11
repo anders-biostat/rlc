@@ -1,5 +1,6 @@
 #' @import JsRCom
 #' @import stringr
+#' @export
 lc <- new.env()
 lc$pageOpened <- F
 lc$charts <- list()
@@ -107,8 +108,9 @@ setProperties <- function(data, id, layerId = NULL) {
     } else {
       stop("LayerId is not specified")
     }
-  
-  lc$charts[[id]]$layers[[layerId]] <- data
+  if(is.null(lc$charts[[id]]$layers[[layerId]]))
+    lc$charts[[id]]$layers[[layerId]] <- list()
+  lc$charts[[id]]$layers[[layerId]]$data <- data
   
   class(id) <- "chartId"
   invisible(id)
@@ -118,15 +120,34 @@ sendProperties <- function(id, layerId = ls(lc$charts[[id]]$layers)){
   for(layer in layerId){
     e <- new.env()
     tryCatch(
-      { d <- lc$charts[[id]]$layers[[layerId]]() },
+      { d <- lc$charts[[id]]$layers[[layer]]$data() },
       error = function(e) 
         stop( str_interp( "in data expression for chart '${id}': ${e$message}." ), call.=FALSE ) ) 
+    
+    if(!is.null(d$on_click)) {
+      lc$charts[[id]]$layers[[layer]]$on_click <- d$on_click
+      d$on_click = NULL
+    }
     
     name <- str_c(id, layerId, sep = "_")
     
     sendData(name, d)
     sendCommand(str_interp("rlc.setProperty('${name}')"))
   }
+}
+
+#' @export
+chartClicked <- function(id, layerId) {
+  on.exit(setEnvironment(globalenv()))
+  
+  if(is.null(lc$charts[[id]]))
+    stop(str_interp("Chart with ID ${id} is not defined"))
+  if(is.null(lc$charts[[id]]$layers[[layerId]]))
+    stop(str_interp("Chart ${id} doesn't have layer ${layerId}"))
+  if(is.null(lc$charts[[id]]$layers[[layerId]]$on_click))
+    stop("Onclick behaviour is not defined for chart ${id} layer ${layerId}")
+  
+  lc$charts[[id]]$layers[[layerId]]$on_click(lc$clicked)
 }
 
 addChart <- function(id, type, place, layerId) {
@@ -149,9 +170,15 @@ chartExists <- function(id) {
 }
 
 #' @export
-scatter <- function(data, place = NULL, id = NULL, layerId = NULL) {
+lc_scatter <- function(data, place = NULL, id = NULL, layerId = NULL) {
   setChart("scatter", data, place, id, layerId)
 }
+
+#' @export
+lc_beeswarm <- function(data, place = NULL, id = NULL, layerId = NULL) {
+  setChart("beeswarm", data, place, id, layerId)
+}
+
  
 setChart <- function(type, data, place, id, layerId) {
   if(!lc$pageOpened) openPage()
@@ -166,9 +193,8 @@ setChart <- function(type, data, place, id, layerId) {
     if(is.null(lc$charts[[id]])) {
       layerId <- "Layer1"
     } else {
-      lyaerId <- str_c("Layer", length(lc$charts[[id]]$layers + 1))
+      lyaerId <- str_c("Layer", length(lc$charts[[id]]$layers) + 1)
     }
-  print(id)
   
   addChart(id, type, place, layerId)
   setProperties(data, id, layerId)
@@ -180,9 +206,9 @@ setChart <- function(type, data, place, id, layerId) {
 
 #' @export
 dat <- function( ... ) {
-   e <- parent.frame()
-   l <- match.call()[-1]
-   function() lapply( l, eval, e )
+  e <- parent.frame()
+  l <- match.call()[-1]
+  function() lapply( l, eval, e )
 }
 
 #' @export

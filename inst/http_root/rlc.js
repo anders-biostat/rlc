@@ -37,8 +37,13 @@ rlc.removeChart = function(id) {
 
 rlc.addChart = function(id, type, place, layerId) {
   //if(layerId = "") layerId = undefined;
-  console.log(layerId);
+
   charts[id] = lc[type](layerId);
+  charts[id].on_click(function(d) {
+    jrc.sendCommand("JsRCom::setEnvironment(lc)");
+    jrc.sendData("clicked", d);
+    jrc.sendCommand("chartClicked('" + id + "', '" + layerId + "')");
+  })
   charts[id].placeIn = place;
 }
 
@@ -47,8 +52,12 @@ rlc.setProperty = function(name) {
   var id = spl[0];
   if(spl[1])
     charts[id].activeLayer(charts[id].get_layer(spl[1]));
+  console.log(window[name]);
   for(pr in window[name]) {
-    charts[id][pr](window[name][pr]);
+    if(Array.isArray(window[name][pr]) && window[name][pr].length == 1)
+      charts[id][pr](window[name][pr][0])
+    else  
+      charts[id][pr](window[name][pr]);
   }
   window[name] = null;
 }
