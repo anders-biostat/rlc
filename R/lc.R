@@ -128,7 +128,17 @@ sendProperties <- function(id, layerId = ls(lc$charts[[id]]$layers)){
       lc$charts[[id]]$layers[[layer]]$on_click <- d$on_click
       d$on_click = NULL
     }
-    
+    if(!is.null(d$elementMouseOver)) {
+      lc$charts[[id]]$layers[[layer]]$on_mouseover <- d$elementMouseOver
+      d$elementMouseOver = NULL
+      sendCommand(str_interp("rlc.setCustomMouseOver('${id}', '${layer}');"))
+    }
+    if(!is.null(d$elementMouseOver)) {
+      lc$charts[[id]]$layers[[layer]]$on_mouseout <- d$elementMouseOut
+      d$elementMouseOut = NULL
+      sendCommand(str_interp("rlc.setCustomMouseOut('${id}', '${layer}');"))
+    }    
+        
     name <- str_c(id, layerId, sep = "_")
     
     sendData(name, d)
@@ -137,18 +147,21 @@ sendProperties <- function(id, layerId = ls(lc$charts[[id]]$layers)){
 }
 
 #' @export
-chartClicked <- function(id, layerId) {
-  on.exit(setEnvironment(globalenv()))
+chartEvent <- function(d, id, layerId, event) {
   
   if(is.null(lc$charts[[id]]))
     stop(str_interp("Chart with ID ${id} is not defined"))
   if(is.null(lc$charts[[id]]$layers[[layerId]]))
     stop(str_interp("Chart ${id} doesn't have layer ${layerId}"))
-  if(is.null(lc$charts[[id]]$layers[[layerId]]$on_click))
-    stop("Onclick behaviour is not defined for chart ${id} layer ${layerId}")
-  
-  lc$charts[[id]]$layers[[layerId]]$on_click(lc$clicked)
+
+  if(event == "click" & !is.null(lc$charts[[id]]$layers[[layerId]]$on_click))
+    lc$charts[[id]]$layers[[layerId]]$on_click(d)
+  if(event == "mouseover" & !is.null(lc$charts[[id]]$layers[[layerId]]$on_mouseover))
+    lc$charts[[id]]$layers[[layerId]]$on_mouseover(d)
+  if(event == "mouseout" & !is.null(lc$charts[[id]]$layers[[layerId]]$on_mouseout))
+    lc$charts[[id]]$layers[[layerId]]$on_mouseout(d)
 }
+
 
 addChart <- function(id, type, place, layerId) {
   if(chartExists(id)) {
