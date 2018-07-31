@@ -3,6 +3,75 @@
 #' @export
 lc <- new.env()
 lc$pageOpened <- F
+
+lc$props <- list(scatter = c("x", "y", "size", "stroke", "strokeWidth", "symbol", "symbolValue", "symbolLegendTitle"),
+                barchart = c("ngroups", "groupIds", "nbars", "barIds", "nstacks", "value", "groupWidth", "stroke", "strokeWidth"), 
+                beeswarm = c("x", "y", "size", "stroke", "strokeWidth", "symbol", "symbolValue", "symbolLegendTitle", "valueAxis"),
+                pointLine = c(),
+                pointRibbon = c(),
+                layer = c("nelements", "elementIds", "elementLabel", "layerDomainX", "layerDomainY", "contScaleX", "contScaleY",
+                          "colour", "colourValue", "palette", "colourDomain", "colourLegendTitle", "addColourScaleToLegend", "opacity", "on_click",
+                          "informText", "elementMouseOver", "elementMouseOut"))
+
+Layer <- setRefClass("Layer", fields = list(type = "character", id = "character", 
+                                            properties = "list", dataFun = "function",
+                                            on_click = "function", on_mouseover = "function",
+                                            on_mouseout = "function", init = "logical"))
+Layer$methods(
+  setProperty = function(name, expr) {
+    properties[[name]] <<- expr
+  }
+)
+Layer$accessors("type")
+
+Chart <- setRefClass("Chart", fields = list(layers = "list", id = "character", place = "character"))
+Chart$methods(
+  addLayer = function(layerId, type) {
+    if((length(layers) != 0) && (layerId %in% names(layers)))
+      stop(str_c("Layer with ID ", layerId, " already exists in chart ", id, ".", 
+                 " Use 'chart$removeLayer(layerId)' to remove it."))
+    
+    layers[[layerId]] <<- Layer$new(type = type, id = layerId, properties = list(), init = F,
+                                    dataFun = function(l) l)
+    layers[[layerId]]
+  },
+  getLayer = function(layerId = NULL) {
+    if(is.null(layerId))
+      if(length(layers) == 2) {
+        #1st layer is always 'main', which is a dummy
+        layerId <- layers[[2]]$id
+      } else {
+        stop(str_c("Chart ", id, " has multiple or no layers. You need to specify the 'layerID'."))
+      }
+    layers[[layerId]]
+  },
+  removeLayer = function(layerId) {
+    if(layerId == "main"){
+      warning("You are attempting to remove the main layer of the chart ", id, 
+              " . The entire chart will be removed.")
+      removeChart(id)
+    } else {
+      if(layerId %in% names(layers)) {
+        stop(str_c("There is no layer with ID ", layerId))
+      } else {
+        sendCommands(str_interp("rlc.removeLayer('${id}, '${layerId}')"))
+        layers[[layerId]] <<- NULL
+      }
+    }
+  },
+  nLayers = function() {
+    length(layers) - 1
+  },
+  JSinitialize = function() {
+    lapply(layers, function(layer) {
+      if(!layer$init) {
+        sendCommand(str_interp("rlc.addChart('${id}', '${layer$type}', '${place}', '${layer$id}');"))
+        layer$init <- T
+      }
+    })
+  })
+                                    
+Chart$accessors("place")
 lc$charts <- list()
 
 #' @export
@@ -57,37 +126,13 @@ addDefaultLayout <- function(layoutName) {
   stop("Unknown default layout name")
 }
 
+#Makes sure that a container exists. Otherwise just creates a 'div' with the provided id
 prepareContainer <- function(place) {
     sendCommand(str_interp("rlc.prepareContainer('${place}');"))
 }
 
-#' @export
-updateChart <- function(id = NULL, layerId = NULL, updateType = NULL) {
-  if(!is.vector(id))
-    stop("Error in 'updateChart': 'id' should be a vector of IDs")
-  if(is.null(id)) id <- ls(lc$charts)
-  if(!is.null(layerId) & length(layerId) != length(id))
-    stop("Error in 'updateChart': lenths of 'id' and 'layerId' differ")
-  if(!is.null(updateType) & length(updateType) != length(id))
-    stop("Error in 'updateChart': lenths of 'id' and 'updateType' differ")
-
-  for(i in 1:length(id)){
-    args <- str_c("'", id[i], "', '")
-    if(!is.null(updateType)) {
-      args <- str_c(args, updateType[i], "', '")
-    } else {
-      args <- str_c(args, "', '")
-    }
-
-    if(!is.null(layerId)) {
-      args <- str_c(args, layerId[i], "'")
-      sendProperties(id[i], layerId[i])
-    } else {
-      sendProperties(id[i])
-      args <- str_c(args, "'")
-    }
-    sendCommand(str_interp("rlc.updateChart(${args});"))
-  }
+getChart <- function(id) {
+  lc$charts[[id]]
 }
 
 #' @export
@@ -95,133 +140,184 @@ removeChart <- function(id) {
   if(!is.vector(id))
     stop("Error in 'removeChart': 'id' should be a vector of IDs")
   for(i in id){
-    lc$charts[[i]] = NULL
+    lc$charts[[i]] <- NULL
     sendCommand(str_interp("rlc.removeChart('${i}');"))  
   }
 }
 
-#' @export
-setProperties <- function(data, id, layerId = NULL) {
-  if(is.null(layerId))
-    if(length(lc$charts[[id]]$layers) == 1) {
-      layerId <- ls(lc$charts[[id]]$layers)[1]
-    } else {
-      stop("LayerId is not specified")
-    }
-  if(is.null(lc$charts[[id]]$layers[[layerId]]))
-    lc$charts[[id]]$layers[[layerId]] <- list()
-  lc$charts[[id]]$layers[[layerId]]$data <- data
+addChart <- function(id, place) {
   
-  class(id) <- "chartId"
-  invisible(id)
+  chart <- Chart$new(layers = list(), id = id)
+  chart$setPlace(place)
+  lc$charts[[id]] <- chart
+  
+  invisible(chart)
 }
 
-sendProperties <- function(id, layerId = ls(lc$charts[[id]]$layers)){
-  for(layer in layerId){
+#' @export
+setProperties <- function(data, id, layerId = NULL) {
+  chart <- getChart(id)
+  if(is.null(chart))
+    stop(str_c("Chart with ID ", id, " is not defined."))
+  
+  if(is.null(layerId))
+    if(chart$getLayer("main")$type != "layerChart") {
+      layerId <- "main"
+    } else {
+      if(chart$nLayers() == 1) {
+        layerId <- names(chart$layers)[2]
+      } else {
+        stop("The chart ", chart$id, " has more then one layer. Please, specify the 'layerId'.")
+      }
+    }
+    
+  print(layerId)
+  layer <- chart$getLayer(layerId)
+  mainLayer <- chart$getLayer("main")
+  
+  if(is.null(layer))
+    stop(str_c("Layer with ID ", id, " is not defined."))
+  
+  for(prop in names(data))
+    if(prop %in% lc$props[[layer$type]] | prop %in% lc$props$layer) {
+      layer$setProperty(prop, data[[prop]])
+    } else {
+      mainLayer$setProperty(prop, data[[prop]])
+    }
+  
+  invisible(chart)
+}
+
+#' @export
+updateChart <- function(id = NULL, layerId = NULL, updateType = NULL) {
+  if(is.null(id)) id <- ls(lc$charts)
+  if(!is.vector(id))
+    stop("'id' should be a vector of IDs")
+
+  
+  if(!is.null(layerId) & length(layerId) != length(id))
+    stop("Lengths of 'id' and 'layerId' differ")
+  if(!is.null(updateType) & length(updateType) != length(id))
+    stop("Lengths of 'id' and 'updateType' differ")
+  
+  for(i in 1:length(id)){
+    chart <- getChart(id[i])
+    if(is.null(chart))
+      stop(str_c("Chart with ID ", id[i], " is not defined."))
+    args <- str_c("'", id[i], "', '")
+    
+    if(!is.null(updateType)) {
+      args <- str_c(args, updateType[i], "', '")
+    } else {
+      args <- str_c(args, "', '")
+    }
+    
+    if(!is.null(layerId)) {
+      args <- str_c(args, layerId[i], "'")
+      sendProperties(chart, layerId[i])
+    } else {
+      sendProperties(chart)
+      args <- str_c(args, "'")
+    }
+    sendCommand(str_interp("rlc.updateChart(${args});"))
+  }
+}
+
+sendProperties <- function(chart, layerId = ls(chart$layers)){
+  for(layerName in layerId){
+    layer <- chart$getLayer(layerName)
+    if(is.null(layer))
+      stop(str_c("There is no layer ", layerName, " in the chart ", chart$id))
+    
     e <- new.env()
-    tryCatch(
-      { d <- lc$charts[[id]]$layers[[layer]]$data() },
-      error = function(e) 
-        stop( str_interp( "in data expression for chart '${id}': ${e$message}." ), call.=FALSE ) ) 
+    tryCatch({
+      d <- lapply(layer$properties, function(el) el())
+      d <- layer$dataFun(d)
+    },
+    error = function(e) 
+      stop( str_interp( "in data expression for chart '${id}': ${e$message}." ), call.=FALSE ) ) 
     
     if(!is.null(d$on_click)) {
-      lc$charts[[id]]$layers[[layer]]$on_click <- d$on_click
+      layer$on_click <- d$on_click
       d$on_click = NULL
     }
+    
     if(!is.null(d$elementMouseOver)) {
-      lc$charts[[id]]$layers[[layer]]$on_mouseover <- d$elementMouseOver
+      layer$on_mouseover <- d$elementMouseOver
       d$elementMouseOver = NULL
-      sendCommand(str_interp("rlc.setCustomMouseOver('${id}', '${layer}');"))
+      sendCommand(str_interp("rlc.setCustomMouseOver('${id}', '${layerName}');"))
     }
     if(!is.null(d$elementMouseOver)) {
-      lc$charts[[id]]$layers[[layer]]$on_mouseout <- d$elementMouseOut
+      layer$on_mouseout <- d$elementMouseOut
       d$elementMouseOut = NULL
-      sendCommand(str_interp("rlc.setCustomMouseOut('${id}', '${layer}');"))
+      sendCommand(str_interp("rlc.setCustomMouseOut('${id}', '${layerName}');"))
     }    
-        
-    name <- str_c(id, layerId, sep = "_")
+    
+    name <- str_c(chart$id, layer$id, sep = "_")
     
     sendData(name, d)
     sendCommand(str_interp("rlc.setProperty('${name}')"))
   }
 }
 
-#' @export
-chartEvent <- function(d, id, layerId, event) {
-  
-  if(is.null(lc$charts[[id]]))
-    stop(str_interp("Chart with ID ${id} is not defined"))
-  if(is.null(lc$charts[[id]]$layers[[layerId]]))
-    stop(str_interp("Chart ${id} doesn't have layer ${layerId}"))
-
-  if(event == "click" & !is.null(lc$charts[[id]]$layers[[layerId]]$on_click))
-    lc$charts[[id]]$layers[[layerId]]$on_click(d)
-  if(event == "mouseover" & !is.null(lc$charts[[id]]$layers[[layerId]]$on_mouseover))
-    lc$charts[[id]]$layers[[layerId]]$on_mouseover(d)
-  if(event == "mouseout" & !is.null(lc$charts[[id]]$layers[[layerId]]$on_mouseout))
-    lc$charts[[id]]$layers[[layerId]]$on_mouseout(d)
-}
-
-
-addChart <- function(id, type, place, layerId) {
-  if(chartExists(id)) {
-    warning(str_interp("Chart with ID ${id} already exists. It will be replaced with a new one."))
-    removeChart(id)
-  }
-  
-  prepareContainer(place)
-  lc$charts[[id]] <- list()
-  lc$charts[[id]]$place <- place
-  lc$charts[[id]]$layers <- list()
-  
-  sendCommand(str_interp("rlc.addChart('${id}', '${type}', '${place}', '${layerId}');"))
-}
-
-#' @export
-chartExists <- function(id) {
-  sum(ls(lc$charts) == id) > 0
-}
-
-#' @export
-lc_scatter <- function(data, place = NULL, id = NULL, layerId = NULL) {
-  setChart("scatter", data, place, id, layerId)
-}
-
-#' @export
-lc_beeswarm <- function(data, place = NULL, id = NULL, layerId = NULL) {
-  setChart("beeswarm", data, place, id, layerId)
-}
-
- 
-setChart <- function(type, data, place, id, layerId) {
+setChart <- function(type, data, place, id, layerId, dataFun) {
   if(!lc$pageOpened) openPage()
-
+  
   if(is.null(place))
     place <- str_c("Chart", length(lc$charts) + 1)
   
   if(is.null(id))
     id <- place
   
-  if(is.null(layerId))
-    if(is.null(lc$charts[[id]])) {
-      layerId <- "Layer1"
-    } else {
-      lyaerId <- str_c("Layer", length(lc$charts[[id]]$layers) + 1)
-    }
+  chart <- getChart(id)
+  if(is.null(chart)) {
+    chart <- addChart(id, place)
+    if(is.null(layerId) || layerId != "main")
+      chart$addLayer("main", "axesChart")
+  }
   
-  addChart(id, type, place, layerId)
+  if(is.null(layerId))
+    layerId <- str_c("Layer", (chart$nLayers() + 1))
+  
+
+  layer <- chart$addLayer(layerId, type)
+  layer$dataFun <- dataFun
+  
+  chart$JSinitialize()
+  
+
   setProperties(data, id, layerId)
   updateChart(id)
   
-  class(id) <- "chartId"
-  invisible(id)
+  invisible(chart)
+}
+
+#' @export
+chartEvent <- function(d, id, layerId, event) {
+  
+  chart <- getChart(id)
+  if(is.null(chart))
+    stop(str_interp("Chart with ID ${id} is not defined"))
+  
+  layer <- chart$getLayer(layerId)
+  if(is.null(layer))
+    stop(str_interp("Chart ${id} doesn't have layer ${layerId}"))
+
+  if(event == "click" & !is.null(layer$on_click))
+    layer$on_click(d)
+  if(event == "mouseover" & !is.null(layer$on_mouseover))
+    layer$on_mouseover(d)
+  if(event == "mouseout" & !is.null(layer$on_mouseout))
+    layer$on_mouseout(d)
 }
 
 #' @export
 dat <- function( ... ) {
   e <- parent.frame()
   l <- match.call()[-1]
-  function() lapply( l, eval, e )
+  lapply(l, function(el) {
+    function() eval(el, e)
+  })
 }
 
 #' @export
@@ -229,4 +325,34 @@ closePage <- function() {
   lc$charts <- list()
   lc$pageOpened <- F
   JsRCom::closePage()
+}
+
+#' @export
+lc_scatter <- function(data, place = NULL, id = NULL, layerId = NULL) {
+  setChart("scatter", data, place, id, layerId, function(l) {
+    l
+  })
+}
+
+#' @export
+lc_beeswarm <- function(data, place = NULL, id = NULL, layerId = NULL) {
+  setChart("beeswarm", data, place, id, layerId, function(l) {
+    l
+  })
+}
+
+#' @export
+lc_line <- function(data, place = NULL, id = NULL, layerId = NULL) {
+  setChart("pointLine", data, place, id, layerId, function(l) {
+    if(!is.null(l$x)) l$x <- t(as.matrix(l$x))
+    if(!is.null(l$y)) l$y <- t(as.matrix(l$y))
+    l
+  })
+}
+
+#' @export
+lc_ribbon <- function(data, place = NULL, id = NULL, layerId = NULL) {
+  setChart("pointRibbon", data, place, id, layerId, function(l) {
+    l
+  })
 }

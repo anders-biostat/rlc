@@ -34,15 +34,23 @@ rlc.removeChart = function(id) {
   charts[id] = null;
 }
 
+rlc.removeLayer = function(chartId, layerId) {
+  charts[chartId].remove_layer(layerId);
+}
+
 
 rlc.addChart = function(id, type, place, layerId) {
   //if(layerId = "") layerId = undefined;
-
-  charts[id] = lc[type](layerId);
-  charts[id].on_click(function(d) {
-    jrc.sendCommand("chartEvent("+ d + ", '" + id + "', '" + layerId + "', 'click')");
-  })
-  charts[id].placeIn = place;
+  charts[id] = lc[type](layerId, charts[id]);
+  if(charts[id].on_click)
+    charts[id].on_click(function(d) {
+      jrc.sendCommand("chartEvent("+ d + ", '" + id + "', '" + layerId + "', 'click')");
+    });
+  if(layerId == "main")
+    charts[id].placeIn = place
+  else
+    if(charts[id].container)
+      charts[id].place_layer(lyaerId);
 }
 
 rlc.setCustomMouseOver = function(id, layerId) {
@@ -60,7 +68,7 @@ rlc.setCustomMouseOver = function(id, layerId) {
 rlc.setProperty = function(name) {
   var spl = name.split("_");
   var id = spl[0];
-  if(spl[1])
+  if(spl[1] != "main")
     charts[id].activeLayer(charts[id].get_layer(spl[1]));
   for(pr in window[name]) {
     if(Array.isArray(window[name][pr]) && window[name][pr].length == 1)

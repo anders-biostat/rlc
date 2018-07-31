@@ -2,11 +2,12 @@
 
 export(addDefaultLayout)
 export(chartEvent)
-export(chartExists)
 export(closePage)
 export(dat)
 export(lc)
 export(lc_beeswarm)
+export(lc_line)
+export(lc_ribbon)
 export(lc_scatter)
 export(openPage)
 export(removeChart)
