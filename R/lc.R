@@ -235,7 +235,7 @@ sendProperties <- function(chart, layerId = ls(chart$layers)){
       d <- layer$dataFun(d)
     },
     error = function(e) 
-      stop( str_interp( "in data expression for chart '${id}': ${e$message}." ), call.=FALSE ) ) 
+      stop( str_interp( "in data expression for chart '${chart$id}': ${e$message}." ), call.=FALSE ) ) 
     
     if(!is.null(d$on_click)) {
       layer$on_click <- d$on_click
@@ -245,12 +245,12 @@ sendProperties <- function(chart, layerId = ls(chart$layers)){
     if(!is.null(d$elementMouseOver)) {
       layer$on_mouseover <- d$elementMouseOver
       d$elementMouseOver = NULL
-      sendCommand(str_interp("rlc.setCustomMouseOver('${id}', '${layerName}');"))
+      sendCommand(str_interp("rlc.setCustomMouseOver('${chart$id}', '${layerName}');"))
     }
     if(!is.null(d$elementMouseOver)) {
       layer$on_mouseout <- d$elementMouseOut
       d$elementMouseOut = NULL
-      sendCommand(str_interp("rlc.setCustomMouseOut('${id}', '${layerName}');"))
+      sendCommand(str_interp("rlc.setCustomMouseOut('${chart$id}', '${layerName}');"))
     }    
     
     name <- str_c(chart$id, layer$id, sep = "_")
@@ -265,6 +265,7 @@ setChart <- function(type, data, place, id, layerId, dataFun) {
   
   if(is.null(place))
     place <- str_c("Chart", length(lc$charts) + 1)
+  prepareContainer(place)
   
   if(is.null(id))
     id <- place
@@ -285,7 +286,6 @@ setChart <- function(type, data, place, id, layerId, dataFun) {
   
   chart$JSinitialize()
   
-
   setProperties(data, id, layerId)
   updateChart(id)
   
