@@ -49,8 +49,10 @@ rlc.addChart = function(id, type, place, layerId) {
   if(layerId == "main")
     charts[id].placeIn = place
   else
-    if(charts[id].container)
-      charts[id].place_layer(lyaerId);
+    if(charts[id].container) {
+      charts[id].place_layer(layerId);
+      
+    }
 }
 
 rlc.setCustomMouseOver = function(id, layerId) {

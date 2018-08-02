@@ -7,8 +7,8 @@ lc$pageOpened <- F
 lc$props <- list(scatter = c("x", "y", "size", "stroke", "strokeWidth", "symbol", "symbolValue", "symbolLegendTitle"),
                 barchart = c("ngroups", "groupIds", "nbars", "barIds", "nstacks", "value", "groupWidth", "stroke", "strokeWidth"), 
                 beeswarm = c("x", "y", "size", "stroke", "strokeWidth", "symbol", "symbolValue", "symbolLegendTitle", "valueAxis"),
-                pointLine = c(),
-                pointRibbon = c(),
+                pointLine = c("lineWidth", "dasharray", "x", "y", "nsteps"),
+                pointRibbon = c("lineWidth", "dasharray", "x", "y", "nsteps"),
                 layer = c("nelements", "elementIds", "elementLabel", "layerDomainX", "layerDomainY", "contScaleX", "contScaleY",
                           "colour", "colourValue", "palette", "colourDomain", "colourLegendTitle", "addColourScaleToLegend", "opacity", "on_click",
                           "informText", "elementMouseOver", "elementMouseOut"))
@@ -65,6 +65,7 @@ Chart$methods(
   JSinitialize = function() {
     lapply(layers, function(layer) {
       if(!layer$init) {
+        print(layer$id)
         sendCommand(str_interp("rlc.addChart('${id}', '${layer$type}', '${place}', '${layer$id}');"))
         layer$init <- T
       }
@@ -171,7 +172,6 @@ setProperties <- function(data, id, layerId = NULL) {
       }
     }
     
-  print(layerId)
   layer <- chart$getLayer(layerId)
   mainLayer <- chart$getLayer("main")
   
@@ -346,6 +346,12 @@ lc_line <- function(data, place = NULL, id = NULL, layerId = NULL) {
   setChart("pointLine", data, place, id, layerId, function(l) {
     if(!is.null(l$x)) l$x <- t(as.matrix(l$x))
     if(!is.null(l$y)) l$y <- t(as.matrix(l$y))
+    if(!is.null(l$x) | !is.null(l$y))
+      if(nrow(l$x) != nrow(l$y))
+        stop("'x' and 'y' define different number of lines")
+    
+    if(!is.null(l$x)) l$nelements <- nrow(l$x)
+    
     l
   })
 }
