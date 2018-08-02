@@ -8,7 +8,7 @@ lc$props <- list(scatter = c("x", "y", "size", "stroke", "strokeWidth", "symbol"
                 barchart = c("ngroups", "groupIds", "nbars", "barIds", "nstacks", "value", "groupWidth", "stroke", "strokeWidth"), 
                 beeswarm = c("x", "y", "size", "stroke", "strokeWidth", "symbol", "symbolValue", "symbolLegendTitle", "valueAxis"),
                 pointLine = c("lineWidth", "dasharray", "x", "y", "nsteps"),
-                pointRibbon = c("lineWidth", "dasharray", "x", "y", "nsteps"),
+                pointRibbon = c("lineWidth", "dasharray", "x", "ymax", "ymin", "nsteps"),
                 layer = c("nelements", "elementIds", "elementLabel", "layerDomainX", "layerDomainY", "contScaleX", "contScaleY",
                           "colour", "colourValue", "palette", "colourDomain", "colourLegendTitle", "addColourScaleToLegend", "opacity", "on_click",
                           "informText", "elementMouseOver", "elementMouseOut"))
@@ -346,11 +346,17 @@ lc_line <- function(data, place = NULL, id = NULL, layerId = NULL) {
   setChart("pointLine", data, place, id, layerId, function(l) {
     if(!is.null(l$x)) l$x <- t(as.matrix(l$x))
     if(!is.null(l$y)) l$y <- t(as.matrix(l$y))
-    if(!is.null(l$x) | !is.null(l$y))
+    if(!is.null(l$x) | !is.null(l$y)){
       if(nrow(l$x) != nrow(l$y))
-        stop("'x' and 'y' define different number of lines")
+        stop("'x' and 'y' define different number of lines.")
+      if(ncol(l$x) != ncol(l$y))
+        stop("Lengths of 'x' and 'y' differ.")
+    }
     
-    if(!is.null(l$x)) l$nelements <- nrow(l$x)
+    if(!is.null(l$x)) {
+      l$nelements <- nrow(l$x)
+      l$nsteps <- ncol(l$x)      
+    }
     
     l
   })
@@ -359,6 +365,22 @@ lc_line <- function(data, place = NULL, id = NULL, layerId = NULL) {
 #' @export
 lc_ribbon <- function(data, place = NULL, id = NULL, layerId = NULL) {
   setChart("pointRibbon", data, place, id, layerId, function(l) {
+    if(!is.null(l$x)) l$x <- t(as.matrix(l$x))
+    if(!is.null(l$ymax)) l$ymax <- t(as.matrix(l$ymax))
+    if(!is.null(l$ymin)) l$ymin <- t(as.matrix(l$ymin))
+    
+    if(!is.null(l$ymax) | !is.null(l$ymin) | !is.null(l$x)){
+      if((nrow(l$ymax) != nrow(l$ymin)) | (nrow(l$x) != nrow(l$ymin)))
+        stop("'x', 'ymax' and 'ymin' define different number of lines.")
+      if((ncol(l$ymax) != ncol(l$ymin)) | (ncol(l$x) != ncol(l$ymin)))
+        stop("Lengths of 'x', 'ymax' and 'ymin' differ.")
+    }
+    
+    if(!is.null(l$x)) {
+      l$nelements <- nrow(l$x)
+      l$nsteps <- ncol(l$x)      
+    }
+  
     l
   })
 }
