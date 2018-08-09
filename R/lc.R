@@ -5,7 +5,7 @@ lc <- new.env()
 lc$pageOpened <- F
 
 lc$props <- list(scatter = c("x", "y", "size", "stroke", "strokeWidth", "symbol", "symbolValue", "symbolLegendTitle"),
-                barchart = c("ngroups", "groupIds", "nbars", "barIds", "nstacks", "value", "groupWidth", "stroke", "strokeWidth"), 
+                barchart = c("ngroups", "groupIds", "nbars", "barIds", "nstacks", "stackIds", "value", "groupWidth", "stroke", "strokeWidth"), 
                 beeswarm = c("x", "y", "size", "stroke", "strokeWidth", "symbol", "symbolValue", "symbolLegendTitle", "valueAxis"),
                 pointLine = c("lineWidth", "dasharray", "x", "y", "nsteps"),
                 pointRibbon = c("lineWidth", "dasharray", "x", "ymax", "ymin", "nsteps"),
@@ -381,6 +381,62 @@ lc_ribbon <- function(data, place = NULL, id = NULL, layerId = NULL) {
       l$nsteps <- ncol(l$x)      
     }
   
+    l
+  })
+}
+
+
+#' @export
+lc_bars <- function(data, place = NULL, id = NULL, layerId = NULL) {
+  setChart("barchart", data, place, id, layerId, function(l) {
+    if(!is.null(l$barIds) && length(l$barIds) != length(l$value))
+      stop("Number of bar IDs is not equal to the number of provided values.")
+    if(!is.null(l$stackIds) && length(l$stackIds) != length(l$value))
+      stop("Number of stack IDs is not equal to the number of provided values.")
+    if(!is.null(l$groupIds) && length(l$groupIds) != length(l$value))
+      stop("Number of group IDs is not equal to the number of provided values.")
+
+    if(all(is.null(l$groupIds), is.null(l$barIds), is.null(l$stackIds)))
+      l$groupIds <- 1:length(l$value)
+    
+    if(is.null(l$groupIds)) l$groupIds <- rep(1, length(l$value))
+    if(is.null(l$barIds)) l$barIds <- rep(1, length(l$value))
+    if(is.null(l$stackIds)) l$stackIds <- rep(1, length(l$value))
+    
+    ngroups <- length(unique(l$groupIds))
+    nbars <- length(unique(l$barIds))
+    nstacks <- length(unique(l$stackIds))
+    
+    vals <- list()
+
+    for(i in 1:length(l$value)) {
+        
+      if(is.null(vals[[as.character(l$groupIds[i])]])) vals[[as.character(l$groupIds[i])]] <- list()
+      if(is.null(vals[[as.character(l$groupIds[i])]][[as.character(l$barIds[i])]])) 
+        vals[[as.character(l$groupIds[i])]][[as.character(l$barIds[i])]] <- list()
+        
+      vals[[as.character(l$groupIds[i])]][[as.character(l$barIds[i])]][[as.character(l$stackIds[i])]] <- l$value[i]
+    }
+    
+    l$value <- vals
+    l$groupIds <- unique(l$groupIds)
+    l$barIds <- unique(l$barIds)
+    l$stackIds <- unique(l$stackIds)
+    
+    l
+  })
+}
+
+#' @export
+lc_hist <- function(data, place = NULL, id = NULL, layerId = NULL) {
+  setChart("barchart", data, place, id, layerId, function(l) {
+    l
+  })
+}
+
+#' @export
+lc_dens <- function(data, place = NULL, id = NULL, layerId = NULL) {
+  setChart("barchart", data, place, id, layerId, function(l) {
     l
   })
 }
