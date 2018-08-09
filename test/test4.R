@@ -1,3 +1,5 @@
+library(rlc)
+
 load("test4.RData")
 
 resPvals <- apply(resPvals, 2, p.adjust, method = "BH")
@@ -21,3 +23,5 @@ lc_bars(dat(value = c(rep(inCommon, times = 2), values),
             groupIds = rep(c(colnames(resPvals), colnames(fitPvals)), times = 2), 
             stackIds = rep(c("in common", "not in common"), each = 10),
             height = 250))
+
+closePage()
