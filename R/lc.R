@@ -8,7 +8,7 @@ lc$props <- list(scatter = c("x", "y", "size", "stroke", "strokeWidth", "symbol"
                 barchart = c("ngroups", "groupIds", "nbars", "barIds", "nstacks", "stackIds", "value", "groupWidth", "stroke", "strokeWidth",
                              "nbins"), 
                 beeswarm = c("x", "y", "size", "stroke", "strokeWidth", "symbol", "symbolValue", "symbolLegendTitle", "valueAxis"),
-                pointLine = c("lineWidth", "dasharray", "x", "y", "nsteps"),
+                pointLine = c("lineWidth", "dasharray", "x", "y", "nsteps", "value"),
                 pointRibbon = c("lineWidth", "dasharray", "x", "ymax", "ymin", "nsteps"),
                 layer = c("nelements", "elementIds", "elementLabel", "layerDomainX", "layerDomainY", "contScaleX", "contScaleY",
                           "colour", "colourValue", "palette", "colourDomain", "colourLegendTitle", "addColourScaleToLegend", "opacity", "on_click",
@@ -342,44 +342,68 @@ lc_beeswarm <- function(data, place = NULL, id = NULL, layerId = NULL) {
   })
 }
 
-#' @export
-lc_line <- function(data, place = NULL, id = NULL, layerId = NULL) {
-  setChart("pointLine", data, place, id, layerId, function(l) {
-    if(!is.null(l$x)) l$x <- t(as.matrix(l$x))
-    if(!is.null(l$y)) l$y <- t(as.matrix(l$y))
-    if(!is.null(l$x) | !is.null(l$y)){
+lineDataFun <- function(l) {
+  if(!is.null(l$x) && !is.vector(l$x)) l$x <- as.matrix(l$x)
+  if(!is.null(l$y) && !is.vector(l$y)) l$y <- as.matrix(l$y)
+  if(!is.null(l$x) | !is.null(l$y)){
+    if(is.matrix(l$x)){
       if(nrow(l$x) != nrow(l$y))
         stop("'x' and 'y' define different number of lines.")
       if(ncol(l$x) != ncol(l$y))
         stop("Lengths of 'x' and 'y' differ.")
+      
+    } else {
+      if(length(l$x) != length(l$y))
+        stop("Lengths of 'x' and 'y' differ.")
     }
-    
-    if(!is.null(l$x)) {
-      l$nelements <- nrow(l$x)
-      l$nsteps <- ncol(l$x)      
+  }
+  
+  if(!is.null(l$x)) {
+    if(is.matrix(l$x)) {
+      l$nelements <- ncol(l$x)
+      l$nsteps <- nrow(l$x)      
+    } else {
+      l$nelements <- 1
+      l$nsteps <- length(l$x)
     }
-    
-    l
-  })
+  }
+  
+  l
+}
+
+#' @export
+lc_line <- function(data, place = NULL, id = NULL, layerId = NULL) {
+  setChart("pointLine", data, place, id, layerId, lineDataFun)
 }
 
 #' @export
 lc_ribbon <- function(data, place = NULL, id = NULL, layerId = NULL) {
   setChart("pointRibbon", data, place, id, layerId, function(l) {
-    if(!is.null(l$x)) l$x <- t(as.matrix(l$x))
-    if(!is.null(l$ymax)) l$ymax <- t(as.matrix(l$ymax))
-    if(!is.null(l$ymin)) l$ymin <- t(as.matrix(l$ymin))
+    if(!is.null(l$x) && !is.vector(l$x)) l$x <- as.matrix(l$x)
+    if(!is.null(l$ymax) && !is.vector(l$ymax)) l$ymax <- as.matrix(l$ymax)
+    if(!is.null(l$ymin) && !is.vector(l$ymin)) l$ymin <- as.matrix(l$ymin)
     
     if(!is.null(l$ymax) | !is.null(l$ymin) | !is.null(l$x)){
-      if((nrow(l$ymax) != nrow(l$ymin)) | (nrow(l$x) != nrow(l$ymin)))
-        stop("'x', 'ymax' and 'ymin' define different number of lines.")
-      if((ncol(l$ymax) != ncol(l$ymin)) | (ncol(l$x) != ncol(l$ymin)))
-        stop("Lengths of 'x', 'ymax' and 'ymin' differ.")
+      if(is.matrix(l$x)) {
+        if((nrow(l$ymax) != nrow(l$ymin)) | (nrow(l$x) != nrow(l$ymin)))
+          stop("'x', 'ymax' and 'ymin' define different number of lines.")
+        if((ncol(l$ymax) != ncol(l$ymin)) | (ncol(l$x) != ncol(l$ymin)))
+          stop("Lengths of 'x', 'ymax' and 'ymin' differ.")
+        
+      } else {
+        if(length(l$ymax) != length(l$ymin) | length(l$x) != length(l$ymin))
+          stop("Lengths of 'x', 'ymax' and 'ymin' differ.")
+      }
     }
     
     if(!is.null(l$x)) {
-      l$nelements <- nrow(l$x)
-      l$nsteps <- ncol(l$x)      
+      if(is.matrix(l$x)) {
+        l$nelements <- ncol(l$x)
+        l$nsteps <- nrow(l$x)      
+      } else {
+        l$nelements <- 1
+        l$nsteps <- length(l$x)
+      }
     }
   
     l
@@ -478,7 +502,13 @@ lc_hist <- function(data, place = NULL, id = NULL, layerId = NULL) {
 
 #' @export
 lc_dens <- function(data, place = NULL, id = NULL, layerId = NULL) {
-  setChart("barchart", data, place, id, layerId, function(l) {
-    l
+  setChart("pointLine", data, place, id, layerId, function(l) {
+    if(!is.null(l$value)) {
+      dens <- density.default(l$value)
+      l$x <- dens$x
+      l$y <- dens$y
+      l$value <- NULL
+    }
+    lineDataFun(l)
   })
 }
