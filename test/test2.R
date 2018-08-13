@@ -3,13 +3,11 @@ library(rlc)
 
 load("droplet_Kidney_seurat_tiss.Robj")
 
-plot( tiss@dr$tsne@cell.embeddings, asp=1, col=as.integer(tiss@ident) )
-
 distsFrom <- function(point) {
   sqrt(colSums((t(tiss@dr$pca@cell.embeddings) - tiss@dr$pca@cell.embeddings[point, ])^2))
 }
 
-clusts <- F
+clusts <- T
 activePoint <- 1
 
 lc_scatter(dat(x = tiss@dr$tsne@cell.embeddings[, 1], y = tiss@dr$tsne@cell.embeddings[, 2],

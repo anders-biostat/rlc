@@ -39,9 +39,9 @@ lc_scatter(dat(x = -log10(pvals$alt), y = -log10(pvals$res), nelements = nrow(ex
                }), place = "A1")
 lc_ribbon(dat(x = cbind(s, s), ymax = fitCurve(selGene) + 1.96 * fitCurve(selGene, ret = "se"),
               ymin = fitCurve(selGene) - 1.96 * fitCurve(selGene, ret = "se"), colourValue = c("Male", "Female"),
-              addColourScaleToLegend = F), 
+              addColourScaleToLegend = F, height = 300), 
           id = "expr", place = "A2")
-lc_scatter(dat(x = st$timePoint, y = exprs[selGene, ], colourValue = st$sex, height = 300), id = "expr")
+lc_scatter(dat(x = st$timePoint, y = exprs[selGene, ], colourValue = st$sex), id = "expr")
 lc_line(dat(x = cbind(s, s), y = fitCurve(selGene), colourValue = c("Male", "Female"), 
             addColourScaleToLegend = F), id = "expr")
 

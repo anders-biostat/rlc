@@ -2,10 +2,9 @@ library(rlc)
 
 load("test4.RData")
 
-resPvals <- apply(resPvals, 2, p.adjust, method = "BH")
 fitPvals <- apply(fitPvals, 2, p.adjust, method = "BH")
 
-lc_bars(dat(value = colSums(resPvals < 0.1, na.rm = T), height = 250))
+lc_bars(dat(value = colSums(resPvals < 0.01, na.rm = T), height = 250))
 
 lc_bars(dat(value = c(colSums(resPvals < 0.1, na.rm = T), colSums(fitPvals < 0.1, na.rm = T)), 
             barIds = rep(c("res", "fit"), each = 5),

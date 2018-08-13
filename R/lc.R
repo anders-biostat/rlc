@@ -512,3 +512,14 @@ lc_dens <- function(data, place = NULL, id = NULL, layerId = NULL) {
     lineDataFun(l)
   })
 }
+
+#' @export
+lc_heatmap <- function(data, place = NULL, id = NULL) {
+  setChart("heatmap", data, place, id, "main", function(l) {
+    if(!is.null(l$value)) {
+      l$nrows <- nrow(l$value)
+      l$ncols <- ncol(l$value)
+    }
+    l
+  })
+}
