@@ -523,3 +523,20 @@ lc_heatmap <- function(data, place = NULL, id = NULL) {
     l
   })
 }
+
+#' @export
+lc_colourSlider <- function(data, place = NULL, id = NULL) {
+  setChart("colourSlider", data, place, id, "main", function(l) {
+    if(!is.null(l$chart)) {
+      l$linkedChart <- str_c("charts.", l$chart)
+      if(is.null(l$layer) && getChart(l$chart)$nLayers() == 1) 
+        l$layer <- names(getChart(l$chart)$layers)[2]
+      if(!is.null(l$layer))
+        l$linkedChart <- str_c(l$linkedChart, ".layers.", l$layer)
+      
+    }
+    l$chart <- NULL
+    l$layer <- NULL
+    l
+  })
+}
