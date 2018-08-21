@@ -1,5 +1,9 @@
 library(rlc)
 
+#In this example is based on Tabula Muris data set.
+#https://www.biorxiv.org/content/early/2017/12/20/237446
+#`test1.RData` contains 
+
 load("test1.RData")
 
 pvals <- apply(counts, 1, function(row) {
@@ -11,7 +15,7 @@ log2Fold <- apply(counts, 1, function(row) {
 })
 
 selGene <- rownames(counts)[1]
-openPage(layout = "table1x2")
+openPage(layout = "table1x2", useViewer = F)
 
 lc_scatter(dat(x = log2Fold, y = -log10(pvals), colourValue = (padjs < 0.1), 
                size = 4, showLegend = F, elementLabel = rownames(counts), on_click = function(i) {

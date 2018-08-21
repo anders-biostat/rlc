@@ -9,7 +9,7 @@ distsFrom <- function(point) {
 
 clusts <- T
 activePoint <- 1
-
+openPage(useViewer = F)
 lc_scatter(dat(x = tiss@dr$tsne@cell.embeddings[, 1], y = tiss@dr$tsne@cell.embeddings[, 2],
                size = 4, width = 800, height = 800,
                colourValue = (if(clusts) as.character(tiss@ident) else distsFrom(activePoint)),
