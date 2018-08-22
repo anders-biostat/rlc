@@ -9,6 +9,8 @@ lc$props <- list(scatter = c("x", "y", "size", "stroke", "strokeWidth", "symbol"
                              "nbins"), 
                 beeswarm = c("x", "y", "size", "stroke", "strokeWidth", "symbol", "symbolValue", "symbolLegendTitle", "valueAxis"),
                 pointLine = c("lineWidth", "dasharray", "x", "y", "nsteps", "value"),
+                xLine = c("lineWidth", "dasharray", "lineFun", "nsteps", "a", "b", "h"),
+                yLine = c("lineWidth", "dasharray", "lineFun", "nsteps", "v"),
                 pointRibbon = c("lineWidth", "dasharray", "x", "ymax", "ymin", "nsteps"),
                 layer = c("nelements", "elementIds", "elementLabel", "layerDomainX", "layerDomainY", "contScaleX", "contScaleY",
                           "colour", "colourValue", "palette", "colourDomain", "colourLegendTitle", "addColourScaleToLegend", "opacity", "on_click",
@@ -540,3 +542,59 @@ lc_colourSlider <- function(data, place = NULL, id = NULL) {
     l
   })
 }
+
+#' @export
+lc_abLine <- function(data, place = NULL, id = NULL, layerId = NULL) {
+  setChart("xLine", data, place, id, layerId, function(l) {
+    if(is.null(l$a) || is.null(l$b))
+      stop("Required properties 'a' and 'b' are not defined.");
+    if(length(l$a) != length(l$b))
+      stop("Lengths of 'a' and 'b' differ.")
+    
+    l$a <- as.vector(l$a)
+    l$b <- as.vector(l$b)
+    
+    l$nelements <- length(l$a)
+    l$lineFun <- str_c("function(x, d) { a = ", toJSON(l$a, digits = NA), ";",
+                       "b = ", toJSON(l$b, digits = NA), ";", 
+                       "return a[d] * x + b[d]; }")
+    l$a <- NULL
+    l$b <- NULL
+    
+    l
+  })
+}
+  
+#' @export
+lc_hLine <- function(data, place = NULL, id = NULL, layerId = NULL) {
+  setChart("xLine", data, place, id, layerId, function(l) {
+    if(is.null(l$h))
+      stop("Required property 'h' is not defined.");
+
+    l$h <- as.vector(l$h)
+
+    l$nelements <- length(l$h)
+    l$lineFun <- str_c("function(x, d) { h = ", toJSON(l$h, digits = NA), ";",
+                         "return h[d]; }")
+    l$h <- NULL
+
+    l
+  })
+}
+
+#' @export
+lc_vLine <- function(data, place = NULL, id = NULL, layerId = NULL) {
+  setChart("yLine", data, place, id, layerId, function(l) {
+    if(is.null(l$v))
+      stop("Required property 'v' is not defined.");
+    
+    l$v <- as.vector(l$v)
+      
+    l$nelements <- length(l$v)
+    l$lineFun <- str_c("function(x, d) { v = ", toJSON(l$v, digits = NA), ";",
+                       "return v[d]; }")
+    l$v <- NULL
+        
+    l
+  })
+}      
