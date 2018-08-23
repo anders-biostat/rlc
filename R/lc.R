@@ -1,6 +1,5 @@
 #' @import JsRCom
 #' @import stringr
-#' @export
 lc <- new.env()
 lc$pageOpened <- F
 
@@ -330,17 +329,43 @@ closePage <- function() {
   JsRCom::closePage()
 }
 
+scatterDataFun <- function(l) {
+  if(is.null(l$x) && is.null(l$y))
+    stop("Required properties 'x' and 'y' are not defined.")
+  if(is.null(l$x))
+    l$x <- 1:length(l$y)
+  if(is.null(l$y))
+    l$y <- 1:length(l$x)
+  
+  if(is.null(l$elementLabel)){
+    if(!is.null(names(l$y)))
+      l$elementLabel <- names(l$y)
+    if(!is.null(names(l$x)))
+      l$elementLabel <- names(l$x)
+  }
+
+  l
+}
+
 #' @export
 lc_scatter <- function(data, place = NULL, id = NULL, layerId = NULL) {
-  setChart("scatter", data, place, id, layerId, function(l) {
-    l
-  })
+  setChart("scatter", data, place, id, layerId, scatterDataFun)
 }
 
 #' @export
 lc_beeswarm <- function(data, place = NULL, id = NULL, layerId = NULL) {
   setChart("beeswarm", data, place, id, layerId, function(l) {
-    l
+    if(is.null(l$x) || is.null(l$y))
+      stop("Required properties 'x' and 'y' are not defined.")
+
+    if(is.null(l$elementLabel)){
+      if(!is.null(names(l$y)))
+        l$elementLabel <- names(l$y)
+      if(!is.null(names(l$x)))
+        l$elementLabel <- names(l$x)
+    }
+    
+    l   
   })
 }
 
@@ -468,8 +493,8 @@ lc_bars <- function(data, place = NULL, id = NULL, layerId = NULL) {
 }
 
 #' @export
-# has a nbins property. Not implemented in JS
 lc_hist <- function(data, place = NULL, id = NULL, layerId = NULL) {
+  # has a nbins property. Not implemented in JS
   setChart("barchart", data, place, id, layerId, function(l) {
     if(is.null(l$nbins)) {
       nbins <- 10
@@ -544,6 +569,7 @@ lc_colourSlider <- function(data, place = NULL, id = NULL) {
 }
 
 #' @export
+#' @importFrom jsonlite toJSON
 lc_abLine <- function(data, place = NULL, id = NULL, layerId = NULL) {
   setChart("xLine", data, place, id, layerId, function(l) {
     if(is.null(l$a) || is.null(l$b))
