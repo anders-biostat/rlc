@@ -34,7 +34,7 @@ Chart$methods(
                  " Use 'chart$removeLayer(layerId)' to remove it."))
     
     layers[[layerId]] <<- Layer$new(type = type, id = layerId, properties = list(), init = F,
-                                    dataFun = function(l) l)
+                                    dataFun = function(l) l, on_click = function(d) NULL)
     layers[[layerId]]
   },
   getLayer = function(layerId = NULL) {
@@ -80,6 +80,9 @@ lc$charts <- list()
 #' @export
 #' @importFrom later run_now
 openPage <- function(useViewer = T, rootDirectory = NULL, startPage = NULL, layout = NULL) {
+  
+  lc$charts <- list()
+  lc$pageOpened <- F  
   JsRCom::openPage(useViewer = useViewer, rootDirectory = rootDirectory, startPage = startPage)
   srcDir <- system.file("http_root", package = "rlc")
 
@@ -305,11 +308,11 @@ chartEvent <- function(d, id, layerId, event) {
   if(is.null(layer))
     stop(str_interp("Chart ${id} doesn't have layer ${layerId}"))
 
-  if(event == "click" & !is.null(layer$on_click))
+  if(event == "click")
     layer$on_click(d)
-  if(event == "mouseover" & !is.null(layer$on_mouseover))
+  if(event == "mouseover")
     layer$on_mouseover(d)
-  if(event == "mouseout" & !is.null(layer$on_mouseout))
+  if(event == "mouseout")
     layer$on_mouseout(d)
 }
 
