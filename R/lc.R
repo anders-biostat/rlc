@@ -13,12 +13,13 @@ lc$props <- list(scatter = c("x", "y", "size", "stroke", "strokeWidth", "symbol"
                 pointRibbon = c("lineWidth", "dasharray", "x", "ymax", "ymin", "nsteps"),
                 layer = c("nelements", "elementIds", "elementLabel", "layerDomainX", "layerDomainY", "contScaleX", "contScaleY",
                           "colour", "colourValue", "palette", "colourDomain", "colourLegendTitle", "addColourScaleToLegend", "opacity", "on_click",
-                          "informText", "elementMouseOver", "elementMouseOut"))
+                          "informText", "elementMouseOver", "elementMouseOut", "markedUpdated"))
 
 Layer <- setRefClass("Layer", fields = list(type = "character", id = "character", 
                                             properties = "list", dataFun = "function",
                                             on_click = "function", on_mouseover = "function",
-                                            on_mouseout = "function", init = "logical"))
+                                            on_mouseout = "function", init = "logical",
+                                            markedUpdated = "function"))
 Layer$methods(
   setProperty = function(name, expr) {
     properties[[name]] <<- expr
@@ -56,7 +57,7 @@ Chart$methods(
       if(layerId %in% names(layers)) {
         stop(str_c("There is no layer with ID ", layerId))
       } else {
-        sendCommands(str_interp("rlc.removeLayer('${id}, '${layerId}')"))
+        sendCommands(str_interp("rlc.removeLayer('${id}', '${layerId}')"))
         layers[[layerId]] <<- NULL
       }
     }
@@ -244,17 +245,23 @@ sendProperties <- function(chart, layerId = ls(chart$layers)){
     
     if(!is.null(d$on_click)) {
       layer$on_click <- d$on_click
-      d$on_click = NULL
+      d$on_click <- NULL
+    }
+    
+    if(!is.null(d$markedUpdated)) {
+      layer$markedUpdated <- d$markedUpdated
+      d$maekedUpdated <- NULL
+      sendCommand(str_interp("rlc.setCustomMarkedUpdated('${chart$id}', '${layerName}');"))
     }
     
     if(!is.null(d$elementMouseOver)) {
       layer$on_mouseover <- d$elementMouseOver
-      d$elementMouseOver = NULL
+      d$elementMouseOver <- NULL
       sendCommand(str_interp("rlc.setCustomMouseOver('${chart$id}', '${layerName}');"))
     }
     if(!is.null(d$elementMouseOver)) {
       layer$on_mouseout <- d$elementMouseOut
-      d$elementMouseOut = NULL
+      d$elementMouseOut <- NULL
       sendCommand(str_interp("rlc.setCustomMouseOut('${chart$id}', '${layerName}');"))
     }    
     
@@ -313,7 +320,42 @@ chartEvent <- function(d, id, layerId, event) {
   if(event == "mouseover")
     layer$on_mouseover(d)
   if(event == "mouseout")
-    layer$on_mouseout(d)
+    layer$on_mouseout()
+  if(event == "markedUpdated")
+    layer$markedUpdated()
+}
+
+#' @export
+getMarked <- function(chartId, layerId = NULL) {
+  chart <- getChart(chartId)
+  if(is.null(chart))
+    stop(str_c("Chart ", chartId, " is not defined."))
+  
+  if(is.null(layerId)) {
+    if(chart$nLayers() == 0)
+      layerId <- "main"
+    if(chart$nLayers() == 1)
+      layerId <- names(chart$layers)[2]
+    if(chart$nLayers() > 1)
+      stop("'layerId' is not defined")
+  }
+  marked <- NULL
+  setEnvironment(environment()) 
+  sendCommand(str_interp("rlc.getMarked('${chartId}', '${layerId}')"))
+  for( i in 1:(10/0.05) ) {
+    run_now()
+    if(!is.null(marked)) {
+      setEnvironment(globalenv())
+      break
+    } 
+    Sys.sleep( .05 )
+  }
+  
+  if( is.null(marked) ) {
+    warning( "Can't load marked elements" )
+  }
+  
+  marked
 }
 
 #' @export

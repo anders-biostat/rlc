@@ -57,14 +57,50 @@ rlc.addChart = function(id, type, place, layerId) {
 
 rlc.setCustomMouseOver = function(id, layerId) {
   if(!charts[id].customMouseOver){
-    var pacer = lc.call_pacer(100);
-    charts[id].get_layer(layerId)
-      .elementMouseOver(function(d) {
-        pacer.do(function() {jrc.sendCommand("chartEvent("+ d + ", '" + id + "', '" + layerId + "', 'mouseover')")});
-      })
+    if(layerId != "main")
+      charts[id].get_layer(layerId)
+        .elementMouseOver(function(d) {
+          jrc.sendCommand("chartEvent("+ d + ", '" + id + "', '" + layerId + "', 'mouseover')");
+        })
+    else
+      charts[id]
+        .elementMouseOver(function(d) {
+          jrc.sendCommand("chartEvent("+ d + ", '" + id + "', '" + layerId + "', 'mouseover')");
+        });      
     charts[id].customMouseOver = true;
   }
+}
 
+rlc.setCustomMouseOut = function(id, layerId) {
+  if(!charts[id].customMouseOut){
+    if(layerId != "main")
+      charts[id].get_layer(layerId)
+        .elementMouseOut(function() {
+          jrc.sendCommand("chartEvent(NULL, '" + id + "', '" + layerId + "', 'mouseout')");
+        })
+    else
+      charts[id]
+        .elementMouseOut(function(d) {
+          jrc.sendCommand("chartEvent(NULL, '" + id + "', '" + layerId + "', 'mouseout')");
+        });      
+    charts[id].customMouseOut = true;
+  }
+}
+
+rlc.setCustomMarkedUpdated = function(id, layerId) {
+  if(!charts[id].customMarkedUpdated){
+    if(layerId != "main")
+      charts[id].get_layer(layerId)
+        .markedUpdated(function() {
+          jrc.sendCommand("chartEvent(NULL, '" + id + "', '" + layerId + "', 'markedUpdated')");
+        })
+    else
+      charts[id]
+        .markedUpdated(function(d) {
+          jrc.sendCommand("chartEvent(NULL, '" + id + "', '" + layerId + "', 'markedUpdated')");
+        });      
+    charts[id].customMarkedUpdated = true;
+  }
 }
 
 rlc.setProperty = function(name) {
@@ -79,6 +115,22 @@ rlc.setProperty = function(name) {
       charts[id][pr](window[name][pr]);
   }
   window[name] = null;
+}
+
+rlc.getMarked = function(id, layerId) {
+  var marked;
+  if(!charts[id])
+    throw "Error in 'rlc.getMarked': there is no chart with ID " + id;
+
+  if(layerId == "main")
+    marked = charts[id].get_marked()
+  else
+    marked = charts[id].get_layer(layerId).get_marked();
+
+  if(marked.empty)
+    marked = marked.data();
+
+  jrc.sendData("marked", marked);
 }
 
 rlc.updateChart = function(id, updateType, layerId) {
