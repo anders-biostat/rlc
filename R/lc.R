@@ -307,6 +307,8 @@ setChart <- function(type, data, place, id, layerId, dataFun) {
 #' @export
 chartEvent <- function(d, id, layerId, event) {
   
+  if(is.numeric(d)) d <- d + 1 
+  
   chart <- getChart(id)
   if(is.null(chart))
     stop(str_interp("Chart with ID ${id} is not defined"))
@@ -354,6 +356,8 @@ getMarked <- function(chartId, layerId = NULL) {
   if( is.null(marked) ) {
     warning( "Can't load marked elements" )
   }
+  
+  if(is.numeric(marked)) marked <- marked + 1
   
   marked
 }
@@ -668,4 +672,15 @@ lc_vLine <- function(data, place = NULL, id = NULL, layerId = NULL) {
         
     l
   })
-}      
+}
+
+#' @export
+#' @importFrom hwriter hwrite
+lc_html <- function(code = "", place = "undefined", append = F) {
+  append <- ifelse(append, "true", "false")
+  if(!is.character(code) || length(code) != 1)
+    code <- hwrite(code)
+  
+  code <- gsub("[\r\n]", "", code)
+  sendCommand(str_c("rlc.html('", code, "', '", place, "', ", append, ")"))
+}
