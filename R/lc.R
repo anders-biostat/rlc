@@ -403,12 +403,12 @@ scatterDataFun <- function(l) {
 }
 
 #' @export
-lc_scatter <- function(data, place = NULL, id = NULL, layerId = NULL, parcerStep = NULL) {
+lc_scatter <- function(data, place = NULL, id = NULL, layerId = NULL, parcerStep = 50) {
   setChart("scatter", data, place, id, layerId, scatterDataFun, parcerStep)
 }
 
 #' @export
-lc_beeswarm <- function(data, place = NULL, id = NULL, layerId = NULL) {
+lc_beeswarm <- function(data, place = NULL, id = NULL, layerId = NULL, parcerStep = 50) {
   setChart("beeswarm", data, place, id, layerId, function(l) {
     if(is.null(l$x) || is.null(l$y))
       stop("Required properties 'x' and 'y' are not defined.")
@@ -424,7 +424,7 @@ lc_beeswarm <- function(data, place = NULL, id = NULL, layerId = NULL) {
       l$mode <- "svg"    
     
     l   
-  })
+  }, parcerStep)
 }
 
 lineDataFun <- function(l) {

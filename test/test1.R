@@ -15,7 +15,7 @@ log2Fold <- apply(counts, 1, function(row) {
 })
 
 selGene <- rownames(counts)[1]
-openPage(layout = "table1x2", useViewer = F)
+openPage(layout = "table1x2")
 
 lc_scatter(dat(x = log2Fold, y = -log10(pvals), colourValue = (padjs < 0.1), 
                size = 4, showLegend = F, elementLabel = rownames(counts), on_click = function(i) {
