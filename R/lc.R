@@ -19,7 +19,7 @@ Layer <- setRefClass("Layer", fields = list(type = "character", id = "character"
                                             properties = "list", dataFun = "function",
                                             on_click = "function", on_mouseover = "function",
                                             on_mouseout = "function", init = "logical",
-                                            markedUpdated = "function"))
+                                            markedUpdated = "function", parcerStep = "numeric"))
 Layer$methods(
   setProperty = function(name, expr) {
     properties[[name]] <<- expr
@@ -83,7 +83,8 @@ lc$charts <- list()
 openPage <- function(useViewer = T, rootDirectory = NULL, startPage = NULL, layout = NULL) {
   
   lc$charts <- list()
-  lc$pageOpened <- F  
+  lc$pageOpened <- F
+  lc$useViewer <- useViewer
   JsRCom::openPage(useViewer = useViewer, rootDirectory = rootDirectory, startPage = startPage)
   srcDir <- system.file("http_root", package = "rlc")
 
@@ -257,7 +258,7 @@ sendProperties <- function(chart, layerId = ls(chart$layers)){
     if(!is.null(d$elementMouseOver)) {
       layer$on_mouseover <- d$elementMouseOver
       d$elementMouseOver <- NULL
-      sendCommand(str_interp("rlc.setCustomMouseOver('${chart$id}', '${layerName}');"))
+      sendCommand(str_interp("rlc.setCustomMouseOver('${chart$id}', '${layerName}', ${layer$parcerStep});"))
     }
     if(!is.null(d$elementMouseOver)) {
       layer$on_mouseout <- d$elementMouseOut
@@ -272,7 +273,7 @@ sendProperties <- function(chart, layerId = ls(chart$layers)){
   }
 }
 
-setChart <- function(type, data, place, id, layerId, dataFun) {
+setChart <- function(type, data, place, id, layerId, dataFun, parcerStep = 50) {
   if(!lc$pageOpened) openPage()
   
   if(is.null(place))
@@ -295,6 +296,8 @@ setChart <- function(type, data, place, id, layerId, dataFun) {
 
   layer <- chart$addLayer(layerId, type)
   layer$dataFun <- dataFun
+  
+  layer$parcerStep <- parcerStep
   
   chart$JSinitialize()
   
@@ -392,13 +395,16 @@ scatterDataFun <- function(l) {
     if(!is.null(names(l$x)))
       l$elementLabel <- names(l$x)
   }
+  
+  if(lc$useViewer)
+    l$mode <- "svg"
 
   l
 }
 
 #' @export
-lc_scatter <- function(data, place = NULL, id = NULL, layerId = NULL) {
-  setChart("scatter", data, place, id, layerId, scatterDataFun)
+lc_scatter <- function(data, place = NULL, id = NULL, layerId = NULL, parcerStep = NULL) {
+  setChart("scatter", data, place, id, layerId, scatterDataFun, parcerStep)
 }
 
 #' @export
@@ -413,6 +419,9 @@ lc_beeswarm <- function(data, place = NULL, id = NULL, layerId = NULL) {
       if(!is.null(names(l$x)))
         l$elementLabel <- names(l$x)
     }
+    
+    if(lc$useViewer)
+      l$mode <- "svg"    
     
     l   
   })

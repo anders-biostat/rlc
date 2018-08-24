@@ -55,17 +55,19 @@ rlc.addChart = function(id, type, place, layerId) {
     }
 }
 
-rlc.setCustomMouseOver = function(id, layerId) {
+rlc.setCustomMouseOver = function(id, layerId, parcerStep) {
   if(!charts[id].customMouseOver){
+    var pacer = lc.call_pacer(parcerStep); 
+
     if(layerId != "main")
       charts[id].get_layer(layerId)
         .elementMouseOver(function(d) {
-          jrc.sendCommand("chartEvent("+ d + ", '" + id + "', '" + layerId + "', 'mouseover')");
+          pacer.do(function() {jrc.sendCommand("chartEvent("+ d + ", '" + id + "', '" + layerId + "', 'mouseover')")}); 
         })
     else
       charts[id]
         .elementMouseOver(function(d) {
-          jrc.sendCommand("chartEvent("+ d + ", '" + id + "', '" + layerId + "', 'mouseover')");
+          pacer.do(function() {jrc.sendCommand("chartEvent("+ d + ", '" + id + "', '" + layerId + "', 'mouseover')")}); 
         });      
     charts[id].customMouseOver = true;
   }
