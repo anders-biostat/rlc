@@ -86,7 +86,7 @@ openPage <- function(useViewer = T, rootDirectory = NULL, startPage = NULL, layo
   lc$pageOpened <- F
   lc$useViewer <- useViewer
   JsRCom::openPage(useViewer = useViewer, rootDirectory = rootDirectory, startPage = startPage)
-  srcDir <- system.file("http_root", package = "rlc")
+  srcDir <- "http_root_rlc"
 
   scriptCount <- 0
   setEnvironment(environment())

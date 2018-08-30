@@ -44,10 +44,9 @@ rlc.addChart = function(id, type, place, layerId) {
   charts[id] = lc[type](layerId, charts[id]);
   if(charts[id].on_click)
     charts[id].on_click(function(d) {
-      if(Array.isArray(d)){
+      if(Array.isArray(d))
         d = "c(" + d + ")";
-        jrc.sendCommand("chartEvent("+ d + ", '" + id + "', '" + layerId + "', 'click')");
-      }
+      jrc.sendCommand("chartEvent("+ d + ", '" + id + "', '" + layerId + "', 'click')");
     });
   if(layerId == "main")
     charts[id].placeIn = place
