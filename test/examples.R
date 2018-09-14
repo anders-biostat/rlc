@@ -1,0 +1,29 @@
+data(iris)
+
+#store some properties in global variables
+width <- 300
+height <- 300
+colour <- iris$Sepal.Width
+#create a chart
+lc_scatter(dat(x = iris$Sepal.Length, y = iris$Petal.Length, colourValue = colour,
+               width = width, height = height), id = "iris")
+
+#change the variables
+height <- 400
+colour <- iris$Petal.Width
+
+#this will change colour of points and chart height
+updateChart("iris")
+#this will change only height
+updateChart("iris", updateType = "Size")
+
+#add another property
+setProperties(dat(symbolValue = iris$Species), "iris")
+#this will change only colour and symbols
+updateChart("iris", updateType = "ElementStyle")
+
+#let's subsample the points
+showPoints <- sample(nrow(iris), 60)
+#add another property
+setProperties(dat(x = iris$Sepal.Length[showPoints], y = iris$Petal.Length[showPoints]), "iris")
+updateChart("iris", updateType = "Elements")

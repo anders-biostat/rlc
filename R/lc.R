@@ -78,6 +78,31 @@ Chart$methods(
 Chart$accessors("place")
 lc$charts <- list()
 
+#' Open a new empty page
+#' 
+#' \code{openPage} creates a server, establishes a websocket connection between it and the current
+#' R session and loads linked-charts JS library with all the dependencies. If there is already an 
+#' opened page, it will be automatically closed.
+#' 
+#' @param useViewer If \code{TRUE}, the page will be opened in the RStudio Viewer. If \code{FALSE}
+#' a default web browser will be used.
+#' @param rootDirectory A path to the root directory of the server. If \code{rootDirectory} is not 
+#' defined, the \code{http_root} in the package directory will be used as a root directory.
+#' @param startPage A path to the HTML file that should be opened, when the server is initialised.
+#' This can be an absolute path to a local file, or it can be relative from the \code{rootDirectory}
+#' or to the current R working directory. If \code{startPage} is not defined, this function opens an 
+#' empty HTML page. The file must have \emph{.html} extension.
+#' @param layout Adds one of the defaults layouts to the page. Currently, only tables of arbitrary 
+#' size are supported. To add a table set this parameter to \code{tableNxM}, where \code{N} is the
+#' number of rows and \code{M} is the number of columns. Each cell will get an ID that consists of 
+#' a letter (inticating the row) and a number (indicating the column) (e.g. \code{B3} is an ID of 
+#' the second row and third column).
+#' 
+#' @examples
+#' openPage()
+#' 
+#' openPage(useViewer = F, layout = "table2x3")
+#' 
 #' @export
 #' @importFrom later run_now
 openPage <- function(useViewer = T, rootDirectory = NULL, startPage = NULL, layout = NULL) {
@@ -122,6 +147,23 @@ openPage <- function(useViewer = T, rootDirectory = NULL, startPage = NULL, layo
   lc$pageOpened <- T
 }
 
+#' Add a default layout to the opened web page
+#' 
+#' \code{addDefaultLayout} adds a layout that can be later used to arrange charts on the page (by
+#' default each new chart is added to the bottom of the page).
+#' 
+#' Currently the only supported type
+#' of a default layout is table with arbitrary number of rows and columns.
+#' To use it set the layout argument to \code{tableMxN}, where \code{N} is the
+#' number of rows and \code{M} is the number of columns. Each cell will get an ID that consists of 
+#' a letter (inticating the row) and a number (indicating the column) (e.g. \code{B3} is an ID of 
+#' the second row and third column).
+#' 
+#' @param layout Type of the layout. See 'Details' for more information.
+#' 
+#' @examples 
+#' addDefaultLayout("table3x2")
+#' 
 #' @export
 addDefaultLayout <- function(layoutName) {
   if(grepl("^table", layoutName)){
@@ -143,6 +185,16 @@ getChart <- function(id) {
   lc$charts[[id]]
 }
 
+#' Remove cahrt from the page
+#' 
+#' Removes an existing chart.
+#' 
+#' @param id A vector of IDs of the charts to be removed.
+#' 
+#' @examples 
+#' lc_scatter(dat(x = 1:10, y = 1:10 * 2), id = "scatter")
+#' removeChart("scatter") 
+#' 
 #' @export
 removeChart <- function(id) {
   if(!is.vector(id))
@@ -162,6 +214,27 @@ addChart <- function(id, place) {
   invisible(chart)
 }
 
+#' Set properties of the chart
+#' 
+#' Changes already defined properties or sets the new ones for an
+#' existing chart.
+#' 
+#' @param data Set of properties to be redefined for this layer or chart. Created by \code{\link{dat}}
+#' function.
+#' @param id ID of the chart, whose properties you want to redefine.
+#' @param layerId ID of the layer, whose properties you want to redefine. If the chart has a single
+#' layer or doesn't have layers, default value (which is NULL) can be used.
+#' 
+#' @examples
+#' data("iris")
+#' lc_scatter(dat(x = iris$Sepal.Length, y = iris$Sepal.Width), id = "irisScatter")
+#' setProperties(dat(symbolValue = iris$Species, y = iris$Petal.Length), id = "irisScatter")
+#' updateChart("irisScatter")
+#' 
+#' lc_line(dat(x = iris$Sepal.Length, y = iris$Petal.Length), id = "irisScatter", layerId = "line")
+#' setProperties(dat(colour = "red"), id = "irisScatter", layerId = "line")
+#' updateChart("irisScatter")
+#' 
 #' @export
 setProperties <- function(data, id, layerId = NULL) {
   chart <- getChart(id)
@@ -169,7 +242,7 @@ setProperties <- function(data, id, layerId = NULL) {
     stop(str_c("Chart with ID ", id, " is not defined."))
   
   if(is.null(layerId))
-    if(chart$getLayer("main")$type != "layerChart") {
+    if(chart$getLayer("main")$type != "axesChart") {
       layerId <- "main"
     } else {
       if(chart$nLayers() == 1) {
@@ -195,6 +268,103 @@ setProperties <- function(data, id, layerId = NULL) {
   invisible(chart)
 }
 
+#' Update a chart
+#' 
+#' \code{updateChart} redraws a chart or a single layer of the chart to make it up
+#' to date with current state of the environment.
+#' 
+#' Linked charts of the \emph{rlc} package are based on the idea that variables
+#' used to define the chart are not constant, but can change as a result of user's
+#' actions. Each time the \code{updateChart} is called, all the properties passed
+#' via \code{\link{dat}} function are reevaluated and cahrt is changed in accordance with the
+#' new state.
+#' 
+#' @section Update types
+#' 
+#' Defining a type of update allows you to change only some aspects of the chart
+#' which may improve the performance speed. 
+#' 
+#' Some of the update types are valid for all the charts:
+#' 
+#' \itemize {
+#'   \item \code{Size} changes the size of the chart (and consequently the location
+#'   of all its elements).
+#'   \item \code{Title} changes 
+#'   \item \code{Canvas}. If number of elements is too high the 
+#'   charts switch to the canvas mode and istead of multiple SVG point or cells
+#'   a single Canvas image is generated. This type of update redraws the Canvas
+#'   image. \emph{It is not recommended to use this function.}
+#' }
+#' 
+#' These types are specific for heatmaps only (\code{\link{lc_heatmap}}):
+#' \itemize {
+#'   \item \code{Labels} adds new row and column labels and removes those that are no longer
+#'   needed. Also updates \code{Cells}.
+#'   \item \code{Cells} adds new cells and removes those that are no longer needed.
+#'   Also updates \code{Texts} if necessary.
+#'   \item \code{Texts} adds or remove text inside cells where needed.
+#'   \item \code{LabelPosition} updates coordinates of all existing row and column labels.
+#'   Also updates \code{CellPosition}.
+#'   \item \code{CellPosition} updates coordinates of all existing cells. Also 
+#'   updates \code{TextPosition} if necessary.
+#'   \item \code{LabelText} updates text of all existing labels.
+#'   \item \code{CellColour} updates colour of all existing cells. Also
+#'   updates \code{TextValues} if necessary.
+#'   \item \code{TextValues} updates text inside cells to make it up to date with current
+#'   data values.
+#' }
+#' 
+#' These types are valid for all other types of charts except heatmaps.
+#' \itemize{
+#'   \item \code{Axes} updates axes of the chart and changes positions 
+#'   of all the elements accordingly.
+#'   \item \code{Elements} updates (add or removes) all the elements of the layer.
+#'   \item \code{ElementPosition} updates positions of all the elements in the layer.
+#'   \item \code{ElementStyle} updates the style (colour, opacity, etc.) of all the elements 
+#'   of the layer.
+#' }
+#' 
+#' 
+#' @param id An ID of the cahrt to be updated (or vector of IDs). If NULL then all the
+#' existing charts will be updated.
+#' 
+#' @param layerId An ID of the layer to be updated (or vector of IDs). If NULL of the
+#' layers of the selected charts will be updated. To update only the selected layers of
+#' multiple charts the lengths of \code{id} and \code{layerId} must be the same.
+#' 
+#' @param updateType To improve performance it may be useful to change only certain 
+#' aspects of the chart (e.g. location of the points, colour of the heatmap cells,
+#' etc.). This argument can specify which part of chart to update. Possible options are
+#' \code{Elements}, \code{ElementPosition}, \code{ElementStyle}, \code{Axes}, \code{Labels},
+#' \code{Cells}, \code{Texts}, \code{LabelPosition}, \code{CellPosition}, 
+#' \code{TextPosition}, \code{LabelText}, \code{CellColour}, \code{TextValues},
+#' \code{Canvas}, \code{Size}. See details for more information.
+#' 
+#' @examples
+#' data(iris)
+#'
+#' #store some properties in global variables
+#' width <- 300
+#' height <- 300
+#' colour <- iris$Sepal.Width
+#' #create a chart
+#' lc_scatter(dat(x = iris$Sepal.Length, y = iris$Petal.Length, colourValue = colour,
+#'                width = width, height = height), id = "iris")
+#' 
+#' #change the variables
+#' height <- 400
+#' colour <- iris$Petal.Width
+#' 
+#' #this will change colour of points and chart height
+#' updateChart("iris")
+#' #this will change only height
+#' updateChart("iris", updateType = "Size")
+#' 
+#' #add another property
+#' setProperties(dat(symbolValue = iris$Species), "iris")
+#' #this will change only colour and symbols
+#' updateChart("iris", updateType = "ElementStyle")
+#' 
 #' @export
 updateChart <- function(id = NULL, layerId = NULL, updateType = NULL) {
   if(is.null(id)) id <- ls(lc$charts)
@@ -307,7 +477,6 @@ setChart <- function(type, data, place, id, layerId, dataFun, parcerStep = 50) {
   invisible(chart)
 }
 
-#' @export
 chartEvent <- function(d, id, layerId, event) {
   
   if(is.numeric(d)) d <- d + 1 
@@ -330,6 +499,29 @@ chartEvent <- function(d, id, layerId, event) {
     layer$markedUpdated()
 }
 
+#' Get currently marked elements
+#' 
+#' \code{getMarked} returns indices of the chart's elements that are currently
+#' marked. To mark elements select them with you mouse while pressing the \emph{Shift} key.
+#' Double click on the chart while pressing the \emph{Shift} key will unmark all the 
+#' elements.
+#' 
+#' @param chartId An ID of the chart.
+#' @param layerId An ID of the layer. This argument is required, if the chart has more
+#' than one layer.
+#' 
+#' @retrun a vector of indices or, in case of heatmaps, an \emph{n x 2} matrix were first and
+#' second columns contain, respectively, row and colunm indices of the marked cells.
+#' 
+#' @examples
+#' data(iris)
+#' 
+#' lc_scatter(dat(x = iris$Sepal.Length, y = iris$Petal.Length))
+#' 
+#' #now mark some points by selecting them with your mouse with Shift pressed
+#' 
+#' getMarked("Chart1")
+#' 
 #' @export
 getMarked <- function(chartId, layerId = NULL) {
   chart <- getChart(chartId)
@@ -365,6 +557,7 @@ getMarked <- function(chartId, layerId = NULL) {
   marked
 }
 
+#' 
 #' @export
 dat <- function( ... ) {
   e <- parent.frame()
@@ -374,6 +567,14 @@ dat <- function( ... ) {
   })
 }
 
+#' Close page
+#' 
+#' Close an opened web page and clear the list of charts.
+#' 
+#' @examples 
+#' openPage(useViewer = F)
+#' closePage()
+#' 
 #' @export
 closePage <- function() {
   lc$charts <- list()
@@ -402,6 +603,8 @@ scatterDataFun <- function(l) {
   l
 }
 
+#' Scatter chart
+#' 
 #' @export
 lc_scatter <- function(data, place = NULL, id = NULL, layerId = NULL, parcerStep = 50) {
   setChart("scatter", data, place, id, layerId, scatterDataFun, parcerStep)
@@ -427,30 +630,37 @@ lc_beeswarm <- function(data, place = NULL, id = NULL, layerId = NULL, parcerSte
   }, parcerStep)
 }
 
+#TO DO: Add grouping
 lineDataFun <- function(l) {
-  if(!is.null(l$x) && !is.vector(l$x)) l$x <- as.matrix(l$x)
-  if(!is.null(l$y) && !is.vector(l$y)) l$y <- as.matrix(l$y)
-  if(!is.null(l$x) | !is.null(l$y)){
-    if(is.matrix(l$x)){
-      if(nrow(l$x) != nrow(l$y))
-        stop("'x' and 'y' define different number of lines.")
-      if(ncol(l$x) != ncol(l$y))
-        stop("Lengths of 'x' and 'y' differ.")
-      
-    } else {
-      if(length(l$x) != length(l$y))
-        stop("Lengths of 'x' and 'y' differ.")
-    }
-  }
+  if(is.null(l$x) && is.null(l$y))
+    stop("Required properties 'x' and 'y' are missing.")
   
+  if(!is.null(l$x)) l$x <- as.matrix(l$x)
+  if(!is.null(l$y)) l$y <- as.matrix(l$y)
+
+  if(is.null(l$y))
+    l$y <- matrix(rep(1:nrow(l$x), ncol(l$x)), nrow = ncol(l$x))
+  if(is.null(l$x))
+    l$x <- matrix(rep(1:nrow(l$y), ncol(l$y)), nrow = ncol(l$y))
+
+  if(!is.matrix(l$x) || !is.matrix(l$y))
+    stop("One of the properties 'x' or 'y' can not be converted into matrix")
+
+  if(nrow(l$x) != nrow(l$y))
+    stop("Lengths of 'x' and 'y' differ.")
+  
+  if(ncol(l$x) != ncol(l$y)){
+    if(ncol(l$x) == 1)
+      l$x <- matrix(rep(l$x, ncol(l$y)), ncol = ncol(l$y))
+    if(ncol(l$y) == 1)
+      l$y <- matrix(rep(l$y, ncol(l$x)), ncol = ncol(l$x))
+    if(ncol(l$x) != ncol(l$y))
+      stop("'x' and 'y' define different number of lines.")
+  }
+    
   if(!is.null(l$x)) {
-    if(is.matrix(l$x)) {
-      l$nelements <- ncol(l$x)
-      l$nsteps <- nrow(l$x)      
-    } else {
-      l$nelements <- 1
-      l$nsteps <- length(l$x)
-    }
+    l$nelements <- ncol(l$x)
+    l$nsteps <- nrow(l$x)      
   }
   
   l
@@ -458,6 +668,21 @@ lineDataFun <- function(l) {
 
 #' @export
 lc_line <- function(data, place = NULL, id = NULL, layerId = NULL) {
+  setChart("pointLine", data, place, id, layerId, 
+           function(l) {
+             l <- lineDataFun(l)
+             
+             for(i in 1:ncol(l$x)) {
+               l$y[, i] <- l$y[order(l$x[, i]), i]
+               l$x[, i] <- l$x[order(l$x[, i]), i]
+             }
+             
+             l
+           })
+}
+
+#' @export
+lc_path <- function(data, place = NULL, id = NULL, layerId = NULL) {
   setChart("pointLine", data, place, id, layerId, lineDataFun)
 }
 
