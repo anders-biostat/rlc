@@ -22,8 +22,13 @@ setProperties(dat(symbolValue = iris$Species), "iris")
 #this will change only colour and symbols
 updateChart("iris", updateType = "ElementStyle")
 
-#let's subsample the points
-showPoints <- sample(nrow(iris), 60)
-#add another property
-setProperties(dat(x = iris$Sepal.Length[showPoints], y = iris$Petal.Length[showPoints]), "iris")
-updateChart("iris", updateType = "Elements")
+a <- 1
+b <- 1
+lc_abLine(dat(a = a, b = b), id = "iris")
+
+b <- 0
+updateChart("iris", "Layer2")
+
+
+lc_scatter(dat(x = 1:10, y = 1:10, colourValue = 1:10 * 10^-20))
+lc_html("abcde\", ''' ljlkj")

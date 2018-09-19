@@ -12,6 +12,10 @@ getMarked(chartId, layerId = NULL)
 \item{layerId}{An ID of the layer. This argument is required, if the chart has more
 than one layer.}
 }
+\value{
+a vector of indices or, in case of heatmaps, an \emph{n x 2} matrix were first and
+second columns contain, respectively, row and colunm indices of the marked cells.
+}
 \description{
 \code{getMarked} returns indices of the chart's elements that are currently
 marked. To mark elements select them with you mouse while pressing the \emph{Shift} key.

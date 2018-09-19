@@ -46,7 +46,7 @@ rlc.addChart = function(id, type, place, layerId) {
     charts[id].on_click(function(d) {
       if(Array.isArray(d))
         d = "c(" + d + ")";
-      jrc.sendCommand("chartEvent("+ d + ", '" + id + "', '" + layerId + "', 'click')");
+      jrc.sendCommand("rlc:::chartEvent("+ d + ", '" + id + "', '" + layerId + "', 'click')");
     });
   if(layerId == "main")
     charts[id].placeIn = place
@@ -64,12 +64,12 @@ rlc.setCustomMouseOver = function(id, layerId, parcerStep) {
     if(layerId != "main")
       charts[id].get_layer(layerId)
         .elementMouseOver(function(d) {
-          pacer.do(function() {jrc.sendCommand("chartEvent("+ d + ", '" + id + "', '" + layerId + "', 'mouseover')")}); 
+          pacer.do(function() {jrc.sendCommand("rlc:::chartEvent("+ d + ", '" + id + "', '" + layerId + "', 'mouseover')")}); 
         })
     else
       charts[id]
         .elementMouseOver(function(d) {
-          pacer.do(function() {jrc.sendCommand("chartEvent("+ d + ", '" + id + "', '" + layerId + "', 'mouseover')")}); 
+          pacer.do(function() {jrc.sendCommand("rlc:::chartEvent("+ d + ", '" + id + "', '" + layerId + "', 'mouseover')")}); 
         });      
     charts[id].customMouseOver = true;
   }
@@ -80,12 +80,12 @@ rlc.setCustomMouseOut = function(id, layerId) {
     if(layerId != "main")
       charts[id].get_layer(layerId)
         .elementMouseOut(function() {
-          jrc.sendCommand("chartEvent(NULL, '" + id + "', '" + layerId + "', 'mouseout')");
+          jrc.sendCommand("rlc:::chartEvent(NULL, '" + id + "', '" + layerId + "', 'mouseout')");
         })
     else
       charts[id]
         .elementMouseOut(function(d) {
-          jrc.sendCommand("chartEvent(NULL, '" + id + "', '" + layerId + "', 'mouseout')");
+          jrc.sendCommand("rlc:::chartEvent(NULL, '" + id + "', '" + layerId + "', 'mouseout')");
         });      
     charts[id].customMouseOut = true;
   }
@@ -96,12 +96,12 @@ rlc.setCustomMarkedUpdated = function(id, layerId) {
     if(layerId != "main")
       charts[id].get_layer(layerId)
         .markedUpdated(function() {
-          jrc.sendCommand("chartEvent(NULL, '" + id + "', '" + layerId + "', 'markedUpdated')");
+          jrc.sendCommand("rlc:::chartEvent(NULL, '" + id + "', '" + layerId + "', 'markedUpdated')");
         })
     else
       charts[id]
         .markedUpdated(function(d) {
-          jrc.sendCommand("chartEvent(NULL, '" + id + "', '" + layerId + "', 'markedUpdated')");
+          jrc.sendCommand("rlc:::chartEvent(NULL, '" + id + "', '" + layerId + "', 'markedUpdated')");
         });      
     charts[id].customMarkedUpdated = true;
   }
@@ -156,10 +156,7 @@ rlc.updateChart = function(id, updateType, layerId) {
   var updateFun = "update" + updateType;
 
   if(layerId)
-    if(updateType == "")
-      charts[id].updateLayer(layerId)
-    else
-      charts[id].activeLayer(charts[id].get_layer(layerId))[updateFun]();
+    charts[id].activeLayer(charts[id].get_layer(layerId))[updateFun]()
   else
     charts[id][updateFun]();
 }

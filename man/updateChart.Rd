@@ -33,6 +33,51 @@ actions. Each time the \code{updateChart} is called, all the properties passed
 via \code{\link{dat}} function are reevaluated and cahrt is changed in accordance with the
 new state.
 }
+\section{Update types}{
+ 
+Defining a type of update allows you to change only some aspects of the chart
+which may improve the performance speed. 
+
+Some of the update types are valid for all the charts:
+\itemize{
+  \item{\code{Size} changes the size of the chart (and consequently the location
+  of all its elements).}
+  \item{\code{Title}changes the title of the chart.}
+  \item{\code{Canvas}If number of elements is too high the 
+  charts switch to the canvas mode and istead of multiple SVG point or cells
+  a single Canvas image is generated. This type of update redraws the Canvas
+  image. \emph{It is not recommended to use this function.}}
+}
+
+These types are specific for heatmaps only (\code{\link{lc_heatmap}}):
+\itemize{
+  \item \code{Labels} adds new row and column labels and removes those that are no longer
+  needed. Also updates \code{Cells}.
+  \item \code{Cells} adds new cells and removes those that are no longer needed.
+  Also updates \code{Texts} if necessary.
+  \item \code{Texts} adds or remove text inside cells where needed.
+  \item \code{LabelPosition} updates coordinates of all existing row and column labels.
+  Also updates \code{CellPosition}.
+  \item \code{CellPosition} updates coordinates of all existing cells. Also 
+  updates \code{TextPosition} if necessary.
+  \item \code{LabelText} updates text of all existing labels.
+  \item \code{CellColour} updates colour of all existing cells. Also
+  updates \code{TextValues} if necessary.
+  \item \code{TextValues} updates text inside cells to make it up to date with current
+  data values.
+}
+
+These types are valid for all other types of charts except heatmaps.
+\itemize{
+  \item \code{Axes} updates axes of the chart and changes positions 
+  of all the elements accordingly.
+  \item \code{Elements} updates (add or removes) all the elements of the layer.
+  \item \code{ElementPosition} updates positions of all the elements in the layer.
+  \item \code{ElementStyle} updates the style (colour, opacity, etc.) of all the elements 
+  of the layer.
+}
+}
+
 \examples{
 data(iris)
 

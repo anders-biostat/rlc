@@ -1,5 +1,6 @@
 #' @import JsRCom
 #' @import stringr
+#' 
 lc <- new.env()
 lc$pageOpened <- F
 
@@ -279,25 +280,23 @@ setProperties <- function(data, id, layerId = NULL) {
 #' via \code{\link{dat}} function are reevaluated and cahrt is changed in accordance with the
 #' new state.
 #' 
-#' @section Update types
-#' 
+#' @section Update types: 
 #' Defining a type of update allows you to change only some aspects of the chart
 #' which may improve the performance speed. 
 #' 
 #' Some of the update types are valid for all the charts:
-#' 
-#' \itemize {
-#'   \item \code{Size} changes the size of the chart (and consequently the location
-#'   of all its elements).
-#'   \item \code{Title} changes 
-#'   \item \code{Canvas}. If number of elements is too high the 
+#' \itemize{
+#'   \item{\code{Size} changes the size of the chart (and consequently the location
+#'   of all its elements).}
+#'   \item{\code{Title}changes the title of the chart.}
+#'   \item{\code{Canvas}If number of elements is too high the 
 #'   charts switch to the canvas mode and istead of multiple SVG point or cells
 #'   a single Canvas image is generated. This type of update redraws the Canvas
-#'   image. \emph{It is not recommended to use this function.}
+#'   image. \emph{It is not recommended to use this function.}}
 #' }
 #' 
 #' These types are specific for heatmaps only (\code{\link{lc_heatmap}}):
-#' \itemize {
+#' \itemize{
 #'   \item \code{Labels} adds new row and column labels and removes those that are no longer
 #'   needed. Also updates \code{Cells}.
 #'   \item \code{Cells} adds new cells and removes those that are no longer needed.
@@ -510,7 +509,7 @@ chartEvent <- function(d, id, layerId, event) {
 #' @param layerId An ID of the layer. This argument is required, if the chart has more
 #' than one layer.
 #' 
-#' @retrun a vector of indices or, in case of heatmaps, an \emph{n x 2} matrix were first and
+#' @return a vector of indices or, in case of heatmaps, an \emph{n x 2} matrix were first and
 #' second columns contain, respectively, row and colunm indices of the marked cells.
 #' 
 #' @examples
@@ -916,5 +915,6 @@ lc_html <- function(code = "", place = "undefined", append = F) {
     code <- hwrite(code)
   
   code <- gsub("[\r\n]", "", code)
+  code <- str_replace_all(code, "(\\W)", "\\\\\\1")
   sendCommand(str_c("rlc.html('", code, "', '", place, "', ", append, ")"))
 }
