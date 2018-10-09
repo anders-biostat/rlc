@@ -442,7 +442,7 @@ sendProperties <- function(chart, layerId = ls(chart$layers)){
   }
 }
 
-setChart <- function(type, data, place, id, layerId, dataFun, parcerStep = 50) {
+setChart <- function(type, data, ..., place, id, layerId, dataFun, parcerStep = 50) {
   if(!lc$pageOpened) openPage()
   
   if(is.null(place))
@@ -470,7 +470,10 @@ setChart <- function(type, data, place, id, layerId, dataFun, parcerStep = 50) {
   
   chart$JSinitialize()
   
-  setProperties(data, id, layerId)
+  l <- list(...)
+  nonEv <- lapply(names(l), function(n) {function() l[[n]]})
+  names(nonEv) <- names(l)
+  setProperties(c(data, nonEv), id, layerId)
   updateChart(id)
   
   invisible(chart)
@@ -605,13 +608,13 @@ scatterDataFun <- function(l) {
 #' Scatter chart
 #' 
 #' @export
-lc_scatter <- function(data, place = NULL, id = NULL, layerId = NULL, parcerStep = 50) {
-  setChart("scatter", data, place, id, layerId, scatterDataFun, parcerStep)
+lc_scatter <- function(data, place = NULL, ..., id = NULL, layerId = NULL, parcerStep = 50) {
+  setChart("scatter", data, ...,  place = place, id = id, layerId = layerId, dataFun = scatterDataFun, parcerStep = parcerStep)
 }
 
 #' @export
-lc_beeswarm <- function(data, place = NULL, id = NULL, layerId = NULL, parcerStep = 50) {
-  setChart("beeswarm", data, place, id, layerId, function(l) {
+lc_beeswarm <- function(data, place = NULL, ..., id = NULL, layerId = NULL, parcerStep = 50) {
+  setChart("beeswarm", data, ..., place = place, id = id, layerId = layerId, dataFun = function(l) {
     if(is.null(l$x) || is.null(l$y))
       stop("Required properties 'x' and 'y' are not defined.")
 
@@ -626,7 +629,7 @@ lc_beeswarm <- function(data, place = NULL, id = NULL, layerId = NULL, parcerSte
       l$mode <- "svg"    
     
     l   
-  }, parcerStep)
+  }, parcerStep = parcerStep)
 }
 
 #TO DO: Add grouping
@@ -666,9 +669,9 @@ lineDataFun <- function(l) {
 }
 
 #' @export
-lc_line <- function(data, place = NULL, id = NULL, layerId = NULL) {
-  setChart("pointLine", data, place, id, layerId, 
-           function(l) {
+lc_line <- function(data, place = NULL, ..., id = NULL, layerId = NULL) {
+  setChart("pointLine", data, ..., place = place, id = id, layerId = layerId, 
+           dataFun = function(l) {
              l <- lineDataFun(l)
              
              for(i in 1:ncol(l$x)) {
@@ -681,13 +684,13 @@ lc_line <- function(data, place = NULL, id = NULL, layerId = NULL) {
 }
 
 #' @export
-lc_path <- function(data, place = NULL, id = NULL, layerId = NULL) {
-  setChart("pointLine", data, place, id, layerId, lineDataFun)
+lc_path <- function(data, place = NULL, ..., id = NULL, layerId = NULL) {
+  setChart("pointLine", data, ..., place = place, id = id, layerId = layerId, dataFun = lineDataFun)
 }
 
 #' @export
-lc_ribbon <- function(data, place = NULL, id = NULL, layerId = NULL) {
-  setChart("pointRibbon", data, place, id, layerId, function(l) {
+lc_ribbon <- function(data, place = NULL, ..., id = NULL, layerId = NULL) {
+  setChart("pointRibbon", data, ...,  place = place, id = id, layerId = layerId, dataFun = function(l) {
     if(!is.null(l$x) && !is.vector(l$x)) l$x <- as.matrix(l$x)
     if(!is.null(l$ymax) && !is.vector(l$ymax)) l$ymax <- as.matrix(l$ymax)
     if(!is.null(l$ymin) && !is.vector(l$ymin)) l$ymin <- as.matrix(l$ymin)
@@ -770,14 +773,14 @@ barDataFun <- function(l) {
   l
 }
 #' @export
-lc_bars <- function(data, place = NULL, id = NULL, layerId = NULL) {
-  setChart("barchart", data, place, id, layerId, barDataFun)
+lc_bars <- function(data, place = NULL, ..., id = NULL, layerId = NULL) {
+  setChart("barchart", data, ..., place = place, id = id, layerId = layerId, dataFun = barDataFun)
 }
 
 #' @export
-lc_hist <- function(data, place = NULL, id = NULL, layerId = NULL) {
+lc_hist <- function(data, place = NULL, ..., id = NULL, layerId = NULL) {
   # has a nbins property. Not implemented in JS
-  setChart("barchart", data, place, id, layerId, function(l) {
+  setChart("barchart", data, ..., place = place, id = id, layerId = layerId, dataFun = function(l) {
     if(is.null(l$nbins)) {
       nbins <- 10
     } else {
@@ -810,8 +813,8 @@ lc_hist <- function(data, place = NULL, id = NULL, layerId = NULL) {
 }
 
 #' @export
-lc_dens <- function(data, place = NULL, id = NULL, layerId = NULL) {
-  setChart("pointLine", data, place, id, layerId, function(l) {
+lc_dens <- function(data, place = NULL, ..., id = NULL, layerId = NULL) {
+  setChart("pointLine", data, ..., place = place, id = id, layerId = layerId, dataFun = function(l) {
     if(!is.null(l$value)) {
       dens <- density.default(l$value)
       l$x <- dens$x
@@ -823,8 +826,8 @@ lc_dens <- function(data, place = NULL, id = NULL, layerId = NULL) {
 }
 
 #' @export
-lc_heatmap <- function(data, place = NULL, id = NULL) {
-  setChart("heatmap", data, place, id, "main", function(l) {
+lc_heatmap <- function(data, place = NULL, ..., id = NULL) {
+  setChart("heatmap", data, ..., place = place, id = id, layerId = "main", dataFun = function(l) {
     if(!is.null(l$value)) {
       l$nrows <- nrow(l$value)
       l$ncols <- ncol(l$value)
@@ -834,8 +837,8 @@ lc_heatmap <- function(data, place = NULL, id = NULL) {
 }
 
 #' @export
-lc_colourSlider <- function(data, place = NULL, id = NULL) {
-  setChart("colourSlider", data, place, id, "main", function(l) {
+lc_colourSlider <- function(data, place = NULL, ..., id = NULL) {
+  setChart("colourSlider", data, ..., place = place, id = id, layerId = "main", dataFun = function(l) {
     if(!is.null(l$chart)) {
       l$linkedChart <- str_c("charts.", l$chart)
       if(is.null(l$layer) && getChart(l$chart)$nLayers() == 1) 
@@ -852,8 +855,8 @@ lc_colourSlider <- function(data, place = NULL, id = NULL) {
 
 #' @export
 #' @importFrom jsonlite toJSON
-lc_abLine <- function(data, place = NULL, id = NULL, layerId = NULL) {
-  setChart("xLine", data, place, id, layerId, function(l) {
+lc_abLine <- function(data, place = NULL, ..., id = NULL, layerId = NULL) {
+  setChart("xLine", data, ..., place = place, id = id, layerId = layerId, dataFun = function(l) {
     if(is.null(l$a) || is.null(l$b))
       stop("Required properties 'a' and 'b' are not defined.");
     if(length(l$a) != length(l$b))
@@ -874,8 +877,8 @@ lc_abLine <- function(data, place = NULL, id = NULL, layerId = NULL) {
 }
   
 #' @export
-lc_hLine <- function(data, place = NULL, id = NULL, layerId = NULL) {
-  setChart("xLine", data, place, id, layerId, function(l) {
+lc_hLine <- function(data, place = NULL, ..., id = NULL, layerId = NULL) {
+  setChart("xLine", data, ..., place = place, id = id, layerId = layerId, dataFun = function(l) {
     if(is.null(l$h))
       stop("Required property 'h' is not defined.");
 
@@ -891,8 +894,8 @@ lc_hLine <- function(data, place = NULL, id = NULL, layerId = NULL) {
 }
 
 #' @export
-lc_vLine <- function(data, place = NULL, id = NULL, layerId = NULL) {
-  setChart("yLine", data, place, id, layerId, function(l) {
+lc_vLine <- function(data, place = NULL, ..., id = NULL, layerId = NULL) {
+  setChart("yLine", data, ..., place = place, id = id, layerId = layerId, dataFun = function(l) {
     if(is.null(l$v))
       stop("Required property 'v' is not defined.");
     

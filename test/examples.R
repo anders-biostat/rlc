@@ -23,12 +23,16 @@ setProperties(dat(symbolValue = iris$Species), "iris")
 updateChart("iris", updateType = "ElementStyle")
 
 a <- 1
-b <- 1
+b <- 0
 lc_abLine(dat(a = a, b = b), id = "iris")
 
-b <- 0
+b <- -2
 updateChart("iris", "Layer2")
 
 
 lc_scatter(dat(x = 1:10, y = 1:10, colourValue = 1:10 * 10^-20))
 lc_html("abcde\", ''' ljlkj")
+
+
+lc_scatter(dat(x = iris$Sepal.Length), y = iris$Petal.Length, colourValue = colour,
+               width = width, height = height, id = "iris")
