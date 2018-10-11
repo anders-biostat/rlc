@@ -559,6 +559,19 @@ getMarked <- function(chartId, layerId = NULL) {
   marked
 }
 
+#' Link data to the chart
+#' 
+#' \code{dat} allows to link variables from the current environment to chart's properties.
+#' On every \code{\link{updateChart}} call all the data, provided via the \code{dat} function,
+#' will be automatically reevaluated and the chart will be changed accordingly. One can also
+#' put properties outside of the \code{dat} function, if they are going to be constant.
+#' 
+#' @param ... List of name values pair to define the properties. 
+#' 
+#' @examples 
+#' lc_scatter(dat(x = rnorm(30)), y = rnorm(30))
+#' #note that the Y values remain the same after each updateChart call
+#' updateChart()
 #' 
 #' @export
 dat <- function( ... ) {
@@ -605,13 +618,122 @@ scatterDataFun <- function(l) {
   l
 }
 
-#' Scatter chart
+#' Visualize a set of points
 #' 
+#' These functions plot a set of points with known coordinates that can be either categorical,
+#' or continuous. 
+#' 
+#' @describeIn lc_scatter creates a scatterplot and adds it as a new layer to an existing chart or
+#' creates a new one.
+#' 
+#' @param data Name value pairs of properties, passed through the \code{\link{dat}} function. These
+#' properties will be reevaluated on each \code{\link{updateChart}} call. 
+#' @param place An ID of a container, where to place the chart. Will be ignored if the chart already
+#' exists. If not defined, the chart will be placed directly in the body of the opened page.
+#' @param ... Name value pairs of properties that can be evaluated only once and then will remain 
+#' constant. These properties can still be changed later using the \code{\link{setProperties}} function
+#' @param id An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
+#' exists, a new layer will be added to it. If you want to replace one chart with another, use \code{\link{removeChart}}
+#' first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} is the number of currently existing charts.
+#' @param layerId An ID for the new layer. All layers within one chart must have different IDs. An error will be thrown
+#' if a layer with this ID already exists in the chart. If not defined, will be set to \code{LayerN}, where \code{N - 1} 
+#' is the number of currently existing layers in this chart.
+#' @param parcerStep Time in ms between to consequentive calls of onmouseover event. Prevents overqueuing in case
+#' of cumbersome computations. May be important when the chart works in canvas mode.
+#' 
+#' @section Available properties: 
+#' You can read more about different properties in the vignette.
+#' 
+#' \itemize{
+#'  \item{\code{x, y} - vector of x and y coordinates of the points.} 
+#'  \item{\code{size} - sizes of the points. Default size is 6.}
+#'  \item{\code{opacity} - opacity of the points in the range from 0 to 1.}
+#'  \item{\code{elementLabel} - vector of text labels for each point.} 
+#'  \item{\code{valueAxis} - (for \code{lc_beeswarm} only) defines, values along 
+#'  which of the axes should not be changed. Must be \code{"x"} or \code{"y"}.} }
+#' 
+#' Colour and shape settings
+#' \itemize{
+#'  \item{\code{colour} - colour of the points. Must be a colour name or hexidecimal code.}
+#'  \item{\code{colourValue} - grouping values for different colours. Can be numbers or charachters.}
+#'  \item{\code{colourDomain} - vector of all possible values for discrete colour scales 
+#'  or range of all possible colour values for the continuous ones.}
+#'  \item{\code{palette} - vector of colours to construct the colour scale.}
+#'  \item{\code{colourLegendTitle} - title for the colour legend.}
+#'  \item{\code{addColourScaleToLegend} - wether or not to show colour legend for the current layer.} 
+#'  \item{\code{symbol} - shape of each point. Must be one of \code{"Circle", "Cross", "Diamond", 
+#'  "Square", "Star", "Triangle", "Wye"}.}
+#'  \item{\code{symbolValue} - grouping values for different symbols.}
+#'  \item{\code{symbolLegendTitle} - title for the symbol value.}
+#'  \item{\code{stroke} - stroke colour for each element. Must be a colour name or hexidecimal code.}
+#'  \item{\code{strokeWidth} - width of the strokes for each point.} }
+#'  
+#' Axes settings
+#' \itemize{
+#'  \item{\code{logScaleX, logScaleY} - a base of logarithm for logarithmic scale transformation.
+#'  If 0 or \code{FALSE} no transformation will be performed.}
+#'  \item{\code{layerDomainX, layerDomainY} - default axes ranges for the given layer.}
+#'  \item{\code{domainX, domainY} - default axes ranges for the entire chart. If not defined, 
+#'  is automatically set to include all layer domains.}
+#'  \item{\code{contScaleX, consScaleY} - wether or not the axis should be continuous.}
+#'  \item{\code{aspectRatio} - aspect ratio.}
+#'  \item{\code{axisTitleX, axisTitleY} - axes titles.}
+#'  \item{\code{ticksX, ticksY} - set of ticks for the axes.} }
+#'
+#' Interactivity settings
+#' \itemize{
+#'  \item{\code{on_click} - function, to be called, when one of the points is clicked. Gets an
+#'  index of the clicked point as an argument.}
+#'  \item{\code{elementMouseOver} - function, to be called, when mouse hovers over one of the points.
+#'  Gets an index of the clicked point as an argument.}
+#'  \item{\code{elementMouseOut} - function, to be called, when mouse moves out of one of the points.} }
+#'  
+#' Global chart settings
+#' \itemize{
+#'  \item{\code{width} - width of the chart in pixels.}
+#'  \item{\code{heigth} - height of the chart in pixels.}
+#'  \item{\code{plotWidth} - width of the plotting area in pixels.}
+#'  \item{\code{plotHeight} - height of the plotting area in pixels.}
+#'  \item{\code{margins} - margins size in pixels. Must be a list with all the following fields: 
+#'  \code{"top", "bottom", "left", "right"}.}
+#'  \item{\code{title} - title of the chart.}
+#'  \item{\code{titleX, titleY} - coordinates of the chart title.}
+#'  \item{\code{titleSize} - font-size of the chart title.}
+#'  \item{\code{showLegend} - wether or not to show the legend.}
+#'  \item{\code{showPanel} - wether of not to show the tools panel.}
+#'  \item{\code{transitionDuration} - duration of the transtions between any two states of the chart. If 0,
+#'  no animated transition is shown. It can be useful to turn the transition off, when lots of frequent 
+#'  changes happen to the chart.}
+#' } 
+#' 
+#' @examples
+#' data("iris")
+#' lc_scatter(dat(x = iris$Sepal.Length, 
+#'                y = iris$Petal.Length,
+#'                colourValue = iris$Petal.Width,
+#'                symbolValue = iris$Species),
+#'            title = "Iris dataset",
+#'            axisTitleY = "Petal Length",
+#'            axisTitleX = "Sepal Length",
+#'            colourLegendTitle = "Petal Width",
+#'            symbolLegendTitle = "Species")
+#' 
+#' lc_beeswarm(dat(x = iris$Species,
+#'                 y = iris$Sepal.Length,
+#'                 colourValue = iris$Sepal.Width),
+#'             title = "Iris dataset",
+#'             axisTitleY = "Sepal Length",
+#'             axisTitleX = "Species",
+#'             colourLegendTitle = "Sepal Width")
 #' @export
-lc_scatter <- function(data, place = NULL, ..., id = NULL, layerId = NULL, parcerStep = 50) {
+lc_scatter <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, parcerStep = 50) {
   setChart("scatter", data, ...,  place = place, id = id, layerId = layerId, dataFun = scatterDataFun, parcerStep = parcerStep)
 }
 
+#' @describeIn lc_scatter creates a special kind of scatterplot, where the points are spread along one of 
+#' the axes to avoid overlapping.
+#' 
+#' 
 #' @export
 lc_beeswarm <- function(data, place = NULL, ..., id = NULL, layerId = NULL, parcerStep = 50) {
   setChart("beeswarm", data, ..., place = place, id = id, layerId = layerId, dataFun = function(l) {
