@@ -660,7 +660,7 @@ scatterDataFun <- function(l) {
 #'  or range of all possible colour values for the continuous ones.}
 #'  \item{\code{palette} - vector of colours to construct the colour scale.}
 #'  \item{\code{colourLegendTitle} - title for the colour legend.}
-#'  \item{\code{addColourScaleToLegend} - wether or not to show colour legend for the current layer.} 
+#'  \item{\code{addColourScaleToLegend} - whether or not to show colour legend for the current layer.} 
 #'  \item{\code{symbol} - shape of each point. Must be one of \code{"Circle", "Cross", "Diamond", 
 #'  "Square", "Star", "Triangle", "Wye"}.}
 #'  \item{\code{symbolValue} - grouping values for different symbols.}
@@ -675,7 +675,7 @@ scatterDataFun <- function(l) {
 #'  \item{\code{layerDomainX, layerDomainY} - default axes ranges for the given layer.}
 #'  \item{\code{domainX, domainY} - default axes ranges for the entire chart. If not defined, 
 #'  is automatically set to include all layer domains.}
-#'  \item{\code{contScaleX, consScaleY} - wether or not the axis should be continuous.}
+#'  \item{\code{contScaleX, consScaleY} - whether or not the axis should be continuous.}
 #'  \item{\code{aspectRatio} - aspect ratio.}
 #'  \item{\code{axisTitleX, axisTitleY} - axes titles.}
 #'  \item{\code{ticksX, ticksY} - set of ticks for the axes.} }
@@ -699,8 +699,8 @@ scatterDataFun <- function(l) {
 #'  \item{\code{title} - title of the chart.}
 #'  \item{\code{titleX, titleY} - coordinates of the chart title.}
 #'  \item{\code{titleSize} - font-size of the chart title.}
-#'  \item{\code{showLegend} - wether or not to show the legend.}
-#'  \item{\code{showPanel} - wether of not to show the tools panel.}
+#'  \item{\code{showLegend} - whether or not to show the legend.}
+#'  \item{\code{showPanel} - whether of not to show the tools panel.}
 #'  \item{\code{transitionDuration} - duration of the transtions between any two states of the chart. If 0,
 #'  no animated transition is shown. It can be useful to turn the transition off, when lots of frequent 
 #'  changes happen to the chart.}
@@ -732,7 +732,6 @@ lc_scatter <- function(data = list(), place = NULL, ..., id = NULL, layerId = NU
 
 #' @describeIn lc_scatter creates a special kind of scatterplot, where the points are spread along one of 
 #' the axes to avoid overlapping.
-#' 
 #' 
 #' @export
 lc_beeswarm <- function(data, place = NULL, ..., id = NULL, layerId = NULL, parcerStep = 50) {
@@ -790,6 +789,100 @@ lineDataFun <- function(l) {
   l
 }
 
+#' Lines and ribbons
+#' 
+#' These functions create different kind of lines. They connect observations or 
+#' create filled area, bordered by a line. Each layer may have one or several lines.
+#' 
+#' @describeIn lc_line connects points in the order of variables on the x axis.
+#' 
+#' @param data Name value pairs of properties, passed through the \code{\link{dat}} function. These
+#' properties will be reevaluated on each \code{\link{updateChart}} call. 
+#' @param place An ID of a container, where to place the chart. Will be ignored if the chart already
+#' exists. If not defined, the chart will be placed directly in the body of the opened page.
+#' @param ... Name value pairs of properties that can be evaluated only once and then will remain 
+#' constant. These properties can still be changed later using the \code{\link{setProperties}} function
+#' @param id An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
+#' exists, a new layer will be added to it. If you want to replace one chart with another, use \code{\link{removeChart}}
+#' first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} is the number of currently existing charts.
+#' @param layerId An ID for the new layer. All layers within one chart must have different IDs. An error will be thrown
+#' if a layer with this ID already exists in the chart. If not defined, will be set to \code{LayerN}, where \code{N - 1} 
+#' is the number of currently existing layers in this chart.
+#' @param parcerStep Time in ms between to consequentive calls of onmouseover event. Prevents overqueuing in case
+#' of cumbersome computations. May be important when the chart works in canvas mode.
+#' 
+#' @section Available properties: 
+#' You can read more about different properties in the vignette.
+#' 
+#' \itemize{
+#'  \item{\code{x, y} - vector of x and y coordinates of the points to connect. Can be 
+#'  vectors for a single line or \code{m x n} matrix for \code{n} lines.}
+#'  \item{\code{ymax, ymin} - (only for \code{lc_ribbon}) vectors of maximal and minimal values of the ribbon.} 
+#'  \item{\code{lineWidth} - width of each line.}
+#'  \item{\code{opacity} - opacity of the lines in the range from 0 to 1.}
+#'  \item{\code{elementLabel} - vector of text labels for each line.} 
+#'  \item{\code{dasharray} - defines pattern of dashes and gaps for each line.} }
+#' 
+#' Colour settings
+#' \itemize{
+#'  \item{\code{colour} - colour of the lines. Must be a colour name or hexidecimal code. For
+#'  \code{lc_ribbon} this property defined the colour of the ribbon, not the strokes.}
+#'  \item{\code{fill} - colour with wich to fill area inside the line. 
+#'  Must be a colour name or hexidecimal code.}
+#'  \item{\code{colourValue} - grouping values for different colours. Can be numbers or charachters.}
+#'  \item{\code{colourDomain} - vector of all possible values for discrete colour scales 
+#'  or range of all possible colour values for the continuous ones.}
+#'  \item{\code{palette} - vector of colours to construct the colour scale.}
+#'  \item{\code{colourLegendTitle} - title for the colour legend.}
+#'  \item{\code{addColourScaleToLegend} - whether or not to show colour legend for the current layer.} 
+#'  \item{\code{stroke} - (only for \code{lc_ribbon}) stroke colour for each ribbon. 
+#'  Must be a colour name or hexidecimal code.}
+#'  \item{\code{strokeWidth} - (only for \code{lc_ribbon}) width of the strokes for each ribbon.} }
+#'  
+#' Axes settings
+#' \itemize{
+#'  \item{\code{logScaleX, logScaleY} - a base of logarithm for logarithmic scale transformation.
+#'  If 0 or \code{FALSE} no transformation will be performed.}
+#'  \item{\code{layerDomainX, layerDomainY} - default axes ranges for the given layer.}
+#'  \item{\code{domainX, domainY} - default axes ranges for the entire chart. If not defined, 
+#'  is automatically set to include all layer domains.}
+#'  \item{\code{contScaleX, consScaleY} - whether or not the axis should be continuous.}
+#'  \item{\code{aspectRatio} - aspect ratio.}
+#'  \item{\code{axisTitleX, axisTitleY} - axes titles.}
+#'  \item{\code{ticksX, ticksY} - set of ticks for the axes.} }
+#'
+#' Interactivity settings
+#' \itemize{
+#'  \item{\code{on_click} - function, to be called, when one of the lines is clicked. Gets an
+#'  index of the clicked point as an argument.}
+#'  \item{\code{elementMouseOver} - function, to be called, when mouse hovers over one of the lines.
+#'  Gets an index of the clicked point as an argument.}
+#'  \item{\code{elementMouseOut} - function, to be called, when mouse moves out of one of the lines.} }
+#'  
+#' Global chart settings
+#' \itemize{
+#'  \item{\code{width} - width of the chart in pixels.}
+#'  \item{\code{heigth} - height of the chart in pixels.}
+#'  \item{\code{plotWidth} - width of the plotting area in pixels.}
+#'  \item{\code{plotHeight} - height of the plotting area in pixels.}
+#'  \item{\code{margins} - margins size in pixels. Must be a list with all the following fields: 
+#'  \code{"top", "bottom", "left", "right"}.}
+#'  \item{\code{title} - title of the chart.}
+#'  \item{\code{titleX, titleY} - coordinates of the chart title.}
+#'  \item{\code{titleSize} - font-size of the chart title.}
+#'  \item{\code{showLegend} - whether or not to show the legend.}
+#'  \item{\code{showPanel} - whether of not to show the tools panel.}
+#'  \item{\code{transitionDuration} - duration of the transtions between any two states of the chart. If 0,
+#'  no animated transition is shown. It can be useful to turn the transition off, when lots of frequent 
+#'  changes happen to the chart.}
+#' } 
+#' 
+#' @examples 
+#' x <- seq(0, 8, 0.2)
+#' lc_line(dat(x = x, y = cbind(cos(x), sin(x)),
+#'             aspectRatio = 1,
+#'             colour = c("blue", "red"),
+#'             dasharray = c("5", "1 5 5")))
 #' @export
 lc_line <- function(data, place = NULL, ..., id = NULL, layerId = NULL) {
   setChart("pointLine", data, ..., place = place, id = id, layerId = layerId, 
@@ -805,11 +898,13 @@ lc_line <- function(data, place = NULL, ..., id = NULL, layerId = NULL) {
            })
 }
 
+#' @describeIn lc_line connects points in the order they are given.
 #' @export
 lc_path <- function(data, place = NULL, ..., id = NULL, layerId = NULL) {
   setChart("pointLine", data, ..., place = place, id = id, layerId = layerId, dataFun = lineDataFun)
 }
 
+#' @describeIn lc_line displays a filled area, defined by \code{ymax} and \code{ymin} values.
 #' @export
 lc_ribbon <- function(data, place = NULL, ..., id = NULL, layerId = NULL) {
   setChart("pointRibbon", data, ...,  place = place, id = id, layerId = layerId, dataFun = function(l) {
