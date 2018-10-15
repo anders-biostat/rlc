@@ -883,6 +883,25 @@ lineDataFun <- function(l) {
 #'             aspectRatio = 1,
 #'             colour = c("blue", "red"),
 #'             dasharray = c("5", "1 5 5")))
+#'             
+#' points <- seq(0, 6.5, 0.1)
+#' x <- cos(points)
+#' y <- sin(points)
+#' lc_path(dat(x = sapply(0:2, function(i) x + i), 
+#'             y = sapply(0:2, function(i) y + i),
+#'             fill = c("blue", "red", "black"),
+#'             opacity = c(0.3, 0.5, 0.7)))
+#'             
+#' x <- seq(0, 5, 0.1, sd = 2)
+#' y <- x*3 + rnorm(length(x))
+#' fit <- lm(y ~ x)
+#' pred <- predict(fit, data.frame(x = x), se.fit = T)
+#' lc_ribbon(dat(ymin = pred$fit - 1.96 * pred$se.fit,
+#'               ymax = pred$fit + 1.96 * pred$se.fit,
+#'               x = x,
+#'               colour = "#555555"), id = "ribbonTest")
+#' lc_scatter(dat(x = x, y = y), size = 2, id = "ribbonTest")
+#' lc_abLine(dat(a = fit$coefficients[2], b = fit$coefficients[1]), id = "ribbonTest")
 #' @export
 lc_line <- function(data, place = NULL, ..., id = NULL, layerId = NULL) {
   setChart("pointLine", data, ..., place = place, id = id, layerId = layerId, 
@@ -947,8 +966,19 @@ barDataFun <- function(l) {
   if(!is.null(l$groupIds) && length(l$groupIds) != length(l$value))
     stop("Number of group IDs is not equal to the number of provided values.")
   
+  if(all(is.null(l$groupIds), !is.null(l$barIds), is.null(l$stackIds))) {
+    l$groupIds <- l$barIds
+    l$barIds <- NULL
+  }
   if(all(is.null(l$groupIds), is.null(l$barIds), is.null(l$stackIds)))
-    l$groupIds <- 1:length(l$value)
+    if(is.null(names(l$value))) {
+      l$groupIds <- 1:length(l$value)  
+    } else {
+      l$groupIds <- names(l$value)
+    }
+  
+  if(is.null(l$barIds) & is.null(l$stackIds))
+    l$addColourScaleToLegend <- FALSE
   
   if(is.null(l$groupIds)) l$groupIds <- rep(1, length(l$value))
   if(is.null(l$barIds)) l$barIds <- rep(1, length(l$value))
@@ -989,6 +1019,88 @@ barDataFun <- function(l) {
   
   l
 }
+
+#' Create a barplot
+#' 
+#' \code{lc_bars} creates a new barplot and adds it on the page
+#' as a new chart or as a new layer of an existing chart.
+#' 
+#' @param data Name value pairs of properties, passed through the \code{\link{dat}} function. These
+#' properties will be reevaluated on each \code{\link{updateChart}} call. 
+#' @param place An ID of a container, where to place the chart. Will be ignored if the chart already
+#' exists. If not defined, the chart will be placed directly in the body of the opened page.
+#' @param ... Name value pairs of properties that can be evaluated only once and then will remain 
+#' constant. These properties can still be changed later using the \code{\link{setProperties}} function
+#' @param id An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
+#' exists, a new layer will be added to it. If you want to replace one chart with another, use \code{\link{removeChart}}
+#' first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} is the number of currently existing charts.
+#' @param layerId An ID for the new layer. All layers within one chart must have different IDs. An error will be thrown
+#' if a layer with this ID already exists in the chart. If not defined, will be set to \code{LayerN}, where \code{N - 1} 
+#' is the number of currently existing layers in this chart.
+#' @param parcerStep Time in ms between to consequentive calls of onmouseover event. Prevents overqueuing in case
+#' of cumbersome computations. May be important when the chart works in canvas mode.
+#' 
+#' @section Available properties: 
+#' You can read more about different properties in the vignette.
+#' 
+#' \itemize{
+#'  \item{\code{value} - heights of bars/stacks.}
+#'  \item{\code{stackIds} - IDs for all stacks (if necessary). Must be the same size as \code{values}.}
+#'  \item{\code{barIds} - IDs for all bars (if necessary). Must be the same size as \code{values}.}
+#'  \item{\code{groupIds} - IDs for all groups (if necessary). Must be the same size as \code{values}.} 
+#'  \item{\code{groupWidth} - ratio of width of a group of bars to the space, available to the group.} }
+#' 
+#' Style settings
+#' \itemize{
+#'  \item{\code{opacity} - opacity of each bar|stack in the range from 0 to 1.}
+#'  \item{\code{colour} - colour of each bar|stack. Must be a colour name or hexidecimal code.}
+#'  \item{\code{colourValue} - grouping values for different colours. Can be numbers or charachters.}
+#'  \item{\code{colourDomain} - vector of all possible values for discrete colour scales 
+#'  or range of all possible colour values for the continuous ones.}
+#'  \item{\code{palette} - vector of colours to construct the colour scale.}
+#'  \item{\code{colourLegendTitle} - title for the colour legend.}
+#'  \item{\code{addColourScaleToLegend} - whether or not to show colour legend for the current layer.} 
+#'  \item{\code{stroke} -  stroke colour of each bar|stack. Must be a colour name or hexidecimal code.}
+#'  \item{\code{strokeWidth} - width of the strokes of each bar|stack.} }
+#'  
+#' Axes settings
+#' \itemize{
+#'  \item{\code{logScaleX, logScaleY} - a base of logarithm for logarithmic scale transformation.
+#'  If 0 or \code{FALSE} no transformation will be performed.}
+#'  \item{\code{layerDomainX, layerDomainY} - default axes ranges for the given layer.}
+#'  \item{\code{domainX, domainY} - default axes ranges for the entire chart. If not defined, 
+#'  is automatically set to include all layer domains.}
+#'  \item{\code{contScaleX, consScaleY} - whether or not the axis should be continuous.}
+#'  \item{\code{aspectRatio} - aspect ratio.}
+#'  \item{\code{axisTitleX, axisTitleY} - axes titles.}
+#'  \item{\code{ticksX, ticksY} - set of ticks for the axes.} }
+#'
+#' Interactivity settings
+#' \itemize{
+#'  \item{\code{on_click} - function, to be called, when one of the lines is clicked. Gets an
+#'  index of the clicked point as an argument.}
+#'  \item{\code{elementMouseOver} - function, to be called, when mouse hovers over one of the lines.
+#'  Gets an index of the clicked point as an argument.}
+#'  \item{\code{elementMouseOut} - function, to be called, when mouse moves out of one of the lines.} }
+#'  
+#' Global chart settings
+#' \itemize{
+#'  \item{\code{width} - width of the chart in pixels.}
+#'  \item{\code{heigth} - height of the chart in pixels.}
+#'  \item{\code{plotWidth} - width of the plotting area in pixels.}
+#'  \item{\code{plotHeight} - height of the plotting area in pixels.}
+#'  \item{\code{margins} - margins size in pixels. Must be a list with all the following fields: 
+#'  \code{"top", "bottom", "left", "right"}.}
+#'  \item{\code{title} - title of the chart.}
+#'  \item{\code{titleX, titleY} - coordinates of the chart title.}
+#'  \item{\code{titleSize} - font-size of the chart title.}
+#'  \item{\code{showLegend} - whether or not to show the legend.}
+#'  \item{\code{showPanel} - whether of not to show the tools panel.}
+#'  \item{\code{transitionDuration} - duration of the transtions between any two states of the chart. If 0,
+#'  no animated transition is shown. It can be useful to turn the transition off, when lots of frequent 
+#'  changes happen to the chart.}
+#' } 
+#' 
 #' @export
 lc_bars <- function(data, place = NULL, ..., id = NULL, layerId = NULL) {
   setChart("barchart", data, ..., place = place, id = id, layerId = layerId, dataFun = barDataFun)
