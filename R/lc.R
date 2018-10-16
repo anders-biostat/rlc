@@ -970,7 +970,7 @@ barDataFun <- function(l) {
     l$groupIds <- l$barIds
     l$barIds <- NULL
   }
-  if(all(is.null(l$groupIds), is.null(l$barIds), is.null(l$stackIds)))
+  if(is.null(l$groupIds) &is.null(l$barIds))
     if(is.null(names(l$value))) {
       l$groupIds <- 1:length(l$value)  
     } else {
@@ -1100,6 +1100,30 @@ barDataFun <- function(l) {
 #'  no animated transition is shown. It can be useful to turn the transition off, when lots of frequent 
 #'  changes happen to the chart.}
 #' } 
+#' @examples 
+#' data("esoph")
+#' 
+#' lc_bars(dat(value = tapply(esoph$ncases, esoph$agegp, sum), 
+#'             title = "Number of cases per age group",
+#'             axisTitleX = "Age group", 
+#'             axisTitleY = "Number of esophageal cases"))
+#' 
+#' lc_bars(dat(value = c(tapply(esoph$ncases, esoph$agegp, sum), tapply(esoph$ncontrols, esoph$agegp, sum)),
+#'             stackIds = c(rep("case", 6), rep("control", 6))))
+#' 
+#' #It is ease to put data in a convenient form for barplots using tidyverse
+#' library(tidyverse)
+#' 
+#' esoph %>%
+#'   gather(type, cases, (ncases:ncontrols)) %>%
+#'   mutate(type = str_sub(type, 2, -2)) %>%
+#'   group_by(agegp, alcgp, type) %>%
+#'   summarise(ncases = sum(cases)) -> newData
+#' 
+#' lc_bars(dat(value = newData$ncases,
+#'             stackIds = newData$type,
+#'             barIds = newData$alcgp,
+#'             groupIds = newData$agegp))
 #' 
 #' @export
 lc_bars <- function(data, place = NULL, ..., id = NULL, layerId = NULL) {

@@ -91,3 +91,8 @@ lc_ribbon(dat(ymin = y - 1.96 * pred$se.fit,
               x = x,
               colour = "#555555"), id = "ribbonTest")
 lc_scatter(dat(x = x, y = y), id = "ribbonTest")
+
+
+data("esoph")
+
+lc_bars(dat(value = tapply(esoph$ncases, esoph$agegp, sum)))
