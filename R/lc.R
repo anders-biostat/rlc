@@ -1130,7 +1130,42 @@ lc_bars <- function(data, place = NULL, ..., id = NULL, layerId = NULL) {
   setChart("barchart", data, ..., place = place, id = id, layerId = layerId, dataFun = barDataFun)
 }
 
-#' @export
+#' Histograms and density plots
+#' 
+#' These functions make either a histogram or a density plot of the given data 
+#' and either add them as a new layer to an existing chart or create a new chart.
+#' 
+#' @param data Name value pairs of properties, passed through the \code{\link{dat}} function. These
+#' properties will be reevaluated on each \code{\link{updateChart}} call. 
+#' @param place An ID of a container, where to place the chart. Will be ignored if the chart already
+#' exists. If not defined, the chart will be placed directly in the body of the opened page.
+#' @param ... Name value pairs of properties that can be evaluated only once and then will remain 
+#' constant. These properties can still be changed later using the \code{\link{setProperties}} function
+#' @param id An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
+#' exists, a new layer will be added to it. If you want to replace one chart with another, use \code{\link{removeChart}}
+#' first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} is the number of currently existing charts.
+#' @param layerId An ID for the new layer. All layers within one chart must have different IDs. An error will be thrown
+#' if a layer with this ID already exists in the chart. If not defined, will be set to \code{LayerN}, where \code{N - 1} 
+#' is the number of currently existing layers in this chart.
+#' @param parcerStep Time in ms between to consequentive calls of onmouseover event. Prevents overqueuing in case
+#' of cumbersome computations. May be important when the chart works in canvas mode.
+#' 
+#' @section Available properties:
+#' 
+#' \itemize{
+#'  \item{\code{value} - vector of data.}
+#'  \item{\code{nbins} - (only for \code{lc_hist}) number of bins.} }
+#' 
+#' These functions are extensions of \code{\link{lc_line}} (\code{lc_dens}) or \code{\link{lc_bars}} 
+#' (\code{lc_hist}) and therefore can also understand their properties.
+#' 
+#' @describeIn lc_hist makes a histogram. It is an extension of \code{\link{lc_bars}}.
+#' 
+#' @examples
+#' lc_hist(dat(value = rnorm(1000), nbins = 30, height = 300))
+#' lc_dens(dat(value = rnorm(1000), height = 300))
+#' 
+#' @export 
 lc_hist <- function(data, place = NULL, ..., id = NULL, layerId = NULL) {
   # has a nbins property. Not implemented in JS
   setChart("barchart", data, ..., place = place, id = id, layerId = layerId, dataFun = function(l) {
@@ -1165,6 +1200,7 @@ lc_hist <- function(data, place = NULL, ..., id = NULL, layerId = NULL) {
   })
 }
 
+#' @describeIn lc_hist makes a density plot. Is an extension of \code{\link{lc_line}}.
 #' @export
 lc_dens <- function(data, place = NULL, ..., id = NULL, layerId = NULL) {
   setChart("pointLine", data, ..., place = place, id = id, layerId = layerId, dataFun = function(l) {
