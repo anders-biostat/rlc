@@ -4,7 +4,8 @@
 \alias{lc_bars}
 \title{Create a barplot}
 \usage{
-lc_bars(data, place = NULL, ..., id = NULL, layerId = NULL)
+lc_bars(data = list(), place = NULL, ..., id = NULL,
+  layerId = NULL)
 }
 \arguments{
 \item{data}{Name value pairs of properties, passed through the \code{\link{dat}} function. These
@@ -23,9 +24,6 @@ first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} i
 \item{layerId}{An ID for the new layer. All layers within one chart must have different IDs. An error will be thrown
 if a layer with this ID already exists in the chart. If not defined, will be set to \code{LayerN}, where \code{N - 1} 
 is the number of currently existing layers in this chart.}
-
-\item{parcerStep}{Time in ms between to consequentive calls of onmouseover event. Prevents overqueuing in case
-of cumbersome computations. May be important when the chart works in canvas mode.}
 }
 \description{
 \code{lc_bars} creates a new barplot and adds it on the page
@@ -69,11 +67,11 @@ Axes settings
 
 Interactivity settings
 \itemize{
- \item{\code{on_click} - function, to be called, when one of the lines is clicked. Gets an
- index of the clicked point as an argument.}
- \item{\code{elementMouseOver} - function, to be called, when mouse hovers over one of the lines.
- Gets an index of the clicked point as an argument.}
- \item{\code{elementMouseOut} - function, to be called, when mouse moves out of one of the lines.} }
+ \item{\code{on_click} - function, to be called, when one of the bars is clicked. Gets an
+ index of the clicked bar as an argument.}
+ \item{\code{elementMouseOver} - function, to be called, when mouse hovers over one of the bars.
+ Gets an index of the clicked bar as an argument.}
+ \item{\code{elementMouseOut} - function, to be called, when mouse moves out of one of the bars.} }
  
 Global chart settings
 \itemize{
@@ -90,8 +88,7 @@ Global chart settings
  \item{\code{showPanel} - whether of not to show the tools panel.}
  \item{\code{transitionDuration} - duration of the transtions between any two states of the chart. If 0,
  no animated transition is shown. It can be useful to turn the transition off, when lots of frequent 
- changes happen to the chart.}
-}
+ changes happen to the chart.} }
 }
 
 \examples{

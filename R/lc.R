@@ -734,7 +734,7 @@ lc_scatter <- function(data = list(), place = NULL, ..., id = NULL, layerId = NU
 #' the axes to avoid overlapping.
 #' 
 #' @export
-lc_beeswarm <- function(data, place = NULL, ..., id = NULL, layerId = NULL, parcerStep = 50) {
+lc_beeswarm <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, parcerStep = 50) {
   setChart("beeswarm", data, ..., place = place, id = id, layerId = layerId, dataFun = function(l) {
     if(is.null(l$x) || is.null(l$y))
       stop("Required properties 'x' and 'y' are not defined.")
@@ -808,8 +808,6 @@ lineDataFun <- function(l) {
 #' @param layerId An ID for the new layer. All layers within one chart must have different IDs. An error will be thrown
 #' if a layer with this ID already exists in the chart. If not defined, will be set to \code{LayerN}, where \code{N - 1} 
 #' is the number of currently existing layers in this chart.
-#' @param parcerStep Time in ms between to consequentive calls of onmouseover event. Prevents overqueuing in case
-#' of cumbersome computations. May be important when the chart works in canvas mode.
 #' 
 #' @section Available properties: 
 #' You can read more about different properties in the vignette.
@@ -854,9 +852,9 @@ lineDataFun <- function(l) {
 #' Interactivity settings
 #' \itemize{
 #'  \item{\code{on_click} - function, to be called, when one of the lines is clicked. Gets an
-#'  index of the clicked point as an argument.}
+#'  index of the clicked line as an argument.}
 #'  \item{\code{elementMouseOver} - function, to be called, when mouse hovers over one of the lines.
-#'  Gets an index of the clicked point as an argument.}
+#'  Gets an index of the clicked line as an argument.}
 #'  \item{\code{elementMouseOut} - function, to be called, when mouse moves out of one of the lines.} }
 #'  
 #' Global chart settings
@@ -903,7 +901,7 @@ lineDataFun <- function(l) {
 #' lc_scatter(dat(x = x, y = y), size = 2, id = "ribbonTest")
 #' lc_abLine(dat(a = fit$coefficients[2], b = fit$coefficients[1]), id = "ribbonTest")
 #' @export
-lc_line <- function(data, place = NULL, ..., id = NULL, layerId = NULL) {
+lc_line <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL) {
   setChart("pointLine", data, ..., place = place, id = id, layerId = layerId, 
            dataFun = function(l) {
              l <- lineDataFun(l)
@@ -919,13 +917,13 @@ lc_line <- function(data, place = NULL, ..., id = NULL, layerId = NULL) {
 
 #' @describeIn lc_line connects points in the order they are given.
 #' @export
-lc_path <- function(data, place = NULL, ..., id = NULL, layerId = NULL) {
+lc_path <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL) {
   setChart("pointLine", data, ..., place = place, id = id, layerId = layerId, dataFun = lineDataFun)
 }
 
 #' @describeIn lc_line displays a filled area, defined by \code{ymax} and \code{ymin} values.
 #' @export
-lc_ribbon <- function(data, place = NULL, ..., id = NULL, layerId = NULL) {
+lc_ribbon <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL) {
   setChart("pointRibbon", data, ...,  place = place, id = id, layerId = layerId, dataFun = function(l) {
     if(!is.null(l$x) && !is.vector(l$x)) l$x <- as.matrix(l$x)
     if(!is.null(l$ymax) && !is.vector(l$ymax)) l$ymax <- as.matrix(l$ymax)
@@ -1037,8 +1035,6 @@ barDataFun <- function(l) {
 #' @param layerId An ID for the new layer. All layers within one chart must have different IDs. An error will be thrown
 #' if a layer with this ID already exists in the chart. If not defined, will be set to \code{LayerN}, where \code{N - 1} 
 #' is the number of currently existing layers in this chart.
-#' @param parcerStep Time in ms between to consequentive calls of onmouseover event. Prevents overqueuing in case
-#' of cumbersome computations. May be important when the chart works in canvas mode.
 #' 
 #' @section Available properties: 
 #' You can read more about different properties in the vignette.
@@ -1077,11 +1073,11 @@ barDataFun <- function(l) {
 #'
 #' Interactivity settings
 #' \itemize{
-#'  \item{\code{on_click} - function, to be called, when one of the lines is clicked. Gets an
-#'  index of the clicked point as an argument.}
-#'  \item{\code{elementMouseOver} - function, to be called, when mouse hovers over one of the lines.
-#'  Gets an index of the clicked point as an argument.}
-#'  \item{\code{elementMouseOut} - function, to be called, when mouse moves out of one of the lines.} }
+#'  \item{\code{on_click} - function, to be called, when one of the bars is clicked. Gets an
+#'  index of the clicked bar as an argument.}
+#'  \item{\code{elementMouseOver} - function, to be called, when mouse hovers over one of the bars.
+#'  Gets an index of the clicked bar as an argument.}
+#'  \item{\code{elementMouseOut} - function, to be called, when mouse moves out of one of the bars.} }
 #'  
 #' Global chart settings
 #' \itemize{
@@ -1098,8 +1094,8 @@ barDataFun <- function(l) {
 #'  \item{\code{showPanel} - whether of not to show the tools panel.}
 #'  \item{\code{transitionDuration} - duration of the transtions between any two states of the chart. If 0,
 #'  no animated transition is shown. It can be useful to turn the transition off, when lots of frequent 
-#'  changes happen to the chart.}
-#' } 
+#'  changes happen to the chart.} }
+#'   
 #' @examples 
 #' data("esoph")
 #' 
@@ -1126,7 +1122,7 @@ barDataFun <- function(l) {
 #'             groupIds = newData$agegp))
 #' 
 #' @export
-lc_bars <- function(data, place = NULL, ..., id = NULL, layerId = NULL) {
+lc_bars <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL) {
   setChart("barchart", data, ..., place = place, id = id, layerId = layerId, dataFun = barDataFun)
 }
 
@@ -1147,8 +1143,6 @@ lc_bars <- function(data, place = NULL, ..., id = NULL, layerId = NULL) {
 #' @param layerId An ID for the new layer. All layers within one chart must have different IDs. An error will be thrown
 #' if a layer with this ID already exists in the chart. If not defined, will be set to \code{LayerN}, where \code{N - 1} 
 #' is the number of currently existing layers in this chart.
-#' @param parcerStep Time in ms between to consequentive calls of onmouseover event. Prevents overqueuing in case
-#' of cumbersome computations. May be important when the chart works in canvas mode.
 #' 
 #' @section Available properties:
 #' 
@@ -1166,7 +1160,7 @@ lc_bars <- function(data, place = NULL, ..., id = NULL, layerId = NULL) {
 #' lc_dens(dat(value = rnorm(1000), height = 300))
 #' 
 #' @export 
-lc_hist <- function(data, place = NULL, ..., id = NULL, layerId = NULL) {
+lc_hist <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL) {
   # has a nbins property. Not implemented in JS
   setChart("barchart", data, ..., place = place, id = id, layerId = layerId, dataFun = function(l) {
     if(is.null(l$nbins)) {
@@ -1202,7 +1196,7 @@ lc_hist <- function(data, place = NULL, ..., id = NULL, layerId = NULL) {
 
 #' @describeIn lc_hist makes a density plot. Is an extension of \code{\link{lc_line}}.
 #' @export
-lc_dens <- function(data, place = NULL, ..., id = NULL, layerId = NULL) {
+lc_dens <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL) {
   setChart("pointLine", data, ..., place = place, id = id, layerId = layerId, dataFun = function(l) {
     if(!is.null(l$value)) {
       dens <- density.default(l$value)
@@ -1214,19 +1208,165 @@ lc_dens <- function(data, place = NULL, ..., id = NULL, layerId = NULL) {
   })
 }
 
+#' Create a heatmap
+#' 
+#' \code{lc_heatmap} creates a new heatmaps. Unlike charts with axes, heatmaps do not have
+#' any layers.
+#' 
+#' @param data Name value pairs of properties, passed through the \code{\link{dat}} function. These
+#' properties will be reevaluated on each \code{\link{updateChart}} call. 
+#' @param place An ID of a container, where to place the chart. Will be ignored if the chart already
+#' exists. If not defined, the chart will be placed directly in the body of the opened page.
+#' @param ... Name value pairs of properties that can be evaluated only once and then will remain 
+#' constant. These properties can still be changed later using the \code{\link{setProperties}} function
+#' @param id An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
+#' exists, a new layer will be added to it. If you want to replace one chart with another, use \code{\link{removeChart}}
+#' first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} is the number of currently existing charts.
+#' @param parcerStep Time in ms between to consequentive calls of onmouseover event. Prevents overqueuing in case
+#' of cumbersome computations. May be important when the chart works in canvas mode.
+#' 
+#' @section Available properties: 
+#' You can read more about different properties in the vignette.
+#' 
+#' \itemize{
+#'  \item{\code{value} - matrix of values.}
+#'  \item{\code{rowLabel, colLabel} - vector of labels for all rows or columns.}
+#'  \item{\code{showDendogramRow, showDendogramCol} - whether to show dendograms when rows or columns are
+#'  clustered. Even if these properties are set to \code{FALSE}, rows and columns can still be clustered. }
+#'  \item{\code{clusterRows, clusterCols} - whether rows or columns should be clustered. If these
+#'  properties are set to \code{FALSE}, rows and columns can still be clustered later using the instrument
+#'  panel.} 
+#'  \item{\code{mode} - one of \code{"default", "svg", "canvas"}. Defines, whether to display heatmap as
+#'  an SVG or Canvas object. \code{"default"} mode switches between the two, turning heatmap into Canvas 
+#'  image, when there are too many cell, and into SVG object otherwise.}
+#'  \item{\code{heatmapRow, heatmapCol} - default order of rows and columns of the heatmap.}
+#'  \item{\code{showValue} - if \code{TRUE}, than in the values will be shown as text in each cell.} }
+#' 
+#' Style settings
+#' \itemize{
+#'  \item{\code{rowTitle, colTilte} - titles of rows and columns.}
+#'  \item{\code{palette} - vector of colours to construct the colour scale.}
+#'  \item{\code{colourDomain} - domain of the colour scale. All values outside it will
+#'  be clamped to its edges.} }
+#'  
+#' Interactivity settings
+#' \itemize{
+#'  \item{\code{on_click} - function, to be called, when one of the cells is clicked. Gets row and column idices 
+#'  of the clicked cell as its arguments.}
+#'  \item{\code{elementMouseOver} - function, to be called, when mouse hovers over one of the cells.
+#'  Gets row and column indices of the clicked cell as its arguments.}
+#'  \item{\code{elementMouseOut} - function, to be called, when mouse moves out of one of the cells.} }
+#'  
+#' Global chart settings
+#' \itemize{
+#'  \item{\code{width} - width of the chart in pixels.}
+#'  \item{\code{heigth} - height of the chart in pixels.}
+#'  \item{\code{plotWidth} - width of the plotting area in pixels.}
+#'  \item{\code{plotHeight} - height of the plotting area in pixels.}
+#'  \item{\code{margins} - margins size in pixels. Must be a list with all the following fields: 
+#'  \code{"top", "bottom", "left", "right"}.}
+#'  \item{\code{title} - title of the chart.}
+#'  \item{\code{titleX, titleY} - coordinates of the chart title.}
+#'  \item{\code{titleSize} - font-size of the chart title.}
+#'  \item{\code{showLegend} - whether or not to show the legend.}
+#'  \item{\code{showPanel} - whether of not to show the tools panel.}
+#'  \item{\code{transitionDuration} - duration of the transtions between any two states of the chart. If 0,
+#'  no animated transition is shown. It can be useful to turn the transition off, when lots of frequent 
+#'  changes happen to the chart.} }
+#' @examples 
+#' #create a test matrix
+#' test <- cbind(sapply(1:10, function(i) c(rnorm(10, mean = 1, sd = 3), 
+#'                                          rnorm(6, mean = 5, sd = 2), 
+#'                                          runif(14, 0, 8))),
+#'               sapply(1:10, function(i) c(rnorm(10, mean = 3, sd = 2), 
+#'                                          rnorm(6, mean = 1, sd = 2), 
+#'                                          runif(14, 0, 8))))
+#' test[test < 0] <- 0
+#' rownames(test) <- paste0("Gene", 1:30)
+#' colnames(test) <- paste0("Sample", 1:20)
+#' 
+#' lc_heatmap(dat(value = test))
+#' 
+#' # when you want to cluster rows or columns, it can be
+#' # a good idea to make bottom and right margins larger to
+#' # fit labels
+#' lc_heatmap(dat(value = test),
+#'            clusterRows = T,
+#'            clusterCols = T,
+#'            margins = list(top = 50, left = 30, bottom = 75, right = 75))
+#' 
+#' lc_heatmap(dat(value = cor(test), 
+#'                colourDomain = c(-1, 1),
+#'                palette = RColorBrewer::brewer.pal(11, "RdYlBu")))
 #' @export
-lc_heatmap <- function(data, place = NULL, ..., id = NULL) {
+lc_heatmap <- function(data = list(), place = NULL, ..., id = NULL, parcerStep = 50) {
   setChart("heatmap", data, ..., place = place, id = id, layerId = "main", dataFun = function(l) {
     if(!is.null(l$value)) {
       l$nrows <- nrow(l$value)
       l$ncols <- ncol(l$value)
+
+      if(is.null(l$rowLabel) & !is.null(rownames(l$value)))
+        l$rowLabel <- rownames(l$value)
+      if(is.null(l$colLabel) & !is.null(colnames(l$value)))
+        l$colLabel <- colnames(l$value)
     }
     l
-  })
+  }, parcerStep = parcerStep)
 }
 
+#' Add a colour slider
+#' 
+#' Colour slider provides an easy way to change any continuous colour scale
+#' interactively. If your chart uses a continuous colour scale, you can just 
+#' link a colour slider and it will be automatically synchronized with your
+#' chart's colour scale.
+#' 
+#' @param data Name value pairs of properties, passed through the \code{\link{dat}} function. These
+#' properties will be reevaluated on each \code{\link{updateChart}} call. 
+#' @param place An ID of a container, where to place the chart. Will be ignored if the chart already
+#' exists. If not defined, the chart will be placed directly in the body of the opened page.
+#' @param ... Name value pairs of properties that can be evaluated only once and then will remain 
+#' constant. These properties can still be changed later using the \code{\link{setProperties}} function
+#' @param id An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
+#' exists, a new layer will be added to it. If you want to replace one chart with another, use \code{\link{removeChart}}
+#' first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} is the number of currently existing charts.
+#' 
+#' @section Available properties: 
+#' You can read more about different properties in the vignette.
+#' 
+#' \itemize{
+#'  \item{\code{chart} - id of the chart whose colour scale should be linked to the colour slider.}
+#'  \item{\code{layer} - id of the layer whose colour scale should be linked to the colour slider.
+#'  If chart has only one layer, this property can be omitted.}}
+#'  
+#' Global chart settings
+#' \itemize{
+#'  \item{\code{width} - width of the chart in pixels.}
+#'  \item{\code{heigth} - height of the chart in pixels.}
+#'  \item{\code{margins} - margins size in pixels. Must be a list with all the following fields: 
+#'  \code{"top", "bottom", "left", "right"}.}
+#'  \item{\code{title} - title of the chart.}
+#'  \item{\code{titleX, titleY} - coordinates of the chart title.}
+#'  \item{\code{titleSize} - font-size of the chart title.} }
+#' 
+#' @examples 
+#' data("iris")
+#' lc_scatter(dat(x = iris$Sepal.Length, 
+#'                y = iris$Petal.Length,
+#'                colourValue = iris$Petal.Width,
+#'                symbolValue = iris$Species),
+#'            title = "Iris dataset",
+#'            axisTitleY = "Petal Length",
+#'            axisTitleX = "Sepal Length",
+#'            colourLegendTitle = "Petal Width",
+#'            symbolLegendTitle = "Species",
+#'            showLegend = F,
+#'            id = "scatter")
+#' 
+#' lc_colourSlider(chart = "scatter")
+#' 
 #' @export
-lc_colourSlider <- function(data, place = NULL, ..., id = NULL) {
+lc_colourSlider <- function(data = list(), place = NULL, ..., id = NULL) {
   setChart("colourSlider", data, ..., place = place, id = id, layerId = "main", dataFun = function(l) {
     if(!is.null(l$chart)) {
       l$linkedChart <- str_c("charts.", l$chart)
@@ -1244,7 +1384,7 @@ lc_colourSlider <- function(data, place = NULL, ..., id = NULL) {
 
 #' @export
 #' @importFrom jsonlite toJSON
-lc_abLine <- function(data, place = NULL, ..., id = NULL, layerId = NULL) {
+lc_abLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL) {
   setChart("xLine", data, ..., place = place, id = id, layerId = layerId, dataFun = function(l) {
     if(is.null(l$a) || is.null(l$b))
       stop("Required properties 'a' and 'b' are not defined.");
@@ -1266,7 +1406,7 @@ lc_abLine <- function(data, place = NULL, ..., id = NULL, layerId = NULL) {
 }
   
 #' @export
-lc_hLine <- function(data, place = NULL, ..., id = NULL, layerId = NULL) {
+lc_hLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL) {
   setChart("xLine", data, ..., place = place, id = id, layerId = layerId, dataFun = function(l) {
     if(is.null(l$h))
       stop("Required property 'h' is not defined.");
@@ -1283,7 +1423,7 @@ lc_hLine <- function(data, place = NULL, ..., id = NULL, layerId = NULL) {
 }
 
 #' @export
-lc_vLine <- function(data, place = NULL, ..., id = NULL, layerId = NULL) {
+lc_vLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL) {
   setChart("yLine", data, ..., place = place, id = id, layerId = layerId, dataFun = function(l) {
     if(is.null(l$v))
       stop("Required property 'v' is not defined.");

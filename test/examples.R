@@ -116,3 +116,29 @@ lc_bars(dat(value = newData$ncases,
             stackIds = newData$type,
             barIds = newData$alcgp,
             groupIds = newData$agegp))
+
+
+#create a test matrix
+test <- cbind(sapply(1:10, function(i) c(rnorm(10, mean = 1, sd = 3), 
+                                 rnorm(6, mean = 5, sd = 2), 
+                                 runif(14, 0, 8))),
+              sapply(1:10, function(i) c(rnorm(10, mean = 3, sd = 2), 
+                                         rnorm(6, mean = 1, sd = 2), 
+                                         runif(14, 0, 8))))
+test[test < 0] <- 0
+rownames(test) <- paste0("Gene", 1:30)
+colnames(test) <- paste0("Sample", 1:20)
+
+lc_heatmap(dat(value = test))
+
+# when you want to cluster rows or columns, it can be
+# a good idea to make bottom and right margins larger to
+# fit labels
+lc_heatmap(dat(value = test),
+           clusterRows = T,
+           clusterCols = T,
+           margins = list(top = 50, left = 30, bottom = 75, right = 75))
+
+lc_heatmap(dat(value = cor(test), 
+               colourDomain = c(-1, 1),
+               palette = RColorBrewer::brewer.pal(11, "RdYlBu")))

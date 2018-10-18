@@ -5,9 +5,11 @@
 \alias{lc_dens}
 \title{Histograms and density plots}
 \usage{
-lc_hist(data, place = NULL, ..., id = NULL, layerId = NULL)
+lc_hist(data = list(), place = NULL, ..., id = NULL,
+  layerId = NULL)
 
-lc_dens(data, place = NULL, ..., id = NULL, layerId = NULL)
+lc_dens(data = list(), place = NULL, ..., id = NULL,
+  layerId = NULL)
 }
 \arguments{
 \item{data}{Name value pairs of properties, passed through the \code{\link{dat}} function. These
@@ -26,9 +28,6 @@ first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} i
 \item{layerId}{An ID for the new layer. All layers within one chart must have different IDs. An error will be thrown
 if a layer with this ID already exists in the chart. If not defined, will be set to \code{LayerN}, where \code{N - 1} 
 is the number of currently existing layers in this chart.}
-
-\item{parcerStep}{Time in ms between to consequentive calls of onmouseover event. Prevents overqueuing in case
-of cumbersome computations. May be important when the chart works in canvas mode.}
 }
 \description{
 These functions make either a histogram or a density plot of the given data 

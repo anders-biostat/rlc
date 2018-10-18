@@ -8,8 +8,8 @@
 lc_scatter(data = list(), place = NULL, ..., id = NULL,
   layerId = NULL, parcerStep = 50)
 
-lc_beeswarm(data, place = NULL, ..., id = NULL, layerId = NULL,
-  parcerStep = 50)
+lc_beeswarm(data = list(), place = NULL, ..., id = NULL,
+  layerId = NULL, parcerStep = 50)
 }
 \arguments{
 \item{data}{Name value pairs of properties, passed through the \code{\link{dat}} function. These

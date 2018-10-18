@@ -113,6 +113,12 @@ rlc.setProperty = function(name) {
   if(spl[1] != "main")
     charts[id].activeLayer(charts[id].get_layer(spl[1]));
   for(pr in window[name]) {
+    if(pr == "margins"){
+      window[name][pr].top = window[name][pr].top[0];
+      window[name][pr].bottom = window[name][pr].bottom[0];
+      window[name][pr].left = window[name][pr].left[0];
+      window[name][pr].right = window[name][pr].right[0];
+    }
     if(Array.isArray(window[name][pr]) && window[name][pr].length == 1)
       charts[id][pr](window[name][pr][0])
     else  

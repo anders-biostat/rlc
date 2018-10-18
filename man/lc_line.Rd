@@ -6,11 +6,14 @@
 \alias{lc_ribbon}
 \title{Lines and ribbons}
 \usage{
-lc_line(data, place = NULL, ..., id = NULL, layerId = NULL)
+lc_line(data = list(), place = NULL, ..., id = NULL,
+  layerId = NULL)
 
-lc_path(data, place = NULL, ..., id = NULL, layerId = NULL)
+lc_path(data = list(), place = NULL, ..., id = NULL,
+  layerId = NULL)
 
-lc_ribbon(data, place = NULL, ..., id = NULL, layerId = NULL)
+lc_ribbon(data = list(), place = NULL, ..., id = NULL,
+  layerId = NULL)
 }
 \arguments{
 \item{data}{Name value pairs of properties, passed through the \code{\link{dat}} function. These
@@ -29,9 +32,6 @@ first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} i
 \item{layerId}{An ID for the new layer. All layers within one chart must have different IDs. An error will be thrown
 if a layer with this ID already exists in the chart. If not defined, will be set to \code{LayerN}, where \code{N - 1} 
 is the number of currently existing layers in this chart.}
-
-\item{parcerStep}{Time in ms between to consequentive calls of onmouseover event. Prevents overqueuing in case
-of cumbersome computations. May be important when the chart works in canvas mode.}
 }
 \description{
 These functions create different kind of lines. They connect observations or 
@@ -90,9 +90,9 @@ Axes settings
 Interactivity settings
 \itemize{
  \item{\code{on_click} - function, to be called, when one of the lines is clicked. Gets an
- index of the clicked point as an argument.}
+ index of the clicked line as an argument.}
  \item{\code{elementMouseOver} - function, to be called, when mouse hovers over one of the lines.
- Gets an index of the clicked point as an argument.}
+ Gets an index of the clicked line as an argument.}
  \item{\code{elementMouseOut} - function, to be called, when mouse moves out of one of the lines.} }
  
 Global chart settings
