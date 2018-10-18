@@ -4,6 +4,9 @@
 \alias{lc_line}
 \alias{lc_path}
 \alias{lc_ribbon}
+\alias{lc_abLine}
+\alias{lc_hLine}
+\alias{lc_vLine}
 \title{Lines and ribbons}
 \usage{
 lc_line(data = list(), place = NULL, ..., id = NULL,
@@ -13,6 +16,15 @@ lc_path(data = list(), place = NULL, ..., id = NULL,
   layerId = NULL)
 
 lc_ribbon(data = list(), place = NULL, ..., id = NULL,
+  layerId = NULL)
+
+lc_abLine(data = list(), place = NULL, ..., id = NULL,
+  layerId = NULL)
+
+lc_hLine(data = list(), place = NULL, ..., id = NULL,
+  layerId = NULL)
+
+lc_vLine(data = list(), place = NULL, ..., id = NULL,
   layerId = NULL)
 }
 \arguments{
@@ -44,6 +56,12 @@ create filled area, bordered by a line. Each layer may have one or several lines
 \item \code{lc_path}: connects points in the order they are given.
 
 \item \code{lc_ribbon}: displays a filled area, defined by \code{ymax} and \code{ymin} values.
+
+\item \code{lc_abLine}: creates straight lines by intercept and slope values
+
+\item \code{lc_hLine}: creates horisontal lines by y-intercept values
+
+\item \code{lc_vLine}: creates vertical lines by x-intercept values
 }}
 
 \section{Available properties}{
@@ -54,6 +72,9 @@ You can read more about different properties in the vignette.
  \item{\code{x, y} - vector of x and y coordinates of the points to connect. Can be 
  vectors for a single line or \code{m x n} matrix for \code{n} lines.}
  \item{\code{ymax, ymin} - (only for \code{lc_ribbon}) vectors of maximal and minimal values of the ribbon.} 
+ \item{\code{a, b} - (only for \code{lc_abLine}) vectors of slope and intercept values respectively.}
+ \item{\code{v} - (only for \code{lc_vLine}) vector of x-intercepts.}  
+ \item{\code{h} - (only for \code{lc_hLine}) vector of y-intercepts.}
  \item{\code{lineWidth} - width of each line.}
  \item{\code{opacity} - opacity of the lines in the range from 0 to 1.}
  \item{\code{elementLabel} - vector of text labels for each line.} 
@@ -139,4 +160,8 @@ lc_ribbon(dat(ymin = pred$fit - 1.96 * pred$se.fit,
               colour = "#555555"), id = "ribbonTest")
 lc_scatter(dat(x = x, y = y), size = 2, id = "ribbonTest")
 lc_abLine(dat(a = fit$coefficients[2], b = fit$coefficients[1]), id = "ribbonTest")
+
+lc_hLine(dat(h = seq(1, 9, 1), domainX = c(0, 10), domainY = c(0, 10)), id = "grid")
+lc_vLine(dat(v = seq(1, 9, 1)), id = "grid")
+
 }

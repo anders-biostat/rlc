@@ -816,6 +816,9 @@ lineDataFun <- function(l) {
 #'  \item{\code{x, y} - vector of x and y coordinates of the points to connect. Can be 
 #'  vectors for a single line or \code{m x n} matrix for \code{n} lines.}
 #'  \item{\code{ymax, ymin} - (only for \code{lc_ribbon}) vectors of maximal and minimal values of the ribbon.} 
+#'  \item{\code{a, b} - (only for \code{lc_abLine}) vectors of slope and intercept values respectively.}
+#'  \item{\code{v} - (only for \code{lc_vLine}) vector of x-intercepts.}  
+#'  \item{\code{h} - (only for \code{lc_hLine}) vector of y-intercepts.}
 #'  \item{\code{lineWidth} - width of each line.}
 #'  \item{\code{opacity} - opacity of the lines in the range from 0 to 1.}
 #'  \item{\code{elementLabel} - vector of text labels for each line.} 
@@ -900,6 +903,10 @@ lineDataFun <- function(l) {
 #'               colour = "#555555"), id = "ribbonTest")
 #' lc_scatter(dat(x = x, y = y), size = 2, id = "ribbonTest")
 #' lc_abLine(dat(a = fit$coefficients[2], b = fit$coefficients[1]), id = "ribbonTest")
+#' 
+#' lc_hLine(dat(h = seq(1, 9, 1), domainX = c(0, 10), domainY = c(0, 10)), id = "grid")
+#' lc_vLine(dat(v = seq(1, 9, 1)), id = "grid")
+#' 
 #' @export
 lc_line <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL) {
   setChart("pointLine", data, ..., place = place, id = id, layerId = layerId, 
@@ -1382,6 +1389,7 @@ lc_colourSlider <- function(data = list(), place = NULL, ..., id = NULL) {
   })
 }
 
+#' @describeIn lc_line creates straight lines by intercept and slope values
 #' @export
 #' @importFrom jsonlite toJSON
 lc_abLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL) {
@@ -1404,7 +1412,8 @@ lc_abLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NUL
     l
   })
 }
-  
+
+#' @describeIn lc_line creates horisontal lines by y-intercept values
 #' @export
 lc_hLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL) {
   setChart("xLine", data, ..., place = place, id = id, layerId = layerId, dataFun = function(l) {
@@ -1422,6 +1431,7 @@ lc_hLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL
   })
 }
 
+#' @describeIn lc_line creates vertical lines by x-intercept values
 #' @export
 lc_vLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL) {
   setChart("yLine", data, ..., place = place, id = id, layerId = layerId, dataFun = function(l) {

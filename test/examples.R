@@ -51,7 +51,11 @@ lc_scatter(dat(x = iris$Sepal.Length,
            axisTitleY = "Petal Length",
            axisTitleX = "Sepal Length",
            colourLegendTitle = "Petal Width",
-           symbolLegendTitle = "Species")
+           symbolLegendTitle = "Species",
+           showLegend = F,
+           id = "scatter")
+
+lc_colourSlider(chart = "scatter")
 
 lc_beeswarm(dat(x = iris$Species,
                 y = iris$Sepal.Length,
@@ -142,3 +146,7 @@ lc_heatmap(dat(value = test),
 lc_heatmap(dat(value = cor(test), 
                colourDomain = c(-1, 1),
                palette = RColorBrewer::brewer.pal(11, "RdYlBu")))
+
+
+lc_hLine(dat(h = seq(1, 9, 1), domainX = c(0, 10), domainY = c(0, 10)), id = "grid")
+lc_vLine(dat(v = seq(1, 9, 1)), id = "grid")
