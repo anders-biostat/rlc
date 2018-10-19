@@ -4,6 +4,12 @@
 lc <- new.env()
 lc$pageOpened <- F
 
+lc$nameList <- c("labels" = "label", "color" = "colour", "colorValue" = "colourValue",
+                 "colourValues" = "colourValue", "colorValues" = "colourValue", "colorDomain" = "colourDomain",
+                 "colorLegendTitle" = "colourLegendTitle", "addColorScaleToLegend" = "addColourScaleToLegend",
+                 "symbols" = "symbol", "symbolValues" = "symbolValue", "strokes" = "stroke", "values" = "value",
+                 "heatmapRows" = "heatmapRow", "heatmapCols" = "heatmapCol", "showValues" = "showValue")
+
 lc$props <- list(scatter = c("x", "y", "size", "stroke", "strokeWidth", "symbol", "symbolValue", "symbolLegendTitle"),
                 barchart = c("ngroups", "groupIds", "nbars", "barIds", "nstacks", "stackIds", "value", "groupWidth", "stroke", "strokeWidth",
                              "nbins"), 
@@ -237,6 +243,7 @@ addChart <- function(id, place) {
 #' updateChart("irisScatter")
 #' 
 #' @export
+#' @importFrom plyr rename
 setProperties <- function(data, id, layerId = NULL) {
   chart <- getChart(id)
   if(is.null(chart))
@@ -256,6 +263,8 @@ setProperties <- function(data, id, layerId = NULL) {
   layer <- chart$getLayer(layerId)
   mainLayer <- chart$getLayer("main")
   
+  data <- plyr::rename(data, lc$nameList)
+    
   if(is.null(layer))
     stop(str_c("Layer with ID ", id, " is not defined."))
   
