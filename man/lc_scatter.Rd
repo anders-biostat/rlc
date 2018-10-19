@@ -53,7 +53,7 @@ You can read more about different properties in the vignette.
  \item{\code{x, y} - vector of x and y coordinates of the points.} 
  \item{\code{size} - sizes of the points. Default size is 6.}
  \item{\code{opacity} - opacity of the points in the range from 0 to 1.}
- \item{\code{elementLabel} - vector of text labels for each point.} 
+ \item{\code{label} - vector of text labels for each point.} 
  \item{\code{valueAxis} - (for \code{lc_beeswarm} only) defines, values along 
  which of the axes should not be changed. Must be \code{"x"} or \code{"y"}.} }
 

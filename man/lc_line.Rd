@@ -77,7 +77,7 @@ You can read more about different properties in the vignette.
  \item{\code{h} - (only for \code{lc_hLine}) vector of y-intercepts.}
  \item{\code{lineWidth} - width of each line.}
  \item{\code{opacity} - opacity of the lines in the range from 0 to 1.}
- \item{\code{elementLabel} - vector of text labels for each line.} 
+ \item{\code{label} - vector of text labels for each line.} 
  \item{\code{dasharray} - defines pattern of dashes and gaps for each line.} }
 
 Colour settings

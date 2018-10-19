@@ -1,6 +1,6 @@
 #' @import JsRCom
 #' @import stringr
-#' 
+
 lc <- new.env()
 lc$pageOpened <- F
 
@@ -12,7 +12,7 @@ lc$props <- list(scatter = c("x", "y", "size", "stroke", "strokeWidth", "symbol"
                 xLine = c("lineWidth", "dasharray", "lineFun", "nsteps", "a", "b", "h"),
                 yLine = c("lineWidth", "dasharray", "lineFun", "nsteps", "v"),
                 pointRibbon = c("lineWidth", "dasharray", "x", "ymax", "ymin", "nsteps"),
-                layer = c("nelements", "elementIds", "elementLabel", "layerDomainX", "layerDomainY", "contScaleX", "contScaleY",
+                layer = c("nelements", "elementIds", "label", "layerDomainX", "layerDomainY", "contScaleX", "contScaleY",
                           "colour", "colourValue", "palette", "colourDomain", "colourLegendTitle", "addColourScaleToLegend", "opacity", "on_click",
                           "informText", "elementMouseOver", "elementMouseOut", "markedUpdated"))
 
@@ -605,11 +605,11 @@ scatterDataFun <- function(l) {
   if(is.null(l$y))
     l$y <- 1:length(l$x)
   
-  if(is.null(l$elementLabel)){
+  if(is.null(l$label)){
     if(!is.null(names(l$y)))
-      l$elementLabel <- names(l$y)
+      l$label <- names(l$y)
     if(!is.null(names(l$x)))
-      l$elementLabel <- names(l$x)
+      l$label <- names(l$x)
   }
   
   if(lc$useViewer)
@@ -648,7 +648,7 @@ scatterDataFun <- function(l) {
 #'  \item{\code{x, y} - vector of x and y coordinates of the points.} 
 #'  \item{\code{size} - sizes of the points. Default size is 6.}
 #'  \item{\code{opacity} - opacity of the points in the range from 0 to 1.}
-#'  \item{\code{elementLabel} - vector of text labels for each point.} 
+#'  \item{\code{label} - vector of text labels for each point.} 
 #'  \item{\code{valueAxis} - (for \code{lc_beeswarm} only) defines, values along 
 #'  which of the axes should not be changed. Must be \code{"x"} or \code{"y"}.} }
 #' 
@@ -739,11 +739,11 @@ lc_beeswarm <- function(data = list(), place = NULL, ..., id = NULL, layerId = N
     if(is.null(l$x) || is.null(l$y))
       stop("Required properties 'x' and 'y' are not defined.")
 
-    if(is.null(l$elementLabel)){
+    if(is.null(l$label)){
       if(!is.null(names(l$y)))
-        l$elementLabel <- names(l$y)
+        l$label <- names(l$y)
       if(!is.null(names(l$x)))
-        l$elementLabel <- names(l$x)
+        l$label <- names(l$x)
     }
     
     if(lc$useViewer)
@@ -821,7 +821,7 @@ lineDataFun <- function(l) {
 #'  \item{\code{h} - (only for \code{lc_hLine}) vector of y-intercepts.}
 #'  \item{\code{lineWidth} - width of each line.}
 #'  \item{\code{opacity} - opacity of the lines in the range from 0 to 1.}
-#'  \item{\code{elementLabel} - vector of text labels for each line.} 
+#'  \item{\code{label} - vector of text labels for each line.} 
 #'  \item{\code{dasharray} - defines pattern of dashes and gaps for each line.} }
 #' 
 #' Colour settings
