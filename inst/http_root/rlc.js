@@ -44,7 +44,9 @@ rlc.addChart = function(id, type, place, layerId) {
   charts[id] = lc[type](layerId, charts[id]);
   if(charts[id].on_click)
     charts[id].on_click(function(d) {
-      jrc.sendCommand("chartEvent("+ d + ", '" + id + "', '" + layerId + "', 'click')");
+      if(Array.isArray(d))
+        d = "c(" + d + ")";
+      jrc.sendCommand("rlc:::chartEvent("+ d + ", '" + id + "', '" + layerId + "', 'click')");
     });
   if(layerId == "main")
     charts[id].placeIn = place
@@ -55,16 +57,54 @@ rlc.addChart = function(id, type, place, layerId) {
     }
 }
 
-rlc.setCustomMouseOver = function(id, layerId) {
+rlc.setCustomMouseOver = function(id, layerId, parcerStep) {
   if(!charts[id].customMouseOver){
-    var pacer = lc.call_pacer(100);
-    charts[id].get_layer(layerId)
-      .elementMouseOver(function(d) {
-        pacer.do(function() {jrc.sendCommand("chartEvent("+ d + ", '" + id + "', '" + layerId + "', 'mouseover')")});
-      })
+    var pacer = lc.call_pacer(parcerStep); 
+
+    if(layerId != "main")
+      charts[id].get_layer(layerId)
+        .elementMouseOver(function(d) {
+          pacer.do(function() {jrc.sendCommand("rlc:::chartEvent("+ d + ", '" + id + "', '" + layerId + "', 'mouseover')")}); 
+        })
+    else
+      charts[id]
+        .elementMouseOver(function(d) {
+          pacer.do(function() {jrc.sendCommand("rlc:::chartEvent("+ d + ", '" + id + "', '" + layerId + "', 'mouseover')")}); 
+        });      
     charts[id].customMouseOver = true;
   }
+}
 
+rlc.setCustomMouseOut = function(id, layerId) {
+  if(!charts[id].customMouseOut){
+    if(layerId != "main")
+      charts[id].get_layer(layerId)
+        .elementMouseOut(function() {
+          jrc.sendCommand("rlc:::chartEvent(NULL, '" + id + "', '" + layerId + "', 'mouseout')");
+        })
+    else
+      charts[id]
+        .elementMouseOut(function(d) {
+          jrc.sendCommand("rlc:::chartEvent(NULL, '" + id + "', '" + layerId + "', 'mouseout')");
+        });      
+    charts[id].customMouseOut = true;
+  }
+}
+
+rlc.setCustomMarkedUpdated = function(id, layerId) {
+  if(!charts[id].customMarkedUpdated){
+    if(layerId != "main")
+      charts[id].get_layer(layerId)
+        .markedUpdated(function() {
+          jrc.sendCommand("rlc:::chartEvent(NULL, '" + id + "', '" + layerId + "', 'markedUpdated')");
+        })
+    else
+      charts[id]
+        .markedUpdated(function(d) {
+          jrc.sendCommand("rlc:::chartEvent(NULL, '" + id + "', '" + layerId + "', 'markedUpdated')");
+        });      
+    charts[id].customMarkedUpdated = true;
+  }
 }
 
 rlc.setProperty = function(name) {
@@ -73,12 +113,34 @@ rlc.setProperty = function(name) {
   if(spl[1] != "main")
     charts[id].activeLayer(charts[id].get_layer(spl[1]));
   for(pr in window[name]) {
+    if(pr == "margins"){
+      window[name][pr].top = window[name][pr].top[0];
+      window[name][pr].bottom = window[name][pr].bottom[0];
+      window[name][pr].left = window[name][pr].left[0];
+      window[name][pr].right = window[name][pr].right[0];
+    }
     if(Array.isArray(window[name][pr]) && window[name][pr].length == 1)
       charts[id][pr](window[name][pr][0])
     else  
       charts[id][pr](window[name][pr]);
   }
   window[name] = null;
+}
+
+rlc.getMarked = function(id, layerId) {
+  var marked;
+  if(!charts[id])
+    throw "Error in 'rlc.getMarked': there is no chart with ID " + id;
+
+  if(layerId == "main")
+    marked = charts[id].get_marked()
+  else
+    marked = charts[id].get_layer(layerId).get_marked();
+
+  if(marked.empty)
+    marked = marked.data();
+
+  jrc.sendData("marked", marked);
 }
 
 rlc.updateChart = function(id, updateType, layerId) {
@@ -100,10 +162,32 @@ rlc.updateChart = function(id, updateType, layerId) {
   var updateFun = "update" + updateType;
 
   if(layerId)
-    if(updateType == "")
-      charts[id].updateLayer(layerId)
-    else
-      charts[id].activeLayer(charts[id].get_layer(layerId))[updateFun]();
+    charts[id].activeLayer(charts[id].get_layer(layerId))[updateFun]()
   else
     charts[id][updateFun]();
+}
+
+rlc.html = function(code, place, append) {
+  if(!place) {
+    place = "body";
+    append = true;
+  }
+
+  var container = d3.select(place);
+  if(container.empty())
+    container = d3.select("#" + place);
+
+  if(container.empty()) {
+    container = d3.select("body");
+    append = true;
+  }
+
+  container = container.node();
+  
+  var oldHtml = container.innerHTML;
+
+  if(!append)
+    oldHtml = "";
+
+  container.innerHTML = oldHtml + code;
 }

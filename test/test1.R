@@ -1,5 +1,9 @@
 library(rlc)
 
+#In this example is based on Tabula Muris data set.
+#https://www.biorxiv.org/content/early/2017/12/20/237446
+#`test1.RData` contains 
+
 load("test1.RData")
 
 pvals <- apply(counts, 1, function(row) {

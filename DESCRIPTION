@@ -7,5 +7,5 @@ Author: Simon Anders, Svetlana Ovchinnikova
 Maintainer: Simon Anders <sanders@fs.tum.de>
 Description: to be filled in
 License: GPL-3
-Imports: httpuv, jsonlite, stringr
-RoxygenNote: 6.0.1
+Imports: httpuv, jsonlite, stringr, hwriter
+RoxygenNote: 6.1.0
