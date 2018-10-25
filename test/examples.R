@@ -150,3 +150,15 @@ lc_heatmap(dat(value = cor(test),
 
 lc_hLine(dat(h = seq(1, 9, 1), domainX = c(0, 10), domainY = c(0, 10)), id = "grid")
 lc_vLine(dat(v = seq(1, 9, 1)), id = "grid")
+
+
+noise <- rnorm(30)
+x <- seq(-4, 4, length.out = 30)
+
+lc_scatter(dat(x = x,
+               y = sin(x) + noise,
+               colourValue = noise), id = "plot", layerId = "points")
+lc_line(dat(x = x, y = sin(x)), id = "plot")
+lc_colourSlider(chart = "plot", layer = "points")
+
+listCharts();

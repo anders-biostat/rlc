@@ -57,8 +57,8 @@ Chart$methods(
   },
   removeLayer = function(layerId) {
     if(layerId == "main"){
-      warning("You are attempting to remove the main layer of the chart ", id, 
-              " . The entire chart will be removed.")
+      warning(str_c("You are attempting to remove the main layer of the chart ", id, 
+              ". The entire chart will be removed."))
       removeChart(id)
     } else {
       if(layerId %in% names(layers)) {
@@ -75,7 +75,8 @@ Chart$methods(
   JSinitialize = function() {
     lapply(layers, function(layer) {
       if(!layer$init) {
-        print(layer$id)
+        if(layer$id != "main")
+          message(str_interp("Layer '${layer$id}' is added to chart '${id}'."))
         sendCommand(str_interp("rlc.addChart('${id}', '${layer$type}', '${place}', '${layer$id}');"))
         layer$init <- T
       }
@@ -217,6 +218,8 @@ addChart <- function(id, place) {
   chart <- Chart$new(layers = list(), id = id)
   chart$setPlace(place)
   lc$charts[[id]] <- chart
+  
+  message(str_interp("Chart '${id}' added."))
   
   invisible(chart)
 }
@@ -508,6 +511,38 @@ chartEvent <- function(d, id, layerId, event) {
     layer$on_mouseout()
   if(event == "markedUpdated")
     layer$markedUpdated()
+}
+
+#' List all existing charts and layers
+#' 
+#' \code{listCharts} prints a list of IDs of all existing charts and layers.
+#' 
+#' @examples 
+#' noise <- rnorm(30)
+#' x <- seq(-4, 4, length.out = 30)
+#' 
+#' lc_scatter(dat(x = x,
+#'                y = sin(x) + noise,
+#'                colourValue = noise), 
+#'            id = "plot", layerId = "points")
+#' lc_line(dat(x = x, y = sin(x)), id = "plot")
+#' lc_colourSlider(chart = "plot", layer = "points")
+#' 
+#' listCharts()
+#' @export
+listCharts <- function() {
+  for(chartId in names(lc$charts)) {
+    print(str_interp("Chart: ${chartId}"))
+    chart <- getChart(chartId)
+    if(chart$nLayers() > 1) {
+      print("- Layers:")
+      for(layerId in names(chart$layers)){
+        layer <- chart$getLayer(layerId)
+        if(layer$id != "main")
+          print(str_interp("-- ${layer$id} - ${layer$type}"))
+      }
+    }
+  }
 }
 
 #' Get currently marked elements
