@@ -37,4 +37,4 @@ Currently supported types of charts are:
 - ```lc_html``` - customary HTML code to be inserted in the web page
 
 ## Examples
-To see how it work, have a look at this [tutorial](https://github.com/anders-biostat/rlc_tutorial).
+To see how it work, have a look at this [tutorial](https://anders-biostat.github.io/linked-charts/rlc/).
