@@ -57,9 +57,9 @@ Interactivity settings
 \itemize{
  \item{\code{on_click} - function, to be called, when one of the cells is clicked. Gets row and column idices 
  of the clicked cell as its arguments.}
- \item{\code{elementMouseOver} - function, to be called, when mouse hovers over one of the cells.
+ \item{\code{on_mouseover} - function, to be called, when mouse hovers over one of the cells.
  Gets row and column indices of the clicked cell as its arguments.}
- \item{\code{elementMouseOut} - function, to be called, when mouse moves out of one of the cells.} }
+ \item{\code{on_mouseout} - function, to be called, when mouse moves out of one of the cells.} }
  
 Global chart settings
 \itemize{

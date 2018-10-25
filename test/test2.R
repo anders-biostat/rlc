@@ -18,7 +18,7 @@ lc_scatter(dat(x = tiss@dr$tsne@cell.embeddings[, 1], y = tiss@dr$tsne@cell.embe
                  clusts <<- !clusts
                  updateChart("tsne", updateType = "ElementStyle")
                },
-               elementMouseOver = function(k) {
+               on_mouseover = function(k) {
                 activePoint <<- k
                 if(!clusts){
                   updateChart("tsne", updateType = "ElementStyle")

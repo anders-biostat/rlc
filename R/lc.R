@@ -20,13 +20,13 @@ lc$props <- list(scatter = c("x", "y", "size", "stroke", "strokeWidth", "symbol"
                 pointRibbon = c("lineWidth", "dasharray", "x", "ymax", "ymin", "nsteps"),
                 layer = c("nelements", "elementIds", "label", "layerDomainX", "layerDomainY", "contScaleX", "contScaleY",
                           "colour", "colourValue", "palette", "colourDomain", "colourLegendTitle", "addColourScaleToLegend", "opacity", "on_click",
-                          "informText", "elementMouseOver", "elementMouseOut", "markedUpdated"))
+                          "informText", "on_mouseover", "on_mouseout", "on_marked"))
 
 Layer <- setRefClass("Layer", fields = list(type = "character", id = "character", 
                                             properties = "list", dataFun = "function",
                                             on_click = "function", on_mouseover = "function",
                                             on_mouseout = "function", init = "logical",
-                                            markedUpdated = "function", parcerStep = "numeric"))
+                                            on_marked = "function", parcerStep = "numeric"))
 Layer$methods(
   setProperty = function(name, expr) {
     properties[[name]] <<- expr
@@ -430,20 +430,20 @@ sendProperties <- function(chart, layerId = ls(chart$layers)){
       d$on_click <- NULL
     }
     
-    if(!is.null(d$markedUpdated)) {
-      layer$markedUpdated <- d$markedUpdated
+    if(!is.null(d$on_marked)) {
+      layer$on_marked <- d$on_marked
       d$maekedUpdated <- NULL
-      sendCommand(str_interp("rlc.setCustomMarkedUpdated('${chart$id}', '${layerName}');"))
+      sendCommand(str_interp("rlc.setCustomOnMarked('${chart$id}', '${layerName}');"))
     }
     
-    if(!is.null(d$elementMouseOver)) {
-      layer$on_mouseover <- d$elementMouseOver
-      d$elementMouseOver <- NULL
+    if(!is.null(d$on_mouseover)) {
+      layer$on_mouseover <- d$on_mouseover
+      d$on_mouseover <- NULL
       sendCommand(str_interp("rlc.setCustomMouseOver('${chart$id}', '${layerName}', ${layer$parcerStep});"))
     }
-    if(!is.null(d$elementMouseOver)) {
-      layer$on_mouseout <- d$elementMouseOut
-      d$elementMouseOut <- NULL
+    if(!is.null(d$on_mouseover)) {
+      layer$on_mouseout <- d$on_mouseout
+      d$on_mouseout <- NULL
       sendCommand(str_interp("rlc.setCustomMouseOut('${chart$id}', '${layerName}');"))
     }    
     
@@ -509,8 +509,8 @@ chartEvent <- function(d, id, layerId, event) {
     layer$on_mouseover(d)
   if(event == "mouseout")
     layer$on_mouseout()
-  if(event == "markedUpdated")
-    layer$markedUpdated()
+  if(event == "marked")
+    layer$on_marked()
 }
 
 #' List all existing charts and layers
@@ -728,9 +728,9 @@ scatterDataFun <- function(l) {
 #' \itemize{
 #'  \item{\code{on_click} - function, to be called, when one of the points is clicked. Gets an
 #'  index of the clicked point as an argument.}
-#'  \item{\code{elementMouseOver} - function, to be called, when mouse hovers over one of the points.
+#'  \item{\code{on_mouseover} - function, to be called, when mouse hovers over one of the points.
 #'  Gets an index of the clicked point as an argument.}
-#'  \item{\code{elementMouseOut} - function, to be called, when mouse moves out of one of the points.} }
+#'  \item{\code{on_mouseout} - function, to be called, when mouse moves out of one of the points.} }
 #'  
 #' Global chart settings
 #' \itemize{
@@ -900,9 +900,9 @@ lineDataFun <- function(l) {
 #' \itemize{
 #'  \item{\code{on_click} - function, to be called, when one of the lines is clicked. Gets an
 #'  index of the clicked line as an argument.}
-#'  \item{\code{elementMouseOver} - function, to be called, when mouse hovers over one of the lines.
+#'  \item{\code{on_mouseover} - function, to be called, when mouse hovers over one of the lines.
 #'  Gets an index of the clicked line as an argument.}
-#'  \item{\code{elementMouseOut} - function, to be called, when mouse moves out of one of the lines.} }
+#'  \item{\code{on_mouseout} - function, to be called, when mouse moves out of one of the lines.} }
 #'  
 #' Global chart settings
 #' \itemize{
@@ -1126,9 +1126,9 @@ barDataFun <- function(l) {
 #' \itemize{
 #'  \item{\code{on_click} - function, to be called, when one of the bars is clicked. Gets an
 #'  index of the clicked bar as an argument.}
-#'  \item{\code{elementMouseOver} - function, to be called, when mouse hovers over one of the bars.
+#'  \item{\code{on_mouseover} - function, to be called, when mouse hovers over one of the bars.
 #'  Gets an index of the clicked bar as an argument.}
-#'  \item{\code{elementMouseOut} - function, to be called, when mouse moves out of one of the bars.} }
+#'  \item{\code{on_mouseout} - function, to be called, when mouse moves out of one of the bars.} }
 #'  
 #' Global chart settings
 #' \itemize{
@@ -1304,9 +1304,9 @@ lc_dens <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL)
 #' \itemize{
 #'  \item{\code{on_click} - function, to be called, when one of the cells is clicked. Gets row and column idices 
 #'  of the clicked cell as its arguments.}
-#'  \item{\code{elementMouseOver} - function, to be called, when mouse hovers over one of the cells.
+#'  \item{\code{on_mouseover} - function, to be called, when mouse hovers over one of the cells.
 #'  Gets row and column indices of the clicked cell as its arguments.}
-#'  \item{\code{elementMouseOut} - function, to be called, when mouse moves out of one of the cells.} }
+#'  \item{\code{on_mouseout} - function, to be called, when mouse moves out of one of the cells.} }
 #'  
 #' Global chart settings
 #' \itemize{

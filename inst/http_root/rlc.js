@@ -63,12 +63,12 @@ rlc.setCustomMouseOver = function(id, layerId, parcerStep) {
 
     if(layerId != "main")
       charts[id].get_layer(layerId)
-        .elementMouseOver(function(d) {
+        .on_mouseover(function(d) {
           pacer.do(function() {jrc.sendCommand("rlc:::chartEvent("+ d + ", '" + id + "', '" + layerId + "', 'mouseover')")}); 
         })
     else
       charts[id]
-        .elementMouseOver(function(d) {
+        .on_mouseover(function(d) {
           pacer.do(function() {jrc.sendCommand("rlc:::chartEvent("+ d + ", '" + id + "', '" + layerId + "', 'mouseover')")}); 
         });      
     charts[id].customMouseOver = true;
@@ -79,31 +79,31 @@ rlc.setCustomMouseOut = function(id, layerId) {
   if(!charts[id].customMouseOut){
     if(layerId != "main")
       charts[id].get_layer(layerId)
-        .elementMouseOut(function() {
+        .on_mouseout(function() {
           jrc.sendCommand("rlc:::chartEvent(NULL, '" + id + "', '" + layerId + "', 'mouseout')");
         })
     else
       charts[id]
-        .elementMouseOut(function(d) {
+        .on_mouseout(function(d) {
           jrc.sendCommand("rlc:::chartEvent(NULL, '" + id + "', '" + layerId + "', 'mouseout')");
         });      
     charts[id].customMouseOut = true;
   }
 }
 
-rlc.setCustomMarkedUpdated = function(id, layerId) {
-  if(!charts[id].customMarkedUpdated){
+rlc.setCustomOnMarked = function(id, layerId) {
+  if(!charts[id].customOnMarked){
     if(layerId != "main")
       charts[id].get_layer(layerId)
-        .markedUpdated(function() {
-          jrc.sendCommand("rlc:::chartEvent(NULL, '" + id + "', '" + layerId + "', 'markedUpdated')");
+        .on_marked(function() {
+          jrc.sendCommand("rlc:::chartEvent(NULL, '" + id + "', '" + layerId + "', 'marked')");
         })
     else
       charts[id]
-        .markedUpdated(function(d) {
-          jrc.sendCommand("rlc:::chartEvent(NULL, '" + id + "', '" + layerId + "', 'markedUpdated')");
+        .on_marked(function(d) {
+          jrc.sendCommand("rlc:::chartEvent(NULL, '" + id + "', '" + layerId + "', 'marked')");
         });      
-    charts[id].customMarkedUpdated = true;
+    charts[id].customOnMarked = true;
   }
 }
 

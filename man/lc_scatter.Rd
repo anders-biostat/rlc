@@ -89,9 +89,9 @@ Interactivity settings
 \itemize{
  \item{\code{on_click} - function, to be called, when one of the points is clicked. Gets an
  index of the clicked point as an argument.}
- \item{\code{elementMouseOver} - function, to be called, when mouse hovers over one of the points.
+ \item{\code{on_mouseover} - function, to be called, when mouse hovers over one of the points.
  Gets an index of the clicked point as an argument.}
- \item{\code{elementMouseOut} - function, to be called, when mouse moves out of one of the points.} }
+ \item{\code{on_mouseout} - function, to be called, when mouse moves out of one of the points.} }
  
 Global chart settings
 \itemize{

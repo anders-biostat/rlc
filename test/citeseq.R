@@ -82,7 +82,7 @@ openPage(useViewer = F, layout = "table1x2")
 lc_scatter(dat(x = tsne_res$Y[, 1], y = tsne_res$Y[, 2], title = "TSNE", 
                colourValue = distsFrom(activeCell), opacity = 0.2, size = 3,
                colourDomain = c(0, 0.5),
-               elementMouseOver = function(k) {
+               on_mouseover = function(k) {
                  activeCell <<- k
                  updateChart(c("tsne", "umap"))
                }), id = "tsne", place = "A1", parcerStep = 200)
@@ -90,7 +90,7 @@ lc_scatter(dat(x = tsne_res$Y[, 1], y = tsne_res$Y[, 2], title = "TSNE",
 lc_scatter(dat(x = umap_res$layout[, 1], y = umap_res$layout[, 2], title = "UMAP", 
                colourValue = distsFrom(activeCell), opacity = 0.2, size = 3,
                colourDomain = c(0, 0.5),
-               elementMouseOver = function(k) {
+               on_mouseover = function(k) {
                  activeCell <<- k
                  updateChart(c("tsne", "umap"))
                }), id = "umap", place = "A2", parcerStep = 300)

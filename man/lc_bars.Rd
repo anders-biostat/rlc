@@ -69,9 +69,9 @@ Interactivity settings
 \itemize{
  \item{\code{on_click} - function, to be called, when one of the bars is clicked. Gets an
  index of the clicked bar as an argument.}
- \item{\code{elementMouseOver} - function, to be called, when mouse hovers over one of the bars.
+ \item{\code{on_mouseover} - function, to be called, when mouse hovers over one of the bars.
  Gets an index of the clicked bar as an argument.}
- \item{\code{elementMouseOut} - function, to be called, when mouse moves out of one of the bars.} }
+ \item{\code{on_mouseout} - function, to be called, when mouse moves out of one of the bars.} }
  
 Global chart settings
 \itemize{
