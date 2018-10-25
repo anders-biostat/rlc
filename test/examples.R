@@ -7,7 +7,7 @@ width <- 300
 height <- 300
 colour <- iris$Sepal.Width
 #create a chart
-lc_scatter(dat(x = iris$Sepal.Length, y = iris$Petal.Length, colourValue = colour,
+lc_scatter(dat(x = iris$Sepal.Length, y = iris$Petal.Length, colorValues = colour,
                width = width, height = height), id = "iris")
 
 #change the variables

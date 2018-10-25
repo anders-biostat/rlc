@@ -263,7 +263,7 @@ setProperties <- function(data, id, layerId = NULL) {
   layer <- chart$getLayer(layerId)
   mainLayer <- chart$getLayer("main")
   
-  data <- plyr::rename(data, lc$nameList)
+  data <- plyr::rename(data, lc$nameList, warn_missing = FALSE)
     
   if(is.null(layer))
     stop(str_c("Layer with ID ", id, " is not defined."))
