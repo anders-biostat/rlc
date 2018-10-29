@@ -16,12 +16,12 @@ lc_scatter(dat(x = tiss@dr$tsne@cell.embeddings[, 1], y = tiss@dr$tsne@cell.embe
                transitionDuration = 0,
                on_click = function(k){
                  clusts <<- !clusts
-                 updateChart("tsne", updateType = "ElementStyle")
+                 updateCharts("tsne", updateOnly = "ElementStyle")
                },
                on_mouseover = function(k) {
                 activePoint <<- k
                 if(!clusts){
-                  updateChart("tsne", updateType = "ElementStyle")
+                  updateCharts("tsne", updateOnly = "ElementStyle")
                 }
                }), id = "tsne")
 

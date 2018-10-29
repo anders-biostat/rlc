@@ -53,8 +53,8 @@ openPage(layout = "table2x2", useViewer = F)
 lc_scatter(dat(x = means, y = vars / means / mean(1/countsums), logScaleX = 10, logScaleY = 10, size = 2,
                on_click = function(i) {
                  selGene <<- rownames(rawCounts_RNA)[i]
-                 updateChart("expression")
-                 updateChart("tsne")
+                 updateCharts("expression")
+                 updateCharts("tsne")
                 }), place = "A1")
 lc_hLine(dat(h = 1, colour = "red"), id = "A1")
 
@@ -84,7 +84,7 @@ lc_scatter(dat(x = tsne_res$Y[, 1], y = tsne_res$Y[, 2], title = "TSNE",
                colourDomain = c(0, 0.5),
                on_mouseover = function(k) {
                  activeCell <<- k
-                 updateChart(c("tsne", "umap"))
+                 updateCharts(c("tsne", "umap"))
                }), id = "tsne", place = "A1", parcerStep = 200)
 
 lc_scatter(dat(x = umap_res$layout[, 1], y = umap_res$layout[, 2], title = "UMAP", 
@@ -92,5 +92,5 @@ lc_scatter(dat(x = umap_res$layout[, 1], y = umap_res$layout[, 2], title = "UMAP
                colourDomain = c(0, 0.5),
                on_mouseover = function(k) {
                  activeCell <<- k
-                 updateChart(c("tsne", "umap"))
+                 updateCharts(c("tsne", "umap"))
                }), id = "umap", place = "A2", parcerStep = 300)

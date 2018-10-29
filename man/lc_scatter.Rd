@@ -13,7 +13,7 @@ lc_beeswarm(data = list(), place = NULL, ..., id = NULL,
 }
 \arguments{
 \item{data}{Name value pairs of properties, passed through the \code{\link{dat}} function. These
-properties will be reevaluated on each \code{\link{updateChart}} call.}
+properties will be reevaluated on each \code{\link{updateCharts}} call.}
 
 \item{place}{An ID of a container, where to place the chart. Will be ignored if the chart already
 exists. If not defined, the chart will be placed directly in the body of the opened page.}

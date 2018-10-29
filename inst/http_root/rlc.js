@@ -143,12 +143,12 @@ rlc.getMarked = function(id, layerId) {
   jrc.sendData("marked", marked);
 }
 
-rlc.updateChart = function(id, updateType, layerId) {
+rlc.updateCharts = function(id, updateType, layerId) {
   if(!charts[id]) 
-    throw "Error in 'rlc.updateChart': there is no chart with ID " + id;
+    throw "Error in 'rlc.updateCharts': there is no chart with ID " + id;
   if(layerId == "") layerId = undefined;
   if(layerId && !charts[id].layers[layerId])
-    throw "Error in 'rlc.updateChart': chart " + id + " doesn't have layer with " +
+    throw "Error in 'rlc.updateCharts': chart " + id + " doesn't have layer with " +
       "ID: " + layerId;
 
   if(charts[id].placeIn) {

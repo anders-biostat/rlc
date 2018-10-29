@@ -15,21 +15,21 @@ height <- 400
 colour <- iris$Petal.Width
 
 #this will change colour of points and chart height
-updateChart("iris")
+updateCharts("iris")
 #this will change only height
-updateChart("iris", updateType = "Size")
+updateCharts("iris", updateOnly = "Size")
 
 #add another property
 setProperties(dat(symbolValue = iris$Species), "iris")
 #this will change only colour and symbols
-updateChart("iris", updateType = "ElementStyle")
+updateCharts("iris", updateOnly = "ElementStyle")
 
 a <- 1
 b <- 0
 lc_abLine(dat(a = a, b = b), id = "iris")
 
 b <- -2
-updateChart("iris", "Layer2")
+updateCharts("iris", "Layer2")
 
 
 lc_scatter(dat(x = 1:10, y = 1:10, colourValue = 1:10 * 10^-20))
@@ -39,8 +39,8 @@ lc_scatter(dat(x = iris$Sepal.Length), y = iris$Petal.Length, colourValue = colo
                width = width, height = height, id = "iris")
 
 lc_scatter(dat(x = rnorm(30)), y = rnorm(30))
-#note that the Y values remain the same after each updateChart call
-updateChart()
+#note that the Y values remain the same after each updateCharts call
+updateCharts()
 
 data("iris")
 lc_scatter(dat(x = iris$Sepal.Length, 

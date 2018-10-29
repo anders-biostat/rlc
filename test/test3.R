@@ -35,7 +35,7 @@ openPage(layout = "table1x2", useViewer = F)
 lc_scatter(dat(x = -log10(pvals$alt), y = -log10(pvals$res), nelements = nrow(exprs), size = 4, opacity  = 0.8,
                on_click = function(i) {
                  selGene <<- rownames(exprs)[i + 1]
-                 updateChart("expr")
+                 updateCharts("expr")
                }), place = "A1")
 lc_ribbon(dat(x = cbind(s, s), ymax = fitCurve(selGene) + 1.96 * fitCurve(selGene, ret = "se"),
               ymin = fitCurve(selGene) - 1.96 * fitCurve(selGene, ret = "se"), colourValue = c("Male", "Female"),

@@ -239,11 +239,11 @@ addChart <- function(id, place) {
 #' data("iris")
 #' lc_scatter(dat(x = iris$Sepal.Length, y = iris$Sepal.Width), id = "irisScatter")
 #' setProperties(dat(symbolValue = iris$Species, y = iris$Petal.Length), id = "irisScatter")
-#' updateChart("irisScatter")
+#' updateCharts("irisScatter")
 #' 
 #' lc_line(dat(x = iris$Sepal.Length, y = iris$Petal.Length), id = "irisScatter", layerId = "line")
 #' setProperties(dat(colour = "red"), id = "irisScatter", layerId = "line")
-#' updateChart("irisScatter")
+#' updateCharts("irisScatter")
 #' 
 #' @export
 #' @importFrom plyr rename
@@ -283,31 +283,32 @@ setProperties <- function(data, id, layerId = NULL) {
 
 #' Update a chart
 #' 
-#' \code{updateChart} redraws a chart or a single layer of the chart to make it up
-#' to date with current state of the environment.
+#' \code{updateCharts} redraws a chart or a single layer of the chart to make it up
+#' to date with the current state of the environment.
 #' 
 #' Linked charts of the \emph{rlc} package are based on the idea that variables
 #' used to define the chart are not constant, but can change as a result of user's
-#' actions. Each time the \code{updateChart} is called, all the properties passed
+#' actions. Each time the \code{updateCharts} is called, all the properties passed
 #' via \code{\link{dat}} function are reevaluated and cahrt is changed in accordance with the
 #' new state.
 #' 
 #' @section Update types: 
-#' Defining a type of update allows you to change only some aspects of the chart
-#' which may improve the performance speed. 
+#' To improve performance you can update only a certain part of the chart (e.g. colours,
+#' size, etc.). This can be done by setting the \code{updateOnly} argument. Here are all
+#' possible values for this argument.
 #' 
-#' Some of the update types are valid for all the charts:
+#' These are valid for all the charts:
 #' \itemize{
 #'   \item{\code{Size} changes the size of the chart (and consequently the location
 #'   of all its elements).}
-#'   \item{\code{Title}changes the title of the chart.}
-#'   \item{\code{Canvas}If number of elements is too high the 
+#'   \item{\code{Title} changes the title of the chart.}
+#'   \item{\code{Canvas} If number of elements is too high the 
 #'   charts switch to the canvas mode and istead of multiple SVG point or cells
 #'   a single Canvas image is generated. This type of update redraws the Canvas
 #'   image. \emph{It is not recommended to use this function.}}
 #' }
 #' 
-#' These types are specific for heatmaps only (\code{\link{lc_heatmap}}):
+#' These can be updated only in heatmaps (\code{\link{lc_heatmap}}):
 #' \itemize{
 #'   \item \code{Labels} adds new row and column labels and removes those that are no longer
 #'   needed. Also updates \code{Cells}.
@@ -325,7 +326,7 @@ setProperties <- function(data, id, layerId = NULL) {
 #'   data values.
 #' }
 #' 
-#' These types are valid for all other types of charts except heatmaps.
+#' These aspects are present in all the charts with axes.
 #' \itemize{
 #'   \item \code{Axes} updates axes of the chart and changes positions 
 #'   of all the elements accordingly.
@@ -343,7 +344,7 @@ setProperties <- function(data, id, layerId = NULL) {
 #' layers of the selected charts will be updated. To update only the selected layers of
 #' multiple charts the lengths of \code{id} and \code{layerId} must be the same.
 #' 
-#' @param updateType To improve performance it may be useful to change only certain 
+#' @param updateOnly To improve performance it may be useful to change only certain 
 #' aspects of the chart (e.g. location of the points, colour of the heatmap cells,
 #' etc.). This argument can specify which part of chart to update. Possible options are
 #' \code{Elements}, \code{ElementPosition}, \code{ElementStyle}, \code{Axes}, \code{Labels},
@@ -367,17 +368,17 @@ setProperties <- function(data, id, layerId = NULL) {
 #' colour <- iris$Petal.Width
 #' 
 #' #this will change colour of points and chart height
-#' updateChart("iris")
+#' updateCharts("iris")
 #' #this will change only height
-#' updateChart("iris", updateType = "Size")
+#' updateCharts("iris", updateOnly = "Size")
 #' 
 #' #add another property
 #' setProperties(dat(symbolValue = iris$Species), "iris")
 #' #this will change only colour and symbols
-#' updateChart("iris", updateType = "ElementStyle")
+#' updateCharts("iris", updateOnly = "ElementStyle")
 #' 
 #' @export
-updateChart <- function(id = NULL, layerId = NULL, updateType = NULL) {
+updateCharts <- function(id = NULL, layerId = NULL, updateOnly = NULL) {
   if(is.null(id)) id <- ls(lc$charts)
   if(!is.vector(id))
     stop("'id' should be a vector of IDs")
@@ -385,8 +386,8 @@ updateChart <- function(id = NULL, layerId = NULL, updateType = NULL) {
   
   if(!is.null(layerId) & length(layerId) != length(id))
     stop("Lengths of 'id' and 'layerId' differ")
-  if(!is.null(updateType) & length(updateType) != length(id))
-    stop("Lengths of 'id' and 'updateType' differ")
+  if(!is.null(updateOnly) & length(updateOnly) != length(id))
+    stop("Lengths of 'id' and 'updateOnly' differ")
   
   for(i in 1:length(id)){
     chart <- getChart(id[i])
@@ -394,8 +395,8 @@ updateChart <- function(id = NULL, layerId = NULL, updateType = NULL) {
       stop(str_c("Chart with ID ", id[i], " is not defined."))
     args <- str_c("'", id[i], "', '")
     
-    if(!is.null(updateType)) {
-      args <- str_c(args, updateType[i], "', '")
+    if(!is.null(updateOnly)) {
+      args <- str_c(args, updateOnly[i], "', '")
     } else {
       args <- str_c(args, "', '")
     }
@@ -407,7 +408,7 @@ updateChart <- function(id = NULL, layerId = NULL, updateType = NULL) {
       sendProperties(chart)
       args <- str_c(args, "'")
     }
-    sendCommand(str_interp("rlc.updateChart(${args});"))
+    sendCommand(str_interp("rlc.updateCharts(${args});"))
   }
 }
 
@@ -486,7 +487,7 @@ setChart <- function(type, data, ..., place, id, layerId, dataFun, parcerStep = 
   nonEv <- lapply(names(l), function(n) {function() l[[n]]})
   names(nonEv) <- names(l)
   setProperties(c(data, nonEv), id, layerId)
-  updateChart(id)
+  updateCharts(id)
   
   invisible(chart)
 }
@@ -606,7 +607,7 @@ getMarked <- function(chartId, layerId = NULL) {
 #' Link data to the chart
 #' 
 #' \code{dat} allows to link variables from the current environment to chart's properties.
-#' On every \code{\link{updateChart}} call all the data, provided via the \code{dat} function,
+#' On every \code{\link{updateCharts}} call all the data, provided via the \code{dat} function,
 #' will be automatically reevaluated and the chart will be changed accordingly. One can also
 #' put properties outside of the \code{dat} function, if they are going to be constant.
 #' 
@@ -614,8 +615,8 @@ getMarked <- function(chartId, layerId = NULL) {
 #' 
 #' @examples 
 #' lc_scatter(dat(x = rnorm(30)), y = rnorm(30))
-#' #note that the Y values remain the same after each updateChart call
-#' updateChart()
+#' #note that the Y values remain the same after each updateCharts call
+#' updateCharts()
 #' 
 #' @export
 dat <- function( ... ) {
@@ -671,7 +672,7 @@ scatterDataFun <- function(l) {
 #' creates a new one.
 #' 
 #' @param data Name value pairs of properties, passed through the \code{\link{dat}} function. These
-#' properties will be reevaluated on each \code{\link{updateChart}} call. 
+#' properties will be reevaluated on each \code{\link{updateCharts}} call. 
 #' @param place An ID of a container, where to place the chart. Will be ignored if the chart already
 #' exists. If not defined, the chart will be placed directly in the body of the opened page.
 #' @param ... Name value pairs of properties that can be evaluated only once and then will remain 
@@ -841,7 +842,7 @@ lineDataFun <- function(l) {
 #' @describeIn lc_line connects points in the order of variables on the x axis.
 #' 
 #' @param data Name value pairs of properties, passed through the \code{\link{dat}} function. These
-#' properties will be reevaluated on each \code{\link{updateChart}} call. 
+#' properties will be reevaluated on each \code{\link{updateCharts}} call. 
 #' @param place An ID of a container, where to place the chart. Will be ignored if the chart already
 #' exists. If not defined, the chart will be placed directly in the body of the opened page.
 #' @param ... Name value pairs of properties that can be evaluated only once and then will remain 
@@ -1075,7 +1076,7 @@ barDataFun <- function(l) {
 #' as a new chart or as a new layer of an existing chart.
 #' 
 #' @param data Name value pairs of properties, passed through the \code{\link{dat}} function. These
-#' properties will be reevaluated on each \code{\link{updateChart}} call. 
+#' properties will be reevaluated on each \code{\link{updateCharts}} call. 
 #' @param place An ID of a container, where to place the chart. Will be ignored if the chart already
 #' exists. If not defined, the chart will be placed directly in the body of the opened page.
 #' @param ... Name value pairs of properties that can be evaluated only once and then will remain 
@@ -1183,7 +1184,7 @@ lc_bars <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL)
 #' and either add them as a new layer to an existing chart or create a new chart.
 #' 
 #' @param data Name value pairs of properties, passed through the \code{\link{dat}} function. These
-#' properties will be reevaluated on each \code{\link{updateChart}} call. 
+#' properties will be reevaluated on each \code{\link{updateCharts}} call. 
 #' @param place An ID of a container, where to place the chart. Will be ignored if the chart already
 #' exists. If not defined, the chart will be placed directly in the body of the opened page.
 #' @param ... Name value pairs of properties that can be evaluated only once and then will remain 
@@ -1265,7 +1266,7 @@ lc_dens <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL)
 #' any layers.
 #' 
 #' @param data Name value pairs of properties, passed through the \code{\link{dat}} function. These
-#' properties will be reevaluated on each \code{\link{updateChart}} call. 
+#' properties will be reevaluated on each \code{\link{updateCharts}} call. 
 #' @param place An ID of a container, where to place the chart. Will be ignored if the chart already
 #' exists. If not defined, the chart will be placed directly in the body of the opened page.
 #' @param ... Name value pairs of properties that can be evaluated only once and then will remain 
@@ -1373,7 +1374,7 @@ lc_heatmap <- function(data = list(), place = NULL, ..., id = NULL, parcerStep =
 #' chart's colour scale.
 #' 
 #' @param data Name value pairs of properties, passed through the \code{\link{dat}} function. These
-#' properties will be reevaluated on each \code{\link{updateChart}} call. 
+#' properties will be reevaluated on each \code{\link{updateCharts}} call. 
 #' @param place An ID of a container, where to place the chart. Will be ignored if the chart already
 #' exists. If not defined, the chart will be placed directly in the body of the opened page.
 #' @param ... Name value pairs of properties that can be evaluated only once and then will remain 
@@ -1499,7 +1500,7 @@ lc_vLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL
 #' to transform some data structures (e.g. data frames) to HTML tables.
 #'
 #' @param data Name value pairs of properties, passed through the \code{\link{dat}} function. These
-#' properties will be reevaluated on each \code{\link{updateChart}} call. 
+#' properties will be reevaluated on each \code{\link{updateCharts}} call. 
 #' @param place An ID of a container, where to place the chart. Will be ignored if the chart already
 #' exists. If not defined, the chart will be placed directly in the body of the opened page.
 #' @param ... Name value pairs of properties that can be evaluated only once and then will remain 
