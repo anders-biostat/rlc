@@ -150,8 +150,10 @@ openPage <- function(useViewer = T, rootDirectory = NULL, startPage = NULL, layo
     stop( "Can't load linked-charts.js or rlc.js" )
   }
   
+  sendCommand("d3.select('title').text('R/linked-charts');")
+  
   if(!is.null(layout)) addDefaultLayout(layout)
-
+  
   lc$pageOpened <- T
 }
 
