@@ -1493,14 +1493,56 @@ lc_vLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL
   })
 }
 
+#' Add HTML code to the page
+#' 
+#' \code{lc_html} adds a block with HTML code. It uses \code{\link[hwriter]{hwrite}} function
+#' to transform some data structures (e.g. data frames) to HTML tables.
+#'
+#' @param data Name value pairs of properties, passed through the \code{\link{dat}} function. These
+#' properties will be reevaluated on each \code{\link{updateChart}} call. 
+#' @param place An ID of a container, where to place the chart. Will be ignored if the chart already
+#' exists. If not defined, the chart will be placed directly in the body of the opened page.
+#' @param ... Name value pairs of properties that can be evaluated only once and then will remain 
+#' constant. These properties can still be changed later using the \code{\link{setProperties}} function
+#' @param id An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
+#' exists, a new layer will be added to it. If you want to replace one chart with another, use \code{\link{removeChart}}
+#' first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} is the number of currently existing charts.
+#' 
+#' @section Available properties: 
+#' You can read more about different properties in the vignette.
+#' 
+#' \itemize{
+#'  \item{\code{content} - HTML code to display on the page. Can also be a vector, data.frame or
+#'  any other structure, that can be transformed by \code{\link[hwriter]{hwrite}}. } }
+#'  
+#' Global chart settings
+#' \itemize{
+#'  \item{\code{width} - width of the chart in pixels. By default, the entire content will be displayed.
+#'  If width is defined and it's smaller than content's width, scrolling will be possible.}
+#'  \item{\code{heigth} - height of the chart in pixels. By default, the entire content will be displayed.
+#'  If height is defined and it's smaller than content's height, scrolling will be possible.}
+#'  \item{\code{margins} - margins size in pixels. Must be a list with all the following fields: 
+#'  \code{"top", "bottom", "left", "right"}.}
+#'  \item{\code{title} - title of the chart.}
+#'  \item{\code{titleX, titleY} - coordinates of the chart title.}
+#'  \item{\code{titleSize} - font-size of the chart title.} }
+#'  
+#' @examples
+#' lc_html(content = "Some <b>HTML</b> <br> <i>code</i>.")
+#' lc_html(dat(content = matrix(1:12, nrow = 4)))
+#' data(iris)
+#' lc_html(content = iris, height = 200)
+#' 
 #' @export
 #' @importFrom hwriter hwrite
-lc_html <- function(code = "", place = "undefined", append = F) {
-  append <- ifelse(append, "true", "false")
-  if(!is.character(code) || length(code) != 1)
-    code <- hwrite(code)
-  
-  code <- gsub("[\r\n]", "", code)
-  code <- str_replace_all(code, "(\\W)", "\\\\\\1")
-  sendCommand(str_c("rlc.html('", code, "', '", place, "', ", append, ")"))
+lc_html <- function(data = list(), place = NULL, ..., id = NULL) {
+  setChart("html", data, ..., place = place, id = id, layerId = "main", dataFun = function(l) {
+    if(!is.character(l$content) || length(l$content) != 1)
+      l$content <- hwrite(l$content)
+    
+    #l$content <- gsub("[\r\n]", "", l$content)
+    #l$content <- str_replace_all(l$content, "(\\W)", "\\\\\\1")
+    
+    l
+  })
 }

@@ -166,28 +166,3 @@ rlc.updateChart = function(id, updateType, layerId) {
   else
     charts[id][updateFun]();
 }
-
-rlc.html = function(code, place, append) {
-  if(!place) {
-    place = "body";
-    append = true;
-  }
-
-  var container = d3.select(place);
-  if(container.empty())
-    container = d3.select("#" + place);
-
-  if(container.empty()) {
-    container = d3.select("body");
-    append = true;
-  }
-
-  container = container.node();
-  
-  var oldHtml = container.innerHTML;
-
-  if(!append)
-    oldHtml = "";
-
-  container.innerHTML = oldHtml + code;
-}

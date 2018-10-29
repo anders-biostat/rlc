@@ -161,4 +161,4 @@ lc_scatter(dat(x = x,
 lc_line(dat(x = x, y = sin(x)), id = "plot")
 lc_colourSlider(chart = "plot", layer = "points")
 
-listCharts();
+listCharts()
