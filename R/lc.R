@@ -61,10 +61,10 @@ Chart$methods(
               ". The entire chart will be removed."))
       removeChart(id)
     } else {
-      if(layerId %in% names(layers)) {
+      if(!(layerId %in% names(layers))) {
         stop(str_c("There is no layer with ID ", layerId))
       } else {
-        sendCommands(str_interp("rlc.removeLayer('${id}', '${layerId}')"))
+        sendCommand(str_interp("rlc.removeLayer('${id}', '${layerId}')"))
         layers[[layerId]] <<- NULL
       }
     }
@@ -457,7 +457,7 @@ sendProperties <- function(chart, layerId = ls(chart$layers)){
   }
 }
 
-setChart <- function(type, data, ..., place, id, layerId, dataFun, parcerStep = 50) {
+setChart <- function(type, data, ..., place, id, layerId, dataFun, addLayer, parcerStep = 50) {
   if(!lc$pageOpened) openPage()
   
   if(is.null(place))
@@ -468,16 +468,30 @@ setChart <- function(type, data, ..., place, id, layerId, dataFun, parcerStep = 
     id <- place
   
   chart <- getChart(id)
+  
   if(is.null(chart)) {
     chart <- addChart(id, place)
     if(is.null(layerId) || layerId != "main")
       chart$addLayer("main", "axesChart")
+  } 
+  
+  if(is.null(layerId)){
+    if(!addLayer & chart$nLayers() > 1) {
+      warning(str_c("Chart '", id, "' has ", chart$nLayers(), " layers and the layer ID is not specified. ", 
+                    "'addLayer' will be set to TRUE."))
+      addLayer <- T
+    }
+    
+    if(addLayer | chart$nLayers() == 0) {
+      layerId <- str_c("Layer", (chart$nLayers() + 1))
+    } else {
+      layerId <- names(chart$layers)[2]
+    }
   }
   
-  if(is.null(layerId))
-    layerId <- str_c("Layer", (chart$nLayers() + 1))
+  if(!is.null(chart$getLayer(layerId)))
+    chart$removeLayer(layerId)
   
-
   layer <- chart$addLayer(layerId, type)
   layer$dataFun <- dataFun
   
@@ -682,9 +696,11 @@ scatterDataFun <- function(l) {
 #' @param id An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
 #' exists, a new layer will be added to it. If you want to replace one chart with another, use \code{\link{removeChart}}
 #' first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} is the number of currently existing charts.
-#' @param layerId An ID for the new layer. All layers within one chart must have different IDs. An error will be thrown
-#' if a layer with this ID already exists in the chart. If not defined, will be set to \code{LayerN}, where \code{N - 1} 
+#' @param layerId An ID for the new layer. All layers within one chart must have different IDs. If a layer with the same
+#' ID already exists, it will be replaced. If not defined, will be set to \code{LayerN}, where \code{N - 1} 
 #' is the number of currently existing layers in this chart.
+#' @param addLayer whether to add a new layer or to replace the existing one. This argument influences the chart only if
+#' it has only one layer and the \code{layerId} is not defined. 
 #' @param parcerStep Time in ms between to consequentive calls of onmouseover event. Prevents overqueuing in case
 #' of cumbersome computations. May be important when the chart works in canvas mode.
 #' 
@@ -773,16 +789,17 @@ scatterDataFun <- function(l) {
 #'             axisTitleX = "Species",
 #'             colourLegendTitle = "Sepal Width")
 #' @export
-lc_scatter <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, parcerStep = 50) {
-  setChart("scatter", data, ...,  place = place, id = id, layerId = layerId, dataFun = scatterDataFun, parcerStep = parcerStep)
+lc_scatter <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = F, parcerStep = 50) {
+  setChart("scatter", data, ...,  place = place, id = id, layerId = layerId, dataFun = scatterDataFun, addLayer = addLayer,
+           parcerStep = parcerStep)
 }
 
 #' @describeIn lc_scatter creates a special kind of scatterplot, where the points are spread along one of 
 #' the axes to avoid overlapping.
 #' 
 #' @export
-lc_beeswarm <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, parcerStep = 50) {
-  setChart("beeswarm", data, ..., place = place, id = id, layerId = layerId, dataFun = function(l) {
+lc_beeswarm <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = F, parcerStep = 50) {
+  setChart("beeswarm", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer, dataFun = function(l) {
     if(is.null(l$x) || is.null(l$y))
       stop("Required properties 'x' and 'y' are not defined.")
 
@@ -852,9 +869,11 @@ lineDataFun <- function(l) {
 #' @param id An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
 #' exists, a new layer will be added to it. If you want to replace one chart with another, use \code{\link{removeChart}}
 #' first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} is the number of currently existing charts.
-#' @param layerId An ID for the new layer. All layers within one chart must have different IDs. An error will be thrown
-#' if a layer with this ID already exists in the chart. If not defined, will be set to \code{LayerN}, where \code{N - 1} 
+#' @param layerId An ID for the new layer. All layers within one chart must have different IDs. If a layer with the same
+#' ID already exists, it will be replaced. If not defined, will be set to \code{LayerN}, where \code{N - 1} 
 #' is the number of currently existing layers in this chart.
+#' @param addLayer whether to add a new layer or to replace the existing one. This argument influences the chart only if
+#' it has only one layer and the \code{layerId} is not defined. 
 #' 
 #' @section Available properties: 
 #' You can read more about different properties in the vignette.
@@ -940,8 +959,8 @@ lineDataFun <- function(l) {
 #'             fill = c("blue", "red", "black"),
 #'             opacity = c(0.3, 0.5, 0.7)))
 #'             
-#' x <- seq(0, 5, 0.1, sd = 2)
-#' y <- x*3 + rnorm(length(x))
+#' x <- seq(0, 5, 0.1)
+#' y <- x*3 + rnorm(length(x), sd = 2)
 #' fit <- lm(y ~ x)
 #' pred <- predict(fit, data.frame(x = x), se.fit = T)
 #' lc_ribbon(dat(ymin = pred$fit - 1.96 * pred$se.fit,
@@ -955,8 +974,8 @@ lineDataFun <- function(l) {
 #' lc_vLine(dat(v = seq(1, 9, 1)), id = "grid")
 #' 
 #' @export
-lc_line <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL) {
-  setChart("pointLine", data, ..., place = place, id = id, layerId = layerId, 
+lc_line <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = F) {
+  setChart("pointLine", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer,
            dataFun = function(l) {
              l <- lineDataFun(l)
              
@@ -971,14 +990,14 @@ lc_line <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL)
 
 #' @describeIn lc_line connects points in the order they are given.
 #' @export
-lc_path <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL) {
-  setChart("pointLine", data, ..., place = place, id = id, layerId = layerId, dataFun = lineDataFun)
+lc_path <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = F) {
+  setChart("pointLine", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer, dataFun = lineDataFun)
 }
 
 #' @describeIn lc_line displays a filled area, defined by \code{ymax} and \code{ymin} values.
 #' @export
-lc_ribbon <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL) {
-  setChart("pointRibbon", data, ...,  place = place, id = id, layerId = layerId, dataFun = function(l) {
+lc_ribbon <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = F) {
+  setChart("pointRibbon", data, ...,  place = place, id = id, layerId = layerId, addLayer = addLayer, dataFun = function(l) {
     if(!is.null(l$x) && !is.vector(l$x)) l$x <- as.matrix(l$x)
     if(!is.null(l$ymax) && !is.vector(l$ymax)) l$ymax <- as.matrix(l$ymax)
     if(!is.null(l$ymin) && !is.vector(l$ymin)) l$ymin <- as.matrix(l$ymin)
@@ -1086,9 +1105,11 @@ barDataFun <- function(l) {
 #' @param id An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
 #' exists, a new layer will be added to it. If you want to replace one chart with another, use \code{\link{removeChart}}
 #' first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} is the number of currently existing charts.
-#' @param layerId An ID for the new layer. All layers within one chart must have different IDs. An error will be thrown
-#' if a layer with this ID already exists in the chart. If not defined, will be set to \code{LayerN}, where \code{N - 1} 
+#' @param layerId An ID for the new layer. All layers within one chart must have different IDs. If a layer with the same
+#' ID already exists, it will be replaced. If not defined, will be set to \code{LayerN}, where \code{N - 1} 
 #' is the number of currently existing layers in this chart.
+#' @param addLayer whether to add a new layer or to replace the existing one. This argument influences the chart only if
+#' it has only one layer and the \code{layerId} is not defined. 
 #' 
 #' @section Available properties: 
 #' You can read more about different properties in the vignette.
@@ -1176,8 +1197,8 @@ barDataFun <- function(l) {
 #'             groupIds = newData$agegp))
 #' 
 #' @export
-lc_bars <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL) {
-  setChart("barchart", data, ..., place = place, id = id, layerId = layerId, dataFun = barDataFun)
+lc_bars <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = F) {
+  setChart("barchart", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer, dataFun = barDataFun)
 }
 
 #' Histograms and density plots
@@ -1194,9 +1215,11 @@ lc_bars <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL)
 #' @param id An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
 #' exists, a new layer will be added to it. If you want to replace one chart with another, use \code{\link{removeChart}}
 #' first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} is the number of currently existing charts.
-#' @param layerId An ID for the new layer. All layers within one chart must have different IDs. An error will be thrown
-#' if a layer with this ID already exists in the chart. If not defined, will be set to \code{LayerN}, where \code{N - 1} 
+#' @param layerId An ID for the new layer. All layers within one chart must have different IDs. If a layer with the same
+#' ID already exists, it will be replaced. If not defined, will be set to \code{LayerN}, where \code{N - 1} 
 #' is the number of currently existing layers in this chart.
+#' @param addLayer whether to add a new layer or to replace the existing one. This argument influences the chart only if
+#' it has only one layer and the \code{layerId} is not defined. 
 #' 
 #' @section Available properties:
 #' 
@@ -1214,9 +1237,9 @@ lc_bars <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL)
 #' lc_dens(dat(value = rnorm(1000), height = 300))
 #' 
 #' @export 
-lc_hist <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL) {
+lc_hist <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = F) {
   # has a nbins property. Not implemented in JS
-  setChart("barchart", data, ..., place = place, id = id, layerId = layerId, dataFun = function(l) {
+  setChart("barchart", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer, dataFun = function(l) {
     if(is.null(l$nbins)) {
       nbins <- 10
     } else {
@@ -1250,8 +1273,8 @@ lc_hist <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL)
 
 #' @describeIn lc_hist makes a density plot. Is an extension of \code{\link{lc_line}}.
 #' @export
-lc_dens <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL) {
-  setChart("pointLine", data, ..., place = place, id = id, layerId = layerId, dataFun = function(l) {
+lc_dens <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = F) {
+  setChart("pointLine", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer, dataFun = function(l) {
     if(!is.null(l$value)) {
       dens <- density.default(l$value)
       l$x <- dens$x
@@ -1439,8 +1462,8 @@ lc_colourSlider <- function(data = list(), place = NULL, ..., id = NULL) {
 #' @describeIn lc_line creates straight lines by intercept and slope values
 #' @export
 #' @importFrom jsonlite toJSON
-lc_abLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL) {
-  setChart("xLine", data, ..., place = place, id = id, layerId = layerId, dataFun = function(l) {
+lc_abLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = F) {
+  setChart("xLine", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer, dataFun = function(l) {
     if(is.null(l$a) || is.null(l$b))
       stop("Required properties 'a' and 'b' are not defined.");
     if(length(l$a) != length(l$b))
@@ -1462,8 +1485,8 @@ lc_abLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NUL
 
 #' @describeIn lc_line creates horisontal lines by y-intercept values
 #' @export
-lc_hLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL) {
-  setChart("xLine", data, ..., place = place, id = id, layerId = layerId, dataFun = function(l) {
+lc_hLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = F) {
+  setChart("xLine", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer, dataFun = function(l) {
     if(is.null(l$h))
       stop("Required property 'h' is not defined.");
 
@@ -1480,8 +1503,8 @@ lc_hLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL
 
 #' @describeIn lc_line creates vertical lines by x-intercept values
 #' @export
-lc_vLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL) {
-  setChart("yLine", data, ..., place = place, id = id, layerId = layerId, dataFun = function(l) {
+lc_vLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = F) {
+  setChart("yLine", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer, dataFun = function(l) {
     if(is.null(l$v))
       stop("Required property 'v' is not defined.");
     

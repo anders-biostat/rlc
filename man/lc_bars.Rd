@@ -5,7 +5,7 @@
 \title{Create a barplot}
 \usage{
 lc_bars(data = list(), place = NULL, ..., id = NULL,
-  layerId = NULL)
+  layerId = NULL, addLayer = F)
 }
 \arguments{
 \item{data}{Name value pairs of properties, passed through the \code{\link{dat}} function. These
@@ -21,9 +21,12 @@ constant. These properties can still be changed later using the \code{\link{setP
 exists, a new layer will be added to it. If you want to replace one chart with another, use \code{\link{removeChart}}
 first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} is the number of currently existing charts.}
 
-\item{layerId}{An ID for the new layer. All layers within one chart must have different IDs. An error will be thrown
-if a layer with this ID already exists in the chart. If not defined, will be set to \code{LayerN}, where \code{N - 1} 
+\item{layerId}{An ID for the new layer. All layers within one chart must have different IDs. If a layer with the same
+ID already exists, it will be replaced. If not defined, will be set to \code{LayerN}, where \code{N - 1} 
 is the number of currently existing layers in this chart.}
+
+\item{addLayer}{whether to add a new layer or to replace the existing one. This argument influences the chart only if
+it has only one layer and the \code{layerId} is not defined.}
 }
 \description{
 \code{lc_bars} creates a new barplot and adds it on the page

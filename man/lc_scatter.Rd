@@ -6,10 +6,10 @@
 \title{Visualize a set of points}
 \usage{
 lc_scatter(data = list(), place = NULL, ..., id = NULL,
-  layerId = NULL, parcerStep = 50)
+  layerId = NULL, addLayer = F, parcerStep = 50)
 
 lc_beeswarm(data = list(), place = NULL, ..., id = NULL,
-  layerId = NULL, parcerStep = 50)
+  layerId = NULL, addLayer = F, parcerStep = 50)
 }
 \arguments{
 \item{data}{Name value pairs of properties, passed through the \code{\link{dat}} function. These
@@ -25,9 +25,12 @@ constant. These properties can still be changed later using the \code{\link{setP
 exists, a new layer will be added to it. If you want to replace one chart with another, use \code{\link{removeChart}}
 first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} is the number of currently existing charts.}
 
-\item{layerId}{An ID for the new layer. All layers within one chart must have different IDs. An error will be thrown
-if a layer with this ID already exists in the chart. If not defined, will be set to \code{LayerN}, where \code{N - 1} 
+\item{layerId}{An ID for the new layer. All layers within one chart must have different IDs. If a layer with the same
+ID already exists, it will be replaced. If not defined, will be set to \code{LayerN}, where \code{N - 1} 
 is the number of currently existing layers in this chart.}
+
+\item{addLayer}{whether to add a new layer or to replace the existing one. This argument influences the chart only if
+it has only one layer and the \code{layerId} is not defined.}
 
 \item{parcerStep}{Time in ms between to consequentive calls of onmouseover event. Prevents overqueuing in case
 of cumbersome computations. May be important when the chart works in canvas mode.}
