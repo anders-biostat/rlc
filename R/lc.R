@@ -20,7 +20,12 @@ lc$props <- list(scatter = c("x", "y", "size", "stroke", "strokeWidth", "symbol"
                 pointRibbon = c("lineWidth", "dasharray", "x", "ymax", "ymin", "nsteps"),
                 layer = c("nelements", "elementIds", "label", "layerDomainX", "layerDomainY", "contScaleX", "contScaleY",
                           "colour", "colourValue", "palette", "colourDomain", "colourLegendTitle", "addColourScaleToLegend", "opacity", "on_click",
-                          "informText", "on_mouseover", "on_mouseout", "on_marked"))
+                          "informText", "on_mouseover", "on_mouseout", "on_marked"),
+                all = c("width", "height", "plotWidth", "plotHeight", "margins", "title", "titleX", "titleY", "titleSize",
+                        "showLegend", "showPanel", "transitioDuration", "value", "rowLabel", "colLabel", "showDendogram",
+                        "clusterRows", "clusterCols", "mode", "heatmapRow", "heatmapCol", "showValue", "rowTitle", 
+                        "colTitle", "palette", "colourDomain", "on_click", "on_mouseover", "on_mouseout", "on_marked", 
+                        "chart", "layer", "content"))
 
 Layer <- setRefClass("Layer", fields = list(type = "character", id = "character", 
                                             properties = "list", dataFun = "function",
@@ -277,7 +282,11 @@ setProperties <- function(data, id, layerId = NULL) {
     if(prop %in% lc$props[[layer$type]] | prop %in% lc$props$layer) {
       layer$setProperty(prop, data[[prop]])
     } else {
-      mainLayer$setProperty(prop, data[[prop]])
+      if(prop %in% lc$props$all) {
+        mainLayer$setProperty(prop, data[[prop]])
+      } else {
+        warning(str_c("In chart '", chart$id, "': Property '", prop, "' doesn't exist."))
+      }
     }
   
   invisible(chart)
@@ -749,7 +758,9 @@ scatterDataFun <- function(l) {
 #'  index of the clicked point as an argument.}
 #'  \item{\code{on_mouseover} - function, to be called, when mouse hovers over one of the points.
 #'  Gets an index of the clicked point as an argument.}
-#'  \item{\code{on_mouseout} - function, to be called, when mouse moves out of one of the points.} }
+#'  \item{\code{on_mouseout} - function, to be called, when mouse moves out of one of the points.} 
+#'  \item{\code{on_marked} - function, to be called, when any of the points are selected (marked) 
+#'  or deselected. Use \code{\link{getMarked}} function to get the IDs of the currently marked points.} }
 #'  
 #' Global chart settings
 #' \itemize{
@@ -924,7 +935,9 @@ lineDataFun <- function(l) {
 #'  index of the clicked line as an argument.}
 #'  \item{\code{on_mouseover} - function, to be called, when mouse hovers over one of the lines.
 #'  Gets an index of the clicked line as an argument.}
-#'  \item{\code{on_mouseout} - function, to be called, when mouse moves out of one of the lines.} }
+#'  \item{\code{on_mouseout} - function, to be called, when mouse moves out of one of the lines.}
+#'  \item{\code{on_marked} - function, to be called, when any of the lines are selected (marked) 
+#'  or deselected. Use \code{\link{getMarked}} function to get the IDs of the currently marked lines.} }
 #'  
 #' Global chart settings
 #' \itemize{
@@ -1152,7 +1165,9 @@ barDataFun <- function(l) {
 #'  index of the clicked bar as an argument.}
 #'  \item{\code{on_mouseover} - function, to be called, when mouse hovers over one of the bars.
 #'  Gets an index of the clicked bar as an argument.}
-#'  \item{\code{on_mouseout} - function, to be called, when mouse moves out of one of the bars.} }
+#'  \item{\code{on_mouseout} - function, to be called, when mouse moves out of one of the bars.}
+#'  \item{\code{on_marked} - function, to be called, when any of the bars are selected (marked) 
+#'  or deselected. Use \code{\link{getMarked}} function to get the IDs of the currently marked bars.} }
 #'  
 #' Global chart settings
 #' \itemize{
@@ -1332,7 +1347,9 @@ lc_dens <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL,
 #'  of the clicked cell as its arguments.}
 #'  \item{\code{on_mouseover} - function, to be called, when mouse hovers over one of the cells.
 #'  Gets row and column indices of the clicked cell as its arguments.}
-#'  \item{\code{on_mouseout} - function, to be called, when mouse moves out of one of the cells.} }
+#'  \item{\code{on_mouseout} - function, to be called, when mouse moves out of one of the cells.}
+#'  \item{\code{on_marked} - function, to be called, when any of the cells are selected (marked) 
+#'  or deselected. Use \code{\link{getMarked}} function to get the IDs of the currently marked cells.} }
 #'  
 #' Global chart settings
 #' \itemize{

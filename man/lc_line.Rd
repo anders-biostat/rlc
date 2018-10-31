@@ -117,7 +117,9 @@ Interactivity settings
  index of the clicked line as an argument.}
  \item{\code{on_mouseover} - function, to be called, when mouse hovers over one of the lines.
  Gets an index of the clicked line as an argument.}
- \item{\code{on_mouseout} - function, to be called, when mouse moves out of one of the lines.} }
+ \item{\code{on_mouseout} - function, to be called, when mouse moves out of one of the lines.}
+ \item{\code{on_marked} - function, to be called, when any of the lines are selected (marked) 
+ or deselected. Use \code{\link{getMarked}} function to get the IDs of the currently marked lines.} }
  
 Global chart settings
 \itemize{

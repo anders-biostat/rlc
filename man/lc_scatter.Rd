@@ -94,7 +94,9 @@ Interactivity settings
  index of the clicked point as an argument.}
  \item{\code{on_mouseover} - function, to be called, when mouse hovers over one of the points.
  Gets an index of the clicked point as an argument.}
- \item{\code{on_mouseout} - function, to be called, when mouse moves out of one of the points.} }
+ \item{\code{on_mouseout} - function, to be called, when mouse moves out of one of the points.} 
+ \item{\code{on_marked} - function, to be called, when any of the points are selected (marked) 
+ or deselected. Use \code{\link{getMarked}} function to get the IDs of the currently marked points.} }
  
 Global chart settings
 \itemize{

@@ -59,7 +59,9 @@ Interactivity settings
  of the clicked cell as its arguments.}
  \item{\code{on_mouseover} - function, to be called, when mouse hovers over one of the cells.
  Gets row and column indices of the clicked cell as its arguments.}
- \item{\code{on_mouseout} - function, to be called, when mouse moves out of one of the cells.} }
+ \item{\code{on_mouseout} - function, to be called, when mouse moves out of one of the cells.}
+ \item{\code{on_marked} - function, to be called, when any of the cells are selected (marked) 
+ or deselected. Use \code{\link{getMarked}} function to get the IDs of the currently marked cells.} }
  
 Global chart settings
 \itemize{

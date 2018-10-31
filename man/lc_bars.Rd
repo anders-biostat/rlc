@@ -74,7 +74,9 @@ Interactivity settings
  index of the clicked bar as an argument.}
  \item{\code{on_mouseover} - function, to be called, when mouse hovers over one of the bars.
  Gets an index of the clicked bar as an argument.}
- \item{\code{on_mouseout} - function, to be called, when mouse moves out of one of the bars.} }
+ \item{\code{on_mouseout} - function, to be called, when mouse moves out of one of the bars.}
+ \item{\code{on_marked} - function, to be called, when any of the bars are selected (marked) 
+ or deselected. Use \code{\link{getMarked}} function to get the IDs of the currently marked bars.} }
  
 Global chart settings
 \itemize{
