@@ -84,11 +84,11 @@ lc_path(dat(x = sapply(0:2, function(i) x + i),
             opacity = c(0.3, 0.5, 0.7)))
 
 
-x <- seq(0, 5, 0.1, sd = 2)
-y <- x*3 + rnorm(length(x))
+x <- seq(0, 5, 0.1)
+y <- x*3 + rnorm(length(x), sd = 2)
 plot(x, y)
 fit <- lm(x ~ y)
-pred <- predict(fit, x, se.fit = T)
+pred <- predict(fit, data.frame(x = x), se.fit = T)
 
 lc_ribbon(dat(ymin = y - 1.96 * pred$se.fit,
               ymax = y + 1.96 * pred$se.fit,
