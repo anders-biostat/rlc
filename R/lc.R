@@ -25,7 +25,7 @@ lc$props <- list(scatter = c("x", "y", "size", "stroke", "strokeWidth", "symbol"
                         "showLegend", "showPanel", "transitioDuration", "value", "rowLabel", "colLabel", "showDendogram",
                         "clusterRows", "clusterCols", "mode", "heatmapRow", "heatmapCol", "showValue", "rowTitle", 
                         "colTitle", "palette", "colourDomain", "on_click", "on_mouseover", "on_mouseout", "on_marked", 
-                        "chart", "layer", "content"))
+                        "chart", "layer", "content", "domainX", "domainY", "apectRatio", "axisTitleX", "axisTitleY"))
 
 Layer <- setRefClass("Layer", fields = list(type = "character", id = "character", 
                                             properties = "list", dataFun = "function",
@@ -1404,6 +1404,10 @@ lc_heatmap <- function(data = list(), place = NULL, ..., id = NULL, parcerStep =
       if(is.null(l$colLabel) & !is.null(colnames(l$value)))
         l$colLabel <- colnames(l$value)
     }
+    
+    if(lc$useViewer)
+      l$mode <- "svg"
+    
     l
   }, parcerStep = parcerStep)
 }
