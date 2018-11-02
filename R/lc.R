@@ -22,7 +22,7 @@ lc$props <- list(scatter = c("x", "y", "size", "stroke", "strokeWidth", "symbol"
                           "colour", "colourValue", "palette", "colourDomain", "colourLegendTitle", "addColourScaleToLegend", "opacity", "on_click",
                           "informText", "on_mouseover", "on_mouseout", "on_marked"),
                 all = c("width", "height", "plotWidth", "plotHeight", "margins", "title", "titleX", "titleY", "titleSize",
-                        "showLegend", "showPanel", "transitioDuration", "value", "rowLabel", "colLabel", "showDendogram",
+                        "showLegend", "showPanel", "transitionDuration", "value", "rowLabel", "colLabel", "showDendogram",
                         "clusterRows", "clusterCols", "mode", "heatmapRow", "heatmapCol", "showValue", "rowTitle", 
                         "colTitle", "palette", "colourDomain", "on_click", "on_mouseover", "on_mouseout", "on_marked", 
                         "chart", "layer", "content", "domainX", "domainY", "apectRatio", "axisTitleX", "axisTitleY",
