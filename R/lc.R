@@ -25,7 +25,8 @@ lc$props <- list(scatter = c("x", "y", "size", "stroke", "strokeWidth", "symbol"
                         "showLegend", "showPanel", "transitioDuration", "value", "rowLabel", "colLabel", "showDendogram",
                         "clusterRows", "clusterCols", "mode", "heatmapRow", "heatmapCol", "showValue", "rowTitle", 
                         "colTitle", "palette", "colourDomain", "on_click", "on_mouseover", "on_mouseout", "on_marked", 
-                        "chart", "layer", "content", "domainX", "domainY", "apectRatio", "axisTitleX", "axisTitleY"))
+                        "chart", "layer", "content", "domainX", "domainY", "apectRatio", "axisTitleX", "axisTitleY",
+                        "logScaleX", "logScaleY"))
 
 Layer <- setRefClass("Layer", fields = list(type = "character", id = "character", 
                                             properties = "list", dataFun = "function",
