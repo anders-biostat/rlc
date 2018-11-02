@@ -6,10 +6,10 @@
 \title{Visualize a set of points}
 \usage{
 lc_scatter(data = list(), place = NULL, ..., id = NULL,
-  layerId = NULL, addLayer = F, parcerStep = 50)
+  layerId = NULL, addLayer = F, pacerStep = 50)
 
 lc_beeswarm(data = list(), place = NULL, ..., id = NULL,
-  layerId = NULL, addLayer = F, parcerStep = 50)
+  layerId = NULL, addLayer = F, pacerStep = 50)
 }
 \arguments{
 \item{data}{Name value pairs of properties, passed through the \code{\link{dat}} function. These
@@ -32,7 +32,7 @@ is the number of currently existing layers in this chart.}
 \item{addLayer}{whether to add a new layer or to replace the existing one. This argument influences the chart only if
 it has only one layer and the \code{layerId} is not defined.}
 
-\item{parcerStep}{Time in ms between to consequentive calls of onmouseover event. Prevents overqueuing in case
+\item{pacerStep}{Time in ms between to consequentive calls of onmouseover event. Prevents overqueuing in case
 of cumbersome computations. May be important when the chart works in canvas mode.}
 }
 \description{

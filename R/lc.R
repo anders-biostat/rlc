@@ -31,7 +31,7 @@ Layer <- setRefClass("Layer", fields = list(type = "character", id = "character"
                                             properties = "list", dataFun = "function",
                                             on_click = "function", on_mouseover = "function",
                                             on_mouseout = "function", init = "logical",
-                                            on_marked = "function", parcerStep = "numeric"))
+                                            on_marked = "function", pacerStep = "numeric"))
 Layer$methods(
   setProperty = function(name, expr) {
     properties[[name]] <<- expr
@@ -451,7 +451,7 @@ sendProperties <- function(chart, layerId = ls(chart$layers)){
     if(!is.null(d$on_mouseover)) {
       layer$on_mouseover <- d$on_mouseover
       d$on_mouseover <- NULL
-      sendCommand(str_interp("rlc.setCustomMouseOver('${chart$id}', '${layerName}', ${layer$parcerStep});"))
+      sendCommand(str_interp("rlc.setCustomMouseOver('${chart$id}', '${layerName}', ${layer$pacerStep});"))
     }
     if(!is.null(d$on_mouseover)) {
       layer$on_mouseout <- d$on_mouseout
@@ -466,7 +466,7 @@ sendProperties <- function(chart, layerId = ls(chart$layers)){
   }
 }
 
-setChart <- function(type, data, ..., place, id, layerId, dataFun, addLayer, parcerStep = 50) {
+setChart <- function(type, data, ..., place, id, layerId, dataFun, addLayer, pacerStep = 50) {
   if(!lc$pageOpened) openPage()
   
   if(is.null(place))
@@ -504,7 +504,7 @@ setChart <- function(type, data, ..., place, id, layerId, dataFun, addLayer, par
   layer <- chart$addLayer(layerId, type)
   layer$dataFun <- dataFun
   
-  layer$parcerStep <- parcerStep
+  layer$pacerStep <- pacerStep
   
   chart$JSinitialize()
   
@@ -710,7 +710,7 @@ scatterDataFun <- function(l) {
 #' is the number of currently existing layers in this chart.
 #' @param addLayer whether to add a new layer or to replace the existing one. This argument influences the chart only if
 #' it has only one layer and the \code{layerId} is not defined. 
-#' @param parcerStep Time in ms between to consequentive calls of onmouseover event. Prevents overqueuing in case
+#' @param pacerStep Time in ms between to consequentive calls of onmouseover event. Prevents overqueuing in case
 #' of cumbersome computations. May be important when the chart works in canvas mode.
 #' 
 #' @section Available properties: 
@@ -800,16 +800,16 @@ scatterDataFun <- function(l) {
 #'             axisTitleX = "Species",
 #'             colourLegendTitle = "Sepal Width")
 #' @export
-lc_scatter <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = F, parcerStep = 50) {
+lc_scatter <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = F, pacerStep = 50) {
   setChart("scatter", data, ...,  place = place, id = id, layerId = layerId, dataFun = scatterDataFun, addLayer = addLayer,
-           parcerStep = parcerStep)
+           pacerStep = pacerStep)
 }
 
 #' @describeIn lc_scatter creates a special kind of scatterplot, where the points are spread along one of 
 #' the axes to avoid overlapping.
 #' 
 #' @export
-lc_beeswarm <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = F, parcerStep = 50) {
+lc_beeswarm <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = F, pacerStep = 50) {
   setChart("beeswarm", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer, dataFun = function(l) {
     if(is.null(l$x) || is.null(l$y))
       stop("Required properties 'x' and 'y' are not defined.")
@@ -825,7 +825,7 @@ lc_beeswarm <- function(data = list(), place = NULL, ..., id = NULL, layerId = N
       l$mode <- "svg"    
     
     l   
-  }, parcerStep = parcerStep)
+  }, pacerStep = pacerStep)
 }
 
 #TO DO: Add grouping
@@ -1314,7 +1314,7 @@ lc_dens <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL,
 #' @param id An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
 #' exists, a new layer will be added to it. If you want to replace one chart with another, use \code{\link{removeChart}}
 #' first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} is the number of currently existing charts.
-#' @param parcerStep Time in ms between to consequentive calls of onmouseover event. Prevents overqueuing in case
+#' @param pacerStep Time in ms between to consequentive calls of onmouseover event. Prevents overqueuing in case
 #' of cumbersome computations. May be important when the chart works in canvas mode.
 #' 
 #' @section Available properties: 
@@ -1393,7 +1393,7 @@ lc_dens <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL,
 #'                colourDomain = c(-1, 1),
 #'                palette = RColorBrewer::brewer.pal(11, "RdYlBu")))
 #' @export
-lc_heatmap <- function(data = list(), place = NULL, ..., id = NULL, parcerStep = 50) {
+lc_heatmap <- function(data = list(), place = NULL, ..., id = NULL, pacerStep = 50) {
   setChart("heatmap", data, ..., place = place, id = id, layerId = "main", dataFun = function(l) {
     if(!is.null(l$value)) {
       l$nrows <- nrow(l$value)
@@ -1409,7 +1409,7 @@ lc_heatmap <- function(data = list(), place = NULL, ..., id = NULL, parcerStep =
       l$mode <- "svg"
     
     l
-  }, parcerStep = parcerStep)
+  }, pacerStep = pacerStep)
 }
 
 #' Add a colour slider

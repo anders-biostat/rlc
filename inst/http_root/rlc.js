@@ -57,9 +57,9 @@ rlc.addChart = function(id, type, place, layerId) {
     }
 }
 
-rlc.setCustomMouseOver = function(id, layerId, parcerStep) {
+rlc.setCustomMouseOver = function(id, layerId, pacerStep) {
   if(!charts[id].customMouseOver){
-    var pacer = lc.call_pacer(parcerStep); 
+    var pacer = lc.call_pacer(pacerStep); 
 
     if(layerId != "main")
       charts[id].get_layer(layerId)
