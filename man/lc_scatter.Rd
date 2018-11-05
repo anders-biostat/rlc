@@ -86,6 +86,8 @@ Axes settings
  \item{\code{contScaleX, consScaleY} - whether or not the axis should be continuous.}
  \item{\code{aspectRatio} - aspect ratio.}
  \item{\code{axisTitleX, axisTitleY} - axes titles.}
+ \item{\code{ticksRotateX, ticksRotateY} - degrees of angle to rotate ticks. Must be between 
+ 0 (horisontal ticks, default) and 90 (vertical ticks).}
  \item{\code{ticksX, ticksY} - set of ticks for the axes.} }
 
 Interactivity settings

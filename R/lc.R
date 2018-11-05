@@ -26,7 +26,7 @@ lc$props <- list(scatter = c("x", "y", "size", "stroke", "strokeWidth", "symbol"
                         "clusterRows", "clusterCols", "mode", "heatmapRow", "heatmapCol", "showValue", "rowTitle", 
                         "colTitle", "palette", "colourDomain", "on_click", "on_mouseover", "on_mouseout", "on_marked", 
                         "chart", "layer", "content", "domainX", "domainY", "apectRatio", "axisTitleX", "axisTitleY",
-                        "logScaleX", "logScaleY"))
+                        "logScaleX", "logScaleY", "ticksRotateX", "ticksRotateY"))
 
 Layer <- setRefClass("Layer", fields = list(type = "character", id = "character", 
                                             properties = "list", dataFun = "function",
@@ -751,6 +751,8 @@ scatterDataFun <- function(l) {
 #'  \item{\code{contScaleX, consScaleY} - whether or not the axis should be continuous.}
 #'  \item{\code{aspectRatio} - aspect ratio.}
 #'  \item{\code{axisTitleX, axisTitleY} - axes titles.}
+#'  \item{\code{ticksRotateX, ticksRotateY} - degrees of angle to rotate ticks. Must be between 
+#'  0 (horisontal ticks, default) and 90 (vertical ticks).}
 #'  \item{\code{ticksX, ticksY} - set of ticks for the axes.} }
 #'
 #' Interactivity settings
@@ -928,6 +930,8 @@ lineDataFun <- function(l) {
 #'  \item{\code{contScaleX, consScaleY} - whether or not the axis should be continuous.}
 #'  \item{\code{aspectRatio} - aspect ratio.}
 #'  \item{\code{axisTitleX, axisTitleY} - axes titles.}
+#'  \item{\code{ticksRotateX, ticksRotateY} - degrees of angle to rotate ticks. Must be between 
+#'  0 (horisontal ticks, default) and 90 (vertical ticks).}
 #'  \item{\code{ticksX, ticksY} - set of ticks for the axes.} }
 #'
 #' Interactivity settings
@@ -1158,6 +1162,8 @@ barDataFun <- function(l) {
 #'  \item{\code{contScaleX, consScaleY} - whether or not the axis should be continuous.}
 #'  \item{\code{aspectRatio} - aspect ratio.}
 #'  \item{\code{axisTitleX, axisTitleY} - axes titles.}
+#'  \item{\code{ticksRotateX, ticksRotateY} - degrees of angle to rotate ticks. Must be between 
+#'  0 (horisontal ticks, default) and 90 (vertical ticks).}
 #'  \item{\code{ticksX, ticksY} - set of ticks for the axes.} }
 #'
 #' Interactivity settings
