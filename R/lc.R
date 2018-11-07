@@ -391,6 +391,11 @@ setProperties <- function(data, id, layerId = NULL) {
 #' 
 #' @export
 updateCharts <- function(id = NULL, layerId = NULL, updateOnly = NULL) {
+  if(length(lc$charts) == 0) {
+    warning("There are no charts yet.")
+    return ();
+  }
+  
   if(is.null(id)) id <- ls(lc$charts)
   if(!is.vector(id))
     stop("'id' should be a vector of IDs")
