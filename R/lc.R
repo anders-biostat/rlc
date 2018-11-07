@@ -676,6 +676,12 @@ closePage <- function() {
 scatterDataFun <- function(l) {
   if(is.null(l$x) && is.null(l$y))
     stop("Required properties 'x' and 'y' are not defined.")
+  
+  if(is.factor(l$x))
+    l$layerDomainX <- levels(l$x)
+  if(is.factor(l$y))
+    l$layerDomainY <- levels(l$y)
+    
   if(is.null(l$x))
     l$x <- 1:length(l$y)
   if(is.null(l$y))
@@ -822,6 +828,11 @@ lc_beeswarm <- function(data = list(), place = NULL, ..., id = NULL, layerId = N
     if(is.null(l$x) || is.null(l$y))
       stop("Required properties 'x' and 'y' are not defined.")
 
+    if(is.factor(l$x))
+      l$layerDomainX <- levels(l$x)
+    if(is.factor(l$y))
+      l$layerDomainY <- levels(l$y)    
+  
     if(is.null(l$label)){
       if(!is.null(names(l$y)))
         l$label <- names(l$y)
@@ -840,6 +851,11 @@ lc_beeswarm <- function(data = list(), place = NULL, ..., id = NULL, layerId = N
 lineDataFun <- function(l) {
   if(is.null(l$x) && is.null(l$y))
     stop("Required properties 'x' and 'y' are missing.")
+  
+  if(is.factor(l$x))
+    l$layerDomainX <- levels(l$x)
+  if(is.factor(l$y))
+    l$layerDomainY <- levels(l$y)
   
   if(!is.null(l$x)) l$x <- as.matrix(l$x)
   if(!is.null(l$y)) l$y <- as.matrix(l$y)
@@ -1021,6 +1037,13 @@ lc_path <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL,
 #' @export
 lc_ribbon <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = F) {
   setChart("pointRibbon", data, ...,  place = place, id = id, layerId = layerId, addLayer = addLayer, dataFun = function(l) {
+    if(is.factor(l$x))
+      l$layerDomainX <- levels(l$x)
+    if(is.factor(l$ymax))
+      l$layerDomainY <- levels(l$ymax)
+    if(is.factor(l$ymin))
+      l$layerDomainY <- levels(l$ymin)
+    
     if(!is.null(l$x) && !is.vector(l$x)) l$x <- as.matrix(l$x)
     if(!is.null(l$ymax) && !is.vector(l$ymax)) l$ymax <- as.matrix(l$ymax)
     if(!is.null(l$ymin) && !is.vector(l$ymin)) l$ymin <- as.matrix(l$ymin)
@@ -1081,6 +1104,9 @@ barDataFun <- function(l) {
   ngroups <- length(unique(l$groupIds))
   nbars <- length(unique(l$barIds))
   nstacks <- length(unique(l$stackIds))
+  
+  if(is.factor(l$groupIds))
+    l$layerDomainX <- levels(l$groupIds)
   
   inds <- NULL
   
