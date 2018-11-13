@@ -349,7 +349,7 @@ setProperties <- function(data, id, layerId = NULL) {
 #' }
 #' 
 #' 
-#' @param id An ID of the cahrt to be updated (or vector of IDs). If NULL then all the
+#' @param id An ID of the chart to be updated (or vector of IDs). If NULL then all the
 #' existing charts will be updated.
 #' 
 #' @param layerId An ID of the layer to be updated (or vector of IDs). If NULL of the
