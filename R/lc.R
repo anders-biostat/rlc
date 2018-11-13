@@ -617,7 +617,7 @@ getMarked <- function(chartId, layerId = NULL) {
   marked <- NULL
   setEnvironment(environment()) 
   sendCommand(str_interp("rlc.getMarked('${chartId}', '${layerId}')"))
-  for( i in 1:(10/0.05) ) {
+  for( i in 1:(5/0.05) ) {
     run_now()
     if(!is.null(marked)) {
       setEnvironment(globalenv())
@@ -631,6 +631,8 @@ getMarked <- function(chartId, layerId = NULL) {
   }
   
   if(is.numeric(marked)) marked <- marked + 1
+  if(length(marked) == 0)
+    return (c())
   
   marked
 }
