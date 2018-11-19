@@ -10,6 +10,13 @@ colour <- iris$Sepal.Width
 lc_scatter(dat(x = iris$Sepal.Length, y = iris$Petal.Length, colorValues = colour,
                width = width, height = height), id = "iris")
 
+
+x <- as.factor(iris$Species)
+x <- relevel(x,"virginica") 
+
+lc_scatter(dat(x = x, y = iris$Petal.Length, colorValues = colour,
+               width = width, height = height), id = "iris")
+
 #change the variables
 height <- 400
 colour <- iris$Petal.Width
@@ -59,7 +66,8 @@ lc_colourSlider(chart = "scatter")
 
 lc_beeswarm(dat(x = iris$Species,
                 y = iris$Sepal.Length,
-                colourValue = iris$Sepal.Width),
+                colourValue = iris$Sepal.Width,
+                on_click = function(i) {print(i)}),
             title = "Iris dataset",
             axisTitleY = "Sepal Length",
             axisTitleX = "Species",

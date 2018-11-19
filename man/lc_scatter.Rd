@@ -80,6 +80,10 @@ Axes settings
 \itemize{
  \item{\code{logScaleX, logScaleY} - a base of logarithm for logarithmic scale transformation.
  If 0 or \code{FALSE} no transformation will be performed.}
+ \item{\code{jitterX, jitterY} - amount of random variation to be added to the position of the
+ points along one of the axes. 0 means no variation. 1 stands for distance between \code{x} and
+ \code{x + 1} for linear scale, \code{x} and \code{b*x} for logarithmic scale (\code{b} is a base
+ of the logarithm), and between neighbouring ticks for categorical scale.}
  \item{\code{layerDomainX, layerDomainY} - default axes ranges for the given layer.}
  \item{\code{domainX, domainY} - default axes ranges for the entire chart. If not defined, 
  is automatically set to include all layer domains.}

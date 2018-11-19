@@ -10,7 +10,8 @@ lc$nameList <- c("labels" = "label", "color" = "colour", "colorValue" = "colourV
                  "symbols" = "symbol", "symbolValues" = "symbolValue", "strokes" = "stroke", "values" = "value",
                  "heatmapRows" = "heatmapRow", "heatmapCols" = "heatmapCol", "showValues" = "showValue")
 
-lc$props <- list(scatter = c("x", "y", "size", "stroke", "strokeWidth", "symbol", "symbolValue", "symbolLegendTitle"),
+lc$props <- list(scatter = c("x", "y", "size", "stroke", "strokeWidth", "symbol", "symbolValue", "symbolLegendTitle",
+                             "jitterX", "jitterY"),
                 barchart = c("ngroups", "groupIds", "nbars", "barIds", "nstacks", "stackIds", "value", "groupWidth", "stroke", "strokeWidth",
                              "nbins"), 
                 beeswarm = c("x", "y", "size", "stroke", "strokeWidth", "symbol", "symbolValue", "symbolLegendTitle", "valueAxis"),
@@ -696,6 +697,23 @@ scatterDataFun <- function(l) {
       l$label <- names(l$x)
   }
   
+  if(!is.null(l$jitterX)) {
+    if(!is.numeric(l$jitterX))
+      stop("'jitterX' must be a number")
+    l$jitterX = abs(l$jitterX)
+    
+    l$shiftX <- runif(length(l$x), -l$jitterX, l$jitterX)
+    l$jitterX <- NULL
+  }
+  if(!is.null(l$jitterY)) {
+    if(!is.numeric(l$jitterY))
+      stop("'jitterX' must be a number")
+    l$jitterY = abs(l$jitterY)
+    
+    l$shiftY <- runif(length(l$y), -l$jitterY, l$jitterY)
+    l$jitterY <- NULL
+  }
+  
   if(lc$useViewer)
     l$mode <- "svg"
 
@@ -758,6 +776,10 @@ scatterDataFun <- function(l) {
 #' \itemize{
 #'  \item{\code{logScaleX, logScaleY} - a base of logarithm for logarithmic scale transformation.
 #'  If 0 or \code{FALSE} no transformation will be performed.}
+#'  \item{\code{jitterX, jitterY} - amount of random variation to be added to the position of the
+#'  points along one of the axes. 0 means no variation. 1 stands for distance between \code{x} and
+#'  \code{x + 1} for linear scale, \code{x} and \code{b*x} for logarithmic scale (\code{b} is a base
+#'  of the logarithm), and between neighbouring ticks for categorical scale.}
 #'  \item{\code{layerDomainX, layerDomainY} - default axes ranges for the given layer.}
 #'  \item{\code{domainX, domainY} - default axes ranges for the entire chart. If not defined, 
 #'  is automatically set to include all layer domains.}
