@@ -27,7 +27,7 @@ lc$props <- list(scatter = c("x", "y", "size", "stroke", "strokeWidth", "symbol"
                         "clusterRows", "clusterCols", "mode", "heatmapRow", "heatmapCol", "showValue", "rowTitle", 
                         "colTitle", "palette", "colourDomain", "on_click", "on_mouseover", "on_mouseout", "on_marked", 
                         "chart", "layer", "content", "domainX", "domainY", "apectRatio", "axisTitleX", "axisTitleY",
-                        "logScaleX", "logScaleY", "ticksRotateX", "ticksRotateY"))
+                        "logScaleX", "logScaleY", "ticksRotateX", "ticksRotateY", "globalColourScale"))
 
 Layer <- setRefClass("Layer", fields = list(type = "character", id = "character", 
                                             properties = "list", dataFun = "function",
@@ -764,7 +764,8 @@ scatterDataFun <- function(l) {
 #'  or range of all possible colour values for the continuous ones.}
 #'  \item{\code{palette} - vector of colours to construct the colour scale.}
 #'  \item{\code{colourLegendTitle} - title for the colour legend.}
-#'  \item{\code{addColourScaleToLegend} - whether or not to show colour legend for the current layer.} 
+#'  \item{\code{addColourScaleToLegend} - whether or not to show colour legend for the current layer.}
+#'  \item{\code{globalColourScale} - whether or not to use one colour scale for all the layers.}
 #'  \item{\code{symbol} - shape of each point. Must be one of \code{"Circle", "Cross", "Diamond", 
 #'  "Square", "Star", "Triangle", "Wye"}.}
 #'  \item{\code{symbolValue} - grouping values for different symbols.}
@@ -960,7 +961,8 @@ lineDataFun <- function(l) {
 #'  or range of all possible colour values for the continuous ones.}
 #'  \item{\code{palette} - vector of colours to construct the colour scale.}
 #'  \item{\code{colourLegendTitle} - title for the colour legend.}
-#'  \item{\code{addColourScaleToLegend} - whether or not to show colour legend for the current layer.} 
+#'  \item{\code{addColourScaleToLegend} - whether or not to show colour legend for the current layer.}
+#'  \item{\code{globalColourScale} - whether or not to use one colour scale for all the layers.} 
 #'  \item{\code{stroke} - (only for \code{lc_ribbon}) stroke colour for each ribbon. 
 #'  Must be a colour name or hexidecimal code.}
 #'  \item{\code{strokeWidth} - (only for \code{lc_ribbon}) width of the strokes for each ribbon.} }
@@ -1203,7 +1205,8 @@ barDataFun <- function(l) {
 #'  or range of all possible colour values for the continuous ones.}
 #'  \item{\code{palette} - vector of colours to construct the colour scale.}
 #'  \item{\code{colourLegendTitle} - title for the colour legend.}
-#'  \item{\code{addColourScaleToLegend} - whether or not to show colour legend for the current layer.} 
+#'  \item{\code{addColourScaleToLegend} - whether or not to show colour legend for the current layer.}
+#'  \item{\code{globalColourScale} - whether or not to use one colour scale for all the layers.} 
 #'  \item{\code{stroke} -  stroke colour of each bar|stack. Must be a colour name or hexidecimal code.}
 #'  \item{\code{strokeWidth} - width of the strokes of each bar|stack.} }
 #'  

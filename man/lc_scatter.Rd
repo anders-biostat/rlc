@@ -68,7 +68,8 @@ Colour and shape settings
  or range of all possible colour values for the continuous ones.}
  \item{\code{palette} - vector of colours to construct the colour scale.}
  \item{\code{colourLegendTitle} - title for the colour legend.}
- \item{\code{addColourScaleToLegend} - whether or not to show colour legend for the current layer.} 
+ \item{\code{addColourScaleToLegend} - whether or not to show colour legend for the current layer.}
+ \item{\code{globalColourScale} - whether or not to use one colour scale for all the layers.}
  \item{\code{symbol} - shape of each point. Must be one of \code{"Circle", "Cross", "Diamond", 
  "Square", "Star", "Triangle", "Wye"}.}
  \item{\code{symbolValue} - grouping values for different symbols.}

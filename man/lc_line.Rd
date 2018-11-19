@@ -94,7 +94,8 @@ Colour settings
  or range of all possible colour values for the continuous ones.}
  \item{\code{palette} - vector of colours to construct the colour scale.}
  \item{\code{colourLegendTitle} - title for the colour legend.}
- \item{\code{addColourScaleToLegend} - whether or not to show colour legend for the current layer.} 
+ \item{\code{addColourScaleToLegend} - whether or not to show colour legend for the current layer.}
+ \item{\code{globalColourScale} - whether or not to use one colour scale for all the layers.} 
  \item{\code{stroke} - (only for \code{lc_ribbon}) stroke colour for each ribbon. 
  Must be a colour name or hexidecimal code.}
  \item{\code{strokeWidth} - (only for \code{lc_ribbon}) width of the strokes for each ribbon.} }
