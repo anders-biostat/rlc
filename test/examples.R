@@ -40,7 +40,6 @@ updateCharts("iris", "Layer2")
 
 
 lc_scatter(dat(x = 1:10, y = 1:10, colourValue = 1:10 * 10^-20))
-lc_html("abcde\", ''' ljlkj")
 
 lc_scatter(dat(x = iris$Sepal.Length), y = iris$Petal.Length, colourValue = colour,
                width = width, height = height, id = "iris")
@@ -73,6 +72,15 @@ lc_beeswarm(dat(x = iris$Species,
             axisTitleX = "Species",
             colourLegendTitle = "Sepal Width")
 
+lc_scatter(dat(x = iris$Species,
+                y = iris$Sepal.Length,
+                colourValue = iris$Sepal.Width,
+               jitterX = 0.3,
+                on_click = function(i) {print(i)}),
+            title = "Iris dataset",
+            axisTitleY = "Sepal Length",
+            axisTitleX = "Species",
+            colourLegendTitle = "Sepal Width")
 
 
 x <- seq(0, 8, 0.2)

@@ -8,16 +8,17 @@ lc$nameList <- c("labels" = "label", "color" = "colour", "colorValue" = "colourV
                  "colourValues" = "colourValue", "colorValues" = "colourValue", "colorDomain" = "colourDomain",
                  "colorLegendTitle" = "colourLegendTitle", "addColorScaleToLegend" = "addColourScaleToLegend",
                  "symbols" = "symbol", "symbolValues" = "symbolValue", "strokes" = "stroke", "values" = "value",
-                 "heatmapRows" = "heatmapRow", "heatmapCols" = "heatmapCol", "showValues" = "showValue")
+                 "heatmapRows" = "heatmapRow", "heatmapCols" = "heatmapCol", "showValues" = "showValue",
+                 "globalColorScale" = "globalColourScale")
 
 lc$props <- list(scatter = c("x", "y", "size", "stroke", "strokeWidth", "symbol", "symbolValue", "symbolLegendTitle",
                              "jitterX", "jitterY"),
                 barchart = c("ngroups", "groupIds", "nbars", "barIds", "nstacks", "stackIds", "value", "groupWidth", "stroke", "strokeWidth",
                              "nbins"), 
                 beeswarm = c("x", "y", "size", "stroke", "strokeWidth", "symbol", "symbolValue", "symbolLegendTitle", "valueAxis"),
-                pointLine = c("lineWidth", "dasharray", "x", "y", "nsteps", "value"),
-                xLine = c("lineWidth", "dasharray", "lineFun", "nsteps", "a", "b", "h"),
-                yLine = c("lineWidth", "dasharray", "lineFun", "nsteps", "v"),
+                pointLine = c("lineWidth", "dasharray", "x", "y", "nsteps", "value", "fill"),
+                xLine = c("lineWidth", "dasharray", "lineFun", "nsteps", "a", "b", "h", "fill"),
+                yLine = c("lineWidth", "dasharray", "lineFun", "nsteps", "v", "fill"),
                 pointRibbon = c("lineWidth", "dasharray", "x", "ymax", "ymin", "nsteps"),
                 layer = c("nelements", "elementIds", "label", "layerDomainX", "layerDomainY", "contScaleX", "contScaleY",
                           "colour", "colourValue", "palette", "colourDomain", "colourLegendTitle", "addColourScaleToLegend", "opacity", "on_click",
