@@ -84,7 +84,7 @@ rlc.setCustomMouseOut = function(id, layerId) {
         })
     else
       charts[id]
-        .on_mouseout(function(d) {
+        .on_mouseout(function() {
           jrc.sendCommand("rlc:::chartEvent(NULL, '" + id + "', '" + layerId + "', 'mouseout')");
         });      
     charts[id].customMouseOut = true;
@@ -141,6 +141,15 @@ rlc.getMarked = function(id, layerId) {
     marked = marked.data();
 
   jrc.sendData("marked", marked);
+}
+
+rlc.mark = function(id, layerId, pe) {
+  if(markElements[0] == "__clear__")
+    markElements = "__clear__";
+  if(layerId == "main")
+    charts[id].mark(markElements, pe)
+  else
+    charts[id].get_layer(layerId).mark(markElements, pe);
 }
 
 rlc.updateCharts = function(id, updateType, layerId) {

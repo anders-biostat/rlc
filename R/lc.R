@@ -603,7 +603,15 @@ listCharts <- function() {
 #' getMarked("Chart1")
 #' 
 #' @export
-getMarked <- function(chartId, layerId = NULL) {
+getMarked <- function(chartId = NULL, layerId = NULL) {
+  if(is.null(chartId))
+    if(length(lc$charts)) {
+      chartId <- lc$charts[[1]]$id
+    } else {
+      stop(str_c("There are more than one chart on the page. 'chartId' must be ",
+                 "specified. Use 'listCharts()' to get IDs of all existing charts."))
+    }
+  
   chart <- getChart(chartId)
   if(is.null(chart))
     stop(str_c("Chart ", chartId, " is not defined."))
@@ -614,7 +622,8 @@ getMarked <- function(chartId, layerId = NULL) {
     if(chart$nLayers() == 1)
       layerId <- names(chart$layers)[2]
     if(chart$nLayers() > 1)
-      stop("'layerId' is not defined")
+      stop(str_c("There is more than one layer in this chart. 'layerId' must be specified. ",
+                 "Use 'listCharts()' to get IDs of all existing charts and their layers."))
   }
   marked <- NULL
   setEnvironment(environment()) 
@@ -638,6 +647,85 @@ getMarked <- function(chartId, layerId = NULL) {
   
   marked
 }
+
+#' Mark elements of a chart
+#' 
+#' \code{mark} selects a set of elements in a given chart. It is equivalent to
+#' selecting elemnts interactively by drawing a rectangle with the mouse 
+#' while holding the \code{Shift} key.
+#' 
+#' @param elements numeric vector of indices of the elements to select.
+#' @param chartId ID of the chart where to select elements (can be omitted if 
+#' there is only one chart).
+#' @param layerId ID of the layer where to select elements (can be omitted if
+#' the chart has only one layer).
+#' @param preventEvent if \code{TRUE}, \code{on_marked} function will not be
+#' called.
+#'
+#' @examples 
+#' data("iris")
+#' openPage(F, layout = "table1x2")
+#' 
+#' lc_scatter(dat(
+#'   x = iris$Sepal.Length,
+#'   y = iris$Petal.Length,
+#'   colourValue = iris$Species,
+#'   on_marked = function() {
+#'     mark(getMarked("A1"), "A2")
+#'   }
+#' ), "A1")
+#' 
+#' lc_scatter(dat(
+#'   x = iris$Sepal.Width,
+#'   y = iris$Petal.Width,
+#'   colourValue = iris$Species,
+#'   on_marked = function() {
+#'     mark(getMarked("A2"), "A1")
+#'   }
+#' ), "A2")
+#'
+#' @export
+mark <- function(elements, chartId = NULL, layerId = NULL, preventEvent = T) {
+  if(is.null(chartId))
+    if(length(lc$charts)) {
+      chartId <- lc$charts[[1]]$id
+    } else {
+      stop(str_c("There is more than one chart on the page. 'chartId' must be ",
+                 "specified. Use 'listCharts()' to get IDs of all existing charts."))
+    }
+  
+  chart <- getChart(chartId)
+  if(is.null(chart))
+    stop(str_c("Chart ", chartId, " is not defined."))
+  
+  if(is.null(layerId)) {
+    if(chart$nLayers() == 0)
+      layerId <- "main"
+    if(chart$nLayers() == 1)
+      layerId <- names(chart$layers)[2]
+    if(chart$nLayers() > 1)
+      stop(str_c("There is more than one layer in this chart. 'layerId' must be specified. ",
+                 "Use 'listCharts()' to get IDs of all existing charts and their layers."))
+  }
+  
+  if(length(elements) != 0 & !is.vector(elements))
+    stop("'elements' must be a vector of indices.")
+  if(preventEvent) {
+    preventEvent = "true"
+  } else {
+    preventEvent = "false"
+  }
+  
+  if(length(elements) == 0) {
+    elements <- "__clear__"
+  } else {
+    elements <- elements - 1
+  }
+  
+  sendData("markElements", elements)
+  sendCommand(str_c("rlc.mark('", chartId, "', '", layerId, "', ", preventEvent, ");"))
+}
+
 
 #' Link data to the chart
 #' 
