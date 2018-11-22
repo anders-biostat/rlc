@@ -461,7 +461,7 @@ sendProperties <- function(chart, layerId = ls(chart$layers)){
       d$on_mouseover <- NULL
       sendCommand(str_interp("rlc.setCustomMouseOver('${chart$id}', '${layerName}', ${layer$pacerStep});"))
     }
-    if(!is.null(d$on_mouseover)) {
+    if(!is.null(d$on_mouseout)) {
       layer$on_mouseout <- d$on_mouseout
       d$on_mouseout <- NULL
       sendCommand(str_interp("rlc.setCustomMouseOut('${chart$id}', '${layerName}');"))
