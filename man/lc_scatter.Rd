@@ -85,6 +85,10 @@ Axes settings
  points along one of the axes. 0 means no variation. 1 stands for distance between \code{x} and
  \code{x + 1} for linear scale, \code{x} and \code{b*x} for logarithmic scale (\code{b} is a base
  of the logarithm), and between neighbouring ticks for categorical scale.}
+ \item{\code{shiftX, shiftY} - shift for each poitn from its original position along one of the
+ axes. 0 means no shift. 1 stands for distance between \code{x} and
+ \code{x + 1} for linear scale, \code{x} and \code{b*x} for logarithmic scale (\code{b} is a base
+ of the logarithm), and between neighbouring ticks for categorical scale.}
  \item{\code{layerDomainX, layerDomainY} - default axes ranges for the given layer.}
  \item{\code{domainX, domainY} - default axes ranges for the entire chart. If not defined, 
  is automatically set to include all layer domains.}

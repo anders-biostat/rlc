@@ -12,7 +12,7 @@ lc$nameList <- c("labels" = "label", "color" = "colour", "colorValue" = "colourV
                  "globalColorScale" = "globalColourScale")
 
 lc$props <- list(scatter = c("x", "y", "size", "stroke", "strokeWidth", "symbol", "symbolValue", "symbolLegendTitle",
-                             "jitterX", "jitterY"),
+                             "jitterX", "jitterY", "shiftX", "shiftY"),
                 barchart = c("ngroups", "groupIds", "nbars", "barIds", "nstacks", "stackIds", "value", "groupWidth", "stroke", "strokeWidth",
                              "nbins"), 
                 beeswarm = c("x", "y", "size", "stroke", "strokeWidth", "symbol", "symbolValue", "symbolLegendTitle", "valueAxis"),
@@ -868,6 +868,10 @@ scatterDataFun <- function(l) {
 #'  If 0 or \code{FALSE} no transformation will be performed.}
 #'  \item{\code{jitterX, jitterY} - amount of random variation to be added to the position of the
 #'  points along one of the axes. 0 means no variation. 1 stands for distance between \code{x} and
+#'  \code{x + 1} for linear scale, \code{x} and \code{b*x} for logarithmic scale (\code{b} is a base
+#'  of the logarithm), and between neighbouring ticks for categorical scale.}
+#'  \item{\code{shiftX, shiftY} - shift for each poitn from its original position along one of the
+#'  axes. 0 means no shift. 1 stands for distance between \code{x} and
 #'  \code{x + 1} for linear scale, \code{x} and \code{b*x} for logarithmic scale (\code{b} is a base
 #'  of the logarithm), and between neighbouring ticks for categorical scale.}
 #'  \item{\code{layerDomainX, layerDomainY} - default axes ranges for the given layer.}
