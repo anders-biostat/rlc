@@ -2,7 +2,7 @@
 
 This package is an R wrapper fot JavaScript 
 [linked-charts](https://kloivenn.github.io/linked-charts) library.
-**rlc** is an easy to use instrument for interactiove data visualisation.
+**rlc** is an easy to use instrument for interactive data visualisation.
 It allows to open interactive charts either in the RStudio Viewer or
 in the default browser window and on the fly process information about user's
 action (clicking, mousehovering, selecting points) in the running R session.
@@ -11,9 +11,10 @@ of the others.
 
 ## Installation
 
-To install rlc from github use the following commands
+To install rlc from GitHub use the following commands:
 
 ```
+install.packages("devtools")
 devtools::install_github("anders-biostat/JsRCom")
 devtools::install_github("anders-biostat/rlc")
 ```
@@ -37,4 +38,4 @@ Currently supported types of charts are:
 - ```lc_html``` - customary HTML code to be inserted in the web page
 
 ## Examples
-To see how it work, have a look at this [tutorial](https://anders-biostat.github.io/linked-charts/rlc/).
+To see how it works, have a look at this [tutorial](https://anders-biostat.github.io/linked-charts/rlc/).
