@@ -115,7 +115,7 @@ Global chart settings
  \item{\code{heigth} - height of the chart in pixels.}
  \item{\code{plotWidth} - width of the plotting area in pixels.}
  \item{\code{plotHeight} - height of the plotting area in pixels.}
- \item{\code{margins} - margins size in pixels. Must be a list with all the following fields: 
+ \item{\code{paddings} - paddings size in pixels. Must be a list with all the following fields: 
  \code{"top", "bottom", "left", "right"}.}
  \item{\code{title} - title of the chart.}
  \item{\code{titleX, titleY} - coordinates of the chart title.}

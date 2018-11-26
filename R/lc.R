@@ -23,12 +23,13 @@ lc$props <- list(scatter = c("x", "y", "size", "stroke", "strokeWidth", "symbol"
                 layer = c("nelements", "elementIds", "label", "layerDomainX", "layerDomainY", "contScaleX", "contScaleY",
                           "colour", "colourValue", "palette", "colourDomain", "colourLegendTitle", "addColourScaleToLegend", "opacity", "on_click",
                           "informText", "on_mouseover", "on_mouseout", "on_marked"),
-                all = c("width", "height", "plotWidth", "plotHeight", "margins", "title", "titleX", "titleY", "titleSize",
+                all = c("width", "height", "plotWidth", "plotHeight", "paddings", "title", "titleX", "titleY", "titleSize",
                         "showLegend", "showPanel", "transitionDuration", "value", "rowLabel", "colLabel", "showDendogram",
                         "clusterRows", "clusterCols", "mode", "heatmapRow", "heatmapCol", "showValue", "rowTitle", 
                         "colTitle", "palette", "colourDomain", "on_click", "on_mouseover", "on_mouseout", "on_marked", 
                         "chart", "layer", "content", "domainX", "domainY", "apectRatio", "axisTitleX", "axisTitleY",
-                        "logScaleX", "logScaleY", "ticksRotateX", "ticksRotateY", "globalColourScale", "aspectRatio"))
+                        "logScaleX", "logScaleY", "ticksRotateX", "ticksRotateY", "globalColourScale", "aspectRatio",
+                        "ticksX", "ticksY"))
 
 Layer <- setRefClass("Layer", fields = list(type = "character", id = "character", 
                                             properties = "list", dataFun = "function",
@@ -444,6 +445,11 @@ sendProperties <- function(chart, layerId = ls(chart$layers)){
     },
     error = function(e) 
       stop( str_interp( "in data expression for chart '${chart$id}': ${e$message}." ), call.=FALSE ) ) 
+    
+    if(!is.null(d$ticksX) & !is.vector(d$ticksX))
+      d$ticksX <- t(d$ticksX)
+    if(!is.null(d$ticksY) & !is.vector(d$ticksY))
+      d$ticksY <- t(d$ticksY)
     
     if(!is.null(d$on_click)) {
       layer$on_click <- d$on_click
@@ -900,7 +906,7 @@ scatterDataFun <- function(l) {
 #'  \item{\code{heigth} - height of the chart in pixels.}
 #'  \item{\code{plotWidth} - width of the plotting area in pixels.}
 #'  \item{\code{plotHeight} - height of the plotting area in pixels.}
-#'  \item{\code{margins} - margins size in pixels. Must be a list with all the following fields: 
+#'  \item{\code{paddings} - paddings size in pixels. Must be a list with all the following fields: 
 #'  \code{"top", "bottom", "left", "right"}.}
 #'  \item{\code{title} - title of the chart.}
 #'  \item{\code{titleX, titleY} - coordinates of the chart title.}
@@ -1090,7 +1096,7 @@ lineDataFun <- function(l) {
 #'  \item{\code{heigth} - height of the chart in pixels.}
 #'  \item{\code{plotWidth} - width of the plotting area in pixels.}
 #'  \item{\code{plotHeight} - height of the plotting area in pixels.}
-#'  \item{\code{margins} - margins size in pixels. Must be a list with all the following fields: 
+#'  \item{\code{paddings} - paddings size in pixels. Must be a list with all the following fields: 
 #'  \code{"top", "bottom", "left", "right"}.}
 #'  \item{\code{title} - title of the chart.}
 #'  \item{\code{titleX, titleY} - coordinates of the chart title.}
@@ -1333,7 +1339,7 @@ barDataFun <- function(l) {
 #'  \item{\code{heigth} - height of the chart in pixels.}
 #'  \item{\code{plotWidth} - width of the plotting area in pixels.}
 #'  \item{\code{plotHeight} - height of the plotting area in pixels.}
-#'  \item{\code{margins} - margins size in pixels. Must be a list with all the following fields: 
+#'  \item{\code{paddings} - paddings size in pixels. Must be a list with all the following fields: 
 #'  \code{"top", "bottom", "left", "right"}.}
 #'  \item{\code{title} - title of the chart.}
 #'  \item{\code{titleX, titleY} - coordinates of the chart title.}
@@ -1515,7 +1521,7 @@ lc_dens <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL,
 #'  \item{\code{heigth} - height of the chart in pixels.}
 #'  \item{\code{plotWidth} - width of the plotting area in pixels.}
 #'  \item{\code{plotHeight} - height of the plotting area in pixels.}
-#'  \item{\code{margins} - margins size in pixels. Must be a list with all the following fields: 
+#'  \item{\code{paddings} - paddings size in pixels. Must be a list with all the following fields: 
 #'  \code{"top", "bottom", "left", "right"}.}
 #'  \item{\code{title} - title of the chart.}
 #'  \item{\code{titleX, titleY} - coordinates of the chart title.}
@@ -1540,12 +1546,12 @@ lc_dens <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL,
 #' lc_heatmap(dat(value = test))
 #' 
 #' # when you want to cluster rows or columns, it can be
-#' # a good idea to make bottom and right margins larger to
+#' # a good idea to make bottom and right paddings larger to
 #' # fit labels
 #' lc_heatmap(dat(value = test),
 #'            clusterRows = T,
 #'            clusterCols = T,
-#'            margins = list(top = 50, left = 30, bottom = 75, right = 75))
+#'            paddings = list(top = 50, left = 30, bottom = 75, right = 75))
 #' 
 #' lc_heatmap(dat(value = cor(test), 
 #'                colourDomain = c(-1, 1),
@@ -1599,7 +1605,7 @@ lc_heatmap <- function(data = list(), place = NULL, ..., id = NULL, pacerStep = 
 #' \itemize{
 #'  \item{\code{width} - width of the chart in pixels.}
 #'  \item{\code{heigth} - height of the chart in pixels.}
-#'  \item{\code{margins} - margins size in pixels. Must be a list with all the following fields: 
+#'  \item{\code{paddings} - paddings size in pixels. Must be a list with all the following fields: 
 #'  \code{"top", "bottom", "left", "right"}.}
 #'  \item{\code{title} - title of the chart.}
 #'  \item{\code{titleX, titleY} - coordinates of the chart title.}
@@ -1726,7 +1732,7 @@ lc_vLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL
 #'  If width is defined and it's smaller than content's width, scrolling will be possible.}
 #'  \item{\code{heigth} - height of the chart in pixels. By default, the entire content will be displayed.
 #'  If height is defined and it's smaller than content's height, scrolling will be possible.}
-#'  \item{\code{margins} - margins size in pixels. Must be a list with all the following fields: 
+#'  \item{\code{paddings} - paddings size in pixels. Must be a list with all the following fields: 
 #'  \code{"top", "bottom", "left", "right"}.}
 #'  \item{\code{title} - title of the chart.}
 #'  \item{\code{titleX, titleY} - coordinates of the chart title.}

@@ -69,7 +69,7 @@ Global chart settings
  \item{\code{heigth} - height of the chart in pixels.}
  \item{\code{plotWidth} - width of the plotting area in pixels.}
  \item{\code{plotHeight} - height of the plotting area in pixels.}
- \item{\code{margins} - margins size in pixels. Must be a list with all the following fields: 
+ \item{\code{paddings} - paddings size in pixels. Must be a list with all the following fields: 
  \code{"top", "bottom", "left", "right"}.}
  \item{\code{title} - title of the chart.}
  \item{\code{titleX, titleY} - coordinates of the chart title.}
@@ -96,12 +96,12 @@ colnames(test) <- paste0("Sample", 1:20)
 lc_heatmap(dat(value = test))
 
 # when you want to cluster rows or columns, it can be
-# a good idea to make bottom and right margins larger to
+# a good idea to make bottom and right paddings larger to
 # fit labels
 lc_heatmap(dat(value = test),
            clusterRows = T,
            clusterCols = T,
-           margins = list(top = 50, left = 30, bottom = 75, right = 75))
+           paddings = list(top = 50, left = 30, bottom = 75, right = 75))
 
 lc_heatmap(dat(value = cor(test), 
                colourDomain = c(-1, 1),

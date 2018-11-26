@@ -38,7 +38,7 @@ Global chart settings
  If width is defined and it's smaller than content's width, scrolling will be possible.}
  \item{\code{heigth} - height of the chart in pixels. By default, the entire content will be displayed.
  If height is defined and it's smaller than content's height, scrolling will be possible.}
- \item{\code{margins} - margins size in pixels. Must be a list with all the following fields: 
+ \item{\code{paddings} - paddings size in pixels. Must be a list with all the following fields: 
  \code{"top", "bottom", "left", "right"}.}
  \item{\code{title} - title of the chart.}
  \item{\code{titleX, titleY} - coordinates of the chart title.}
