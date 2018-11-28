@@ -24,18 +24,19 @@ lc$props <- list(scatter = c("x", "y", "size", "stroke", "strokeWidth", "symbol"
                           "colour", "colourValue", "palette", "colourDomain", "colourLegendTitle", "addColourScaleToLegend", "opacity", "on_click",
                           "informText", "on_mouseover", "on_mouseout", "on_marked"),
                 all = c("width", "height", "plotWidth", "plotHeight", "paddings", "title", "titleX", "titleY", "titleSize",
-                        "showLegend", "showPanel", "transitionDuration", "value", "rowLabel", "colLabel", "showDendogram",
+                        "showLegend", "showPanel", "transitionDuration", "value", "rowLabel", "colLabel", "showDendogramRow",
                         "clusterRows", "clusterCols", "mode", "heatmapRow", "heatmapCol", "showValue", "rowTitle", 
                         "colTitle", "palette", "colourDomain", "on_click", "on_mouseover", "on_mouseout", "on_marked", 
                         "chart", "layer", "content", "domainX", "domainY", "apectRatio", "axisTitleX", "axisTitleY",
                         "logScaleX", "logScaleY", "ticksRotateX", "ticksRotateY", "globalColourScale", "aspectRatio",
-                        "ticksX", "ticksY"))
+                        "ticksX", "ticksY", "showDendogramCol", "on_labelClickCol", "on_labelClickRow"))
 
 Layer <- setRefClass("Layer", fields = list(type = "character", id = "character", 
                                             properties = "list", dataFun = "function",
                                             on_click = "function", on_mouseover = "function",
                                             on_mouseout = "function", init = "logical",
-                                            on_marked = "function", pacerStep = "numeric"))
+                                            on_marked = "function", pacerStep = "numeric",
+                                            on_labelClickRow = "function", on_labelClickCol = "function"))
 Layer$methods(
   setProperty = function(name, expr) {
     properties[[name]] <<- expr
@@ -472,6 +473,16 @@ sendProperties <- function(chart, layerId = ls(chart$layers)){
       d$on_mouseout <- NULL
       sendCommand(str_interp("rlc.setCustomMouseOut('${chart$id}', '${layerName}');"))
     }    
+    if(!is.null(d$on_labelClickRow)) {
+      layer$on_labelClickRow <- d$on_labelClickRow
+      d$on_labelClickRow <- NULL
+      sendCommand(str_interp("rlc.setCustomClickLabel('${chart$id}', 'Row');"))
+    }    
+    if(!is.null(d$on_labelClickCol)) {
+      layer$on_labelClickCol <- d$on_labelClickCol
+      d$on_labelClickCol <- NULL
+      sendCommand(str_interp("rlc.setCustomClickLabel('${chart$id}', 'Col');"))
+    }    
     
     name <- str_c(chart$id, layer$id, sep = "_")
     
@@ -532,6 +543,7 @@ setChart <- function(type, data, ..., place, id, layerId, dataFun, addLayer, pac
 }
 
 chartEvent <- function(d, id, layerId, event) {
+  print(event)
   
   if(is.numeric(d)) d <- d + 1 
   
@@ -551,6 +563,10 @@ chartEvent <- function(d, id, layerId, event) {
     layer$on_mouseout()
   if(event == "marked")
     layer$on_marked()
+  if(event == "labelClickRow")
+    layer$on_labelClickRow(d)
+  if(event == "labelClickCol")
+    layer$on_labelClickCol(d)
 }
 
 #' List all existing charts and layers

@@ -107,6 +107,16 @@ rlc.setCustomOnMarked = function(id, layerId) {
   }
 }
 
+rlc.setCustomClickLabel = function(id, type) {
+  if(!charts[id]["customClickLabel" + type]){
+    charts[id]
+      ["on_labelClick" + type](function(d) {
+        jrc.sendCommand("rlc:::chartEvent("+ d + ", '" + id + "', 'main', 'labelClick" + type + "')");
+      });      
+    charts[id]["customClickLabel" + type] = true;
+  }
+}
+
 rlc.setProperty = function(name) {
   var spl = name.split("_");
   var id = spl[0];
