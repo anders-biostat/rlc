@@ -29,7 +29,7 @@ lc$props <- list(scatter = c("x", "y", "size", "stroke", "strokeWidth", "symbol"
                         "colTitle", "palette", "colourDomain", "on_click", "on_mouseover", "on_mouseout", "on_marked", 
                         "chart", "layer", "content", "domainX", "domainY", "apectRatio", "axisTitleX", "axisTitleY",
                         "logScaleX", "logScaleY", "ticksRotateX", "ticksRotateY", "globalColourScale", "aspectRatio",
-                        "ticksX", "ticksY", "showDendogramCol", "on_labelClickCol", "on_labelClickRow"))
+                        "orderRows", "orderCols", "ticksX", "ticksY", "showDendogramCol", "on_labelClickCol", "on_labelClickRow"))
 
 Layer <- setRefClass("Layer", fields = list(type = "character", id = "character", 
                                             properties = "list", dataFun = "function",
@@ -543,7 +543,6 @@ setChart <- function(type, data, ..., place, id, layerId, dataFun, addLayer, pac
 }
 
 chartEvent <- function(d, id, layerId, event) {
-  print(event)
   
   if(is.numeric(d)) d <- d + 1 
   
@@ -1578,7 +1577,9 @@ lc_heatmap <- function(data = list(), place = NULL, ..., id = NULL, pacerStep = 
     if(!is.null(l$value)) {
       l$nrows <- nrow(l$value)
       l$ncols <- ncol(l$value)
-
+      
+      l$value <- as.matrix(l$value)
+      
       if(is.null(l$rowLabel) & !is.null(rownames(l$value)))
         l$rowLabel <- rownames(l$value)
       if(is.null(l$colLabel) & !is.null(colnames(l$value)))

@@ -133,9 +133,19 @@ rlc.setProperty = function(name) {
       if(window[name][pr].right)
         window[name][pr].right = window[name][pr].right[0];
       charts[id].set_paddings(window[name][pr]);
-      return;
-    }
-    if(Array.isArray(window[name][pr]) && window[name][pr].length == 1)
+    } else if(pr == "orderRows") {
+      orderRow = window[name][pr];
+      charts[id].rowIds(d3.range(window[name][pr].length));
+      charts[id].reorder("Row", function(a, b) {
+        return orderRow[a] - orderRow[b];
+      })
+    } else if(pr == "orderCols") {
+      orderCol = window[name][pr];
+      charts[id].colIds(d3.range(window[name][pr].length));
+      charts[id].reorder("Col", function(a, b) {
+        return orderCol[a] - orderCol[b];
+      })
+    } else if(Array.isArray(window[name][pr]) && window[name][pr].length == 1)
       charts[id][pr](window[name][pr][0])
     else  
       charts[id][pr](window[name][pr]);
