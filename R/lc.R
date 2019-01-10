@@ -29,7 +29,7 @@ lc$props <- list(scatter = c("x", "y", "size", "stroke", "strokeWidth", "symbol"
                         "colTitle", "palette", "colourDomain", "on_click", "on_mouseover", "on_mouseout", "on_marked", 
                         "chart", "layer", "content", "domainX", "domainY", "apectRatio", "axisTitleX", "axisTitleY",
                         "logScaleX", "logScaleY", "ticksRotateX", "ticksRotateY", "globalColourScale", "aspectRatio",
-                        "orderRows", "orderCols", "ticksX", "ticksY", "showDendogramCol", "on_labelClickCol", "on_labelClickRow"))
+                        "rankRows", "rankCols", "ticksX", "ticksY", "showDendogramCol", "on_labelClickCol", "on_labelClickRow"))
 
 Layer <- setRefClass("Layer", fields = list(type = "character", id = "character", 
                                             properties = "list", dataFun = "function",
@@ -315,13 +315,13 @@ setProperties <- function(data, id, layerId = NULL) {
 #' 
 #' These are valid for all the charts:
 #' \itemize{
-#'   \item{\code{Size} changes the size of the chart (and consequently the location
-#'   of all its elements).}
-#'   \item{\code{Title} changes the title of the chart.}
-#'   \item{\code{Canvas} If number of elements is too high the 
+#'   \item \code{Size} changes the size of the chart (and consequently the location
+#'   of all its elements).
+#'   \item \code{Title} changes the title of the chart.
+#'   \item \code{Canvas} If number of elements is too high the 
 #'   charts switch to the canvas mode and istead of multiple SVG point or cells
 #'   a single Canvas image is generated. This type of update redraws the Canvas
-#'   image. \emph{It is not recommended to use this function.}}
+#'   image. \emph{It is not recommended to use this function.}
 #' }
 #' 
 #' These can be updated only in heatmaps (\code{\link{lc_heatmap}}):
@@ -856,82 +856,82 @@ scatterDataFun <- function(l) {
 #' of cumbersome computations. May be important when the chart works in canvas mode.
 #' 
 #' @section Available properties: 
-#' You can read more about different properties in the vignette.
+#' You can read more about different properties 
+#' \href{https://anders-biostat.github.io/linked-charts/rlc/tutorials/props.html}{here}.
 #' 
 #' \itemize{
-#'  \item{\code{x, y} - vector of x and y coordinates of the points.} 
-#'  \item{\code{size} - sizes of the points. Default size is 6.}
-#'  \item{\code{opacity} - opacity of the points in the range from 0 to 1.}
-#'  \item{\code{label} - vector of text labels for each point.} 
-#'  \item{\code{valueAxis} - (for \code{lc_beeswarm} only) defines, values along 
-#'  which of the axes should not be changed. Must be \code{"x"} or \code{"y"}.} }
+#'  \item \code{x, y} - vector of x and y coordinates of the points.
+#'  \item \code{size} - sizes of the points. Default size is 6.
+#'  \item \code{opacity} - opacity of the points in the range from 0 to 1.
+#'  \item \code{label} - vector of text labels for each point.
+#'  \item \code{valueAxis} - (for \code{lc_beeswarm} only) defines, values along 
+#'  which of the axes should not be changed. Must be \code{"x"} or \code{"y"}.} 
 #' 
 #' Colour and shape settings
 #' \itemize{
-#'  \item{\code{colour} - colour of the points. Must be a colour name or hexidecimal code.}
-#'  \item{\code{colourValue} - grouping values for different colours. Can be numbers or charachters.}
-#'  \item{\code{colourDomain} - vector of all possible values for discrete colour scales 
-#'  or range of all possible colour values for the continuous ones.}
-#'  \item{\code{palette} - vector of colours to construct the colour scale.}
-#'  \item{\code{colourLegendTitle} - title for the colour legend.}
-#'  \item{\code{addColourScaleToLegend} - whether or not to show colour legend for the current layer.}
-#'  \item{\code{globalColourScale} - whether or not to use one colour scale for all the layers.}
-#'  \item{\code{symbol} - shape of each point. Must be one of \code{"Circle", "Cross", "Diamond", 
-#'  "Square", "Star", "Triangle", "Wye"}.}
-#'  \item{\code{symbolValue} - grouping values for different symbols.}
-#'  \item{\code{symbolLegendTitle} - title for the symbol value.}
-#'  \item{\code{stroke} - stroke colour for each element. Must be a colour name or hexidecimal code.}
-#'  \item{\code{strokeWidth} - width of the strokes for each point.} }
+#'  \item \code{colour} - colour of the points. Must be a colour name or hexidecimal code.
+#'  \item \code{colourValue} - grouping values for different colours. Can be numbers or charachters.
+#'  \item \code{colourDomain} - vector of all possible values for discrete colour scales 
+#'  or range of all possible colour values for the continuous ones.
+#'  \item \code{palette} - vector of colours to construct the colour scale.
+#'  \item \code{colourLegendTitle} - title for the colour legend.
+#'  \item \code{addColourScaleToLegend} - whether or not to show colour legend for the current layer.
+#'  \item \code{globalColourScale} - whether or not to use one colour scale for all the layers.
+#'  \item \code{symbol} - shape of each point. Must be one of \code{"Circle", "Cross", "Diamond", 
+#'  "Square", "Star", "Triangle", "Wye"}.
+#'  \item \code{symbolValue} - grouping values for different symbols.
+#'  \item \code{symbolLegendTitle} - title for the symbol value.
+#'  \item \code{stroke} - stroke colour for each element. Must be a colour name or hexidecimal code.
+#'  \item \code{strokeWidth} - width of the strokes for each point.} 
 #'  
 #' Axes settings
 #' \itemize{
-#'  \item{\code{logScaleX, logScaleY} - a base of logarithm for logarithmic scale transformation.
-#'  If 0 or \code{FALSE} no transformation will be performed.}
-#'  \item{\code{jitterX, jitterY} - amount of random variation to be added to the position of the
+#'  \item \code{logScaleX, logScaleY} - a base of logarithm for logarithmic scale transformation.
+#'  If 0 or \code{FALSE} no transformation will be performed.
+#'  \item \code{jitterX, jitterY} - amount of random variation to be added to the position of the
 #'  points along one of the axes. 0 means no variation. 1 stands for distance between \code{x} and
 #'  \code{x + 1} for linear scale, \code{x} and \code{b*x} for logarithmic scale (\code{b} is a base
-#'  of the logarithm), and between neighbouring ticks for categorical scale.}
-#'  \item{\code{shiftX, shiftY} - shift for each poitn from its original position along one of the
+#'  of the logarithm), and between neighbouring ticks for categorical scale.
+#'  \item \code{shiftX, shiftY} - shift for each poitn from its original position along one of the
 #'  axes. 0 means no shift. 1 stands for distance between \code{x} and
 #'  \code{x + 1} for linear scale, \code{x} and \code{b*x} for logarithmic scale (\code{b} is a base
-#'  of the logarithm), and between neighbouring ticks for categorical scale.}
-#'  \item{\code{layerDomainX, layerDomainY} - default axes ranges for the given layer.}
-#'  \item{\code{domainX, domainY} - default axes ranges for the entire chart. If not defined, 
-#'  is automatically set to include all layer domains.}
-#'  \item{\code{contScaleX, consScaleY} - whether or not the axis should be continuous.}
-#'  \item{\code{aspectRatio} - aspect ratio.}
-#'  \item{\code{axisTitleX, axisTitleY} - axes titles.}
-#'  \item{\code{ticksRotateX, ticksRotateY} - degrees of angle to rotate ticks. Must be between 
-#'  0 (horisontal ticks, default) and 90 (vertical ticks).}
-#'  \item{\code{ticksX, ticksY} - set of ticks for the axes.} }
+#'  of the logarithm), and between neighbouring ticks for categorical scale.
+#'  \item \code{layerDomainX, layerDomainY} - default axes ranges for the given layer.
+#'  \item \code{domainX, domainY} - default axes ranges for the entire chart. If not defined, 
+#'  is automatically set to include all layer domains.
+#'  \item \code{contScaleX, consScaleY} - whether or not the axis should be continuous.
+#'  \item \code{aspectRatio} - aspect ratio.
+#'  \item \code{axisTitleX, axisTitleY} - axes titles.
+#'  \item \code{ticksRotateX, ticksRotateY} - degrees of angle to rotate ticks. Must be between 
+#'  0 (horisontal ticks, default) and 90 (vertical ticks).
+#'  \item \code{ticksX, ticksY} - set of ticks for the axes.} 
 #'
 #' Interactivity settings
 #' \itemize{
-#'  \item{\code{on_click} - function, to be called, when one of the points is clicked. Gets an
-#'  index of the clicked point as an argument.}
-#'  \item{\code{on_mouseover} - function, to be called, when mouse hovers over one of the points.
-#'  Gets an index of the clicked point as an argument.}
-#'  \item{\code{on_mouseout} - function, to be called, when mouse moves out of one of the points.} 
-#'  \item{\code{on_marked} - function, to be called, when any of the points are selected (marked) 
-#'  or deselected. Use \code{\link{getMarked}} function to get the IDs of the currently marked points.} }
+#'  \item \code{on_click} - function, to be called, when one of the points is clicked. Gets an
+#'  index of the clicked point as an argument.
+#'  \item \code{on_mouseover} - function, to be called, when mouse hovers over one of the points.
+#'  Gets an index of the clicked point as an argument.
+#'  \item \code{on_mouseout} - function, to be called, when mouse moves out of one of the points.
+#'  \item \code{on_marked} - function, to be called, when any of the points are selected (marked) 
+#'  or deselected. Use \code{\link{getMarked}} function to get the IDs of the currently marked points.} 
 #'  
 #' Global chart settings
 #' \itemize{
-#'  \item{\code{width} - width of the chart in pixels.}
-#'  \item{\code{heigth} - height of the chart in pixels.}
-#'  \item{\code{plotWidth} - width of the plotting area in pixels.}
-#'  \item{\code{plotHeight} - height of the plotting area in pixels.}
-#'  \item{\code{paddings} - paddings size in pixels. Must be a list with all the following fields: 
-#'  \code{"top", "bottom", "left", "right"}.}
-#'  \item{\code{title} - title of the chart.}
-#'  \item{\code{titleX, titleY} - coordinates of the chart title.}
-#'  \item{\code{titleSize} - font-size of the chart title.}
-#'  \item{\code{showLegend} - whether or not to show the legend.}
-#'  \item{\code{showPanel} - whether of not to show the tools panel.}
-#'  \item{\code{transitionDuration} - duration of the transtions between any two states of the chart. If 0,
+#'  \item \code{width} - width of the chart in pixels.
+#'  \item \code{heigth} - height of the chart in pixels. 
+#'  \item \code{plotWidth} - width of the plotting area in pixels.
+#'  \item \code{plotHeight} - height of the plotting area in pixels.
+#'  \item \code{paddings} - paddings size in pixels. Must be a list with all the following fields: 
+#'  \code{"top", "bottom", "left", "right"}.
+#'  \item \code{title} - title of the chart.
+#'  \item \code{titleX, titleY} - coordinates of the chart title.
+#'  \item \code{titleSize} - font-size of the chart title.
+#'  \item \code{showLegend} - whether or not to show the legend.
+#'  \item \code{showPanel} - whether of not to show the tools panel.
+#'  \item \code{transitionDuration} - duration of the transtions between any two states of the chart. If 0,
 #'  no animated transition is shown. It can be useful to turn the transition off, when lots of frequent 
-#'  changes happen to the chart.}
-#' } 
+#'  changes happen to the chart.} 
 #' 
 #' @examples
 #' data("iris")
@@ -1050,77 +1050,78 @@ lineDataFun <- function(l) {
 #' it has only one layer and the \code{layerId} is not defined. 
 #' 
 #' @section Available properties: 
-#' You can read more about different properties in the vignette.
+#' You can read more about different properties
+#' \href{https://anders-biostat.github.io/linked-charts/rlc/tutorials/props.html}{here}.
 #' 
 #' \itemize{
-#'  \item{\code{x, y} - vector of x and y coordinates of the points to connect. Can be 
-#'  vectors for a single line or \code{m x n} matrix for \code{n} lines.}
-#'  \item{\code{ymax, ymin} - (only for \code{lc_ribbon}) vectors of maximal and minimal values of the ribbon.} 
-#'  \item{\code{a, b} - (only for \code{lc_abLine}) vectors of slope and intercept values respectively.}
-#'  \item{\code{v} - (only for \code{lc_vLine}) vector of x-intercepts.}  
-#'  \item{\code{h} - (only for \code{lc_hLine}) vector of y-intercepts.}
-#'  \item{\code{lineWidth} - width of each line.}
-#'  \item{\code{opacity} - opacity of the lines in the range from 0 to 1.}
-#'  \item{\code{label} - vector of text labels for each line.} 
-#'  \item{\code{dasharray} - defines pattern of dashes and gaps for each line.} }
+#'  \item \code{x, y} - vector of x and y coordinates of the points to connect. Can be 
+#'  vectors for a single line or \code{m x n} matrix for \code{n} lines.
+#'  \item \code{ymax, ymin} - (only for \code{lc_ribbon}) vectors of maximal and minimal values of the ribbon.
+#'  \item \code{a, b} - (only for \code{lc_abLine}) vectors of slope and intercept values respectively.
+#'  \item \code{v} - (only for \code{lc_vLine}) vector of x-intercepts.
+#'  \item \code{h} - (only for \code{lc_hLine}) vector of y-intercepts.
+#'  \item \code{lineWidth} - width of each line.
+#'  \item \code{opacity} - opacity of the lines in the range from 0 to 1.
+#'  \item \code{label} - vector of text labels for each line.
+#'  \item \code{dasharray} - defines pattern of dashes and gaps for each line. }
 #' 
 #' Colour settings
 #' \itemize{
-#'  \item{\code{colour} - colour of the lines. Must be a colour name or hexidecimal code. For
-#'  \code{lc_ribbon} this property defined the colour of the ribbon, not the strokes.}
-#'  \item{\code{fill} - colour with wich to fill area inside the line. 
-#'  Must be a colour name or hexidecimal code.}
-#'  \item{\code{colourValue} - grouping values for different colours. Can be numbers or charachters.}
-#'  \item{\code{colourDomain} - vector of all possible values for discrete colour scales 
-#'  or range of all possible colour values for the continuous ones.}
-#'  \item{\code{palette} - vector of colours to construct the colour scale.}
-#'  \item{\code{colourLegendTitle} - title for the colour legend.}
-#'  \item{\code{addColourScaleToLegend} - whether or not to show colour legend for the current layer.}
-#'  \item{\code{globalColourScale} - whether or not to use one colour scale for all the layers.} 
-#'  \item{\code{stroke} - (only for \code{lc_ribbon}) stroke colour for each ribbon. 
-#'  Must be a colour name or hexidecimal code.}
-#'  \item{\code{strokeWidth} - (only for \code{lc_ribbon}) width of the strokes for each ribbon.} }
+#'  \item \code{colour} - colour of the lines. Must be a colour name or hexidecimal code. For
+#'  \code{lc_ribbon} this property defined the colour of the ribbon, not the strokes.
+#'  \item \code{fill} - colour with wich to fill area inside the line. 
+#'  Must be a colour name or hexidecimal code.
+#'  \item \code{colourValue} - grouping values for different colours. Can be numbers or charachters.
+#'  \item \code{colourDomain} - vector of all possible values for discrete colour scales 
+#'  or range of all possible colour values for the continuous ones.
+#'  \item \code{palette} - vector of colours to construct the colour scale.
+#'  \item \code{colourLegendTitle} - title for the colour legend.
+#'  \item \code{addColourScaleToLegend} - whether or not to show colour legend for the current layer.
+#'  \item \code{globalColourScale} - whether or not to use one colour scale for all the layers.
+#'  \item \code{stroke} - (only for \code{lc_ribbon}) stroke colour for each ribbon. 
+#'  Must be a colour name or hexidecimal code.
+#'  \item \code{strokeWidth} - (only for \code{lc_ribbon}) width of the strokes for each ribbon. }
 #'  
 #' Axes settings
 #' \itemize{
-#'  \item{\code{logScaleX, logScaleY} - a base of logarithm for logarithmic scale transformation.
-#'  If 0 or \code{FALSE} no transformation will be performed.}
-#'  \item{\code{layerDomainX, layerDomainY} - default axes ranges for the given layer.}
-#'  \item{\code{domainX, domainY} - default axes ranges for the entire chart. If not defined, 
-#'  is automatically set to include all layer domains.}
-#'  \item{\code{contScaleX, consScaleY} - whether or not the axis should be continuous.}
-#'  \item{\code{aspectRatio} - aspect ratio.}
-#'  \item{\code{axisTitleX, axisTitleY} - axes titles.}
-#'  \item{\code{ticksRotateX, ticksRotateY} - degrees of angle to rotate ticks. Must be between 
-#'  0 (horisontal ticks, default) and 90 (vertical ticks).}
-#'  \item{\code{ticksX, ticksY} - set of ticks for the axes.} }
+#'  \item \code{logScaleX, logScaleY} - a base of logarithm for logarithmic scale transformation.
+#'  If 0 or \code{FALSE} no transformation will be performed.
+#'  \item \code{layerDomainX, layerDomainY} - default axes ranges for the given layer.
+#'  \item \code{domainX, domainY} - default axes ranges for the entire chart. If not defined, 
+#'  is automatically set to include all layer domains.
+#'  \item \code{contScaleX, consScaleY} - whether or not the axis should be continuous.
+#'  \item \code{aspectRatio} - aspect ratio.
+#'  \item \code{axisTitleX, axisTitleY} - axes titles.
+#'  \item \code{ticksRotateX, ticksRotateY} - degrees of angle to rotate ticks. Must be between 
+#'  0 (horisontal ticks, default) and 90 (vertical ticks).
+#'  \item \code{ticksX, ticksY} - set of ticks for the axes.} 
 #'
 #' Interactivity settings
 #' \itemize{
-#'  \item{\code{on_click} - function, to be called, when one of the lines is clicked. Gets an
-#'  index of the clicked line as an argument.}
-#'  \item{\code{on_mouseover} - function, to be called, when mouse hovers over one of the lines.
-#'  Gets an index of the clicked line as an argument.}
-#'  \item{\code{on_mouseout} - function, to be called, when mouse moves out of one of the lines.}
-#'  \item{\code{on_marked} - function, to be called, when any of the lines are selected (marked) 
-#'  or deselected. Use \code{\link{getMarked}} function to get the IDs of the currently marked lines.} }
+#'  \item \code{on_click} - function, to be called, when one of the lines is clicked. Gets an
+#'  index of the clicked line as an argument.
+#'  \item \code{on_mouseover} - function, to be called, when mouse hovers over one of the lines.
+#'  Gets an index of the clicked line as an argument.
+#'  \item \code{on_mouseout} - function, to be called, when mouse moves out of one of the lines.
+#'  \item \code{on_marked} - function, to be called, when any of the lines are selected (marked) 
+#'  or deselected. Use \code{\link{getMarked}} function to get the IDs of the currently marked lines.} 
 #'  
 #' Global chart settings
 #' \itemize{
-#'  \item{\code{width} - width of the chart in pixels.}
-#'  \item{\code{heigth} - height of the chart in pixels.}
-#'  \item{\code{plotWidth} - width of the plotting area in pixels.}
-#'  \item{\code{plotHeight} - height of the plotting area in pixels.}
-#'  \item{\code{paddings} - paddings size in pixels. Must be a list with all the following fields: 
-#'  \code{"top", "bottom", "left", "right"}.}
-#'  \item{\code{title} - title of the chart.}
-#'  \item{\code{titleX, titleY} - coordinates of the chart title.}
-#'  \item{\code{titleSize} - font-size of the chart title.}
-#'  \item{\code{showLegend} - whether or not to show the legend.}
-#'  \item{\code{showPanel} - whether of not to show the tools panel.}
-#'  \item{\code{transitionDuration} - duration of the transtions between any two states of the chart. If 0,
+#'  \item \code{width} - width of the chart in pixels.
+#'  \item \code{heigth} - height of the chart in pixels.
+#'  \item \code{plotWidth} - width of the plotting area in pixels.
+#'  \item \code{plotHeight} - height of the plotting area in pixels.
+#'  \item \code{paddings} - paddings size in pixels. Must be a list with all the following fields: 
+#'  \code{"top", "bottom", "left", "right"}.
+#'  \item \code{title} - title of the chart.
+#'  \item \code{titleX, titleY} - coordinates of the chart title.
+#'  \item \code{titleSize} - font-size of the chart title.
+#'  \item \code{showLegend} - whether or not to show the legend.
+#'  \item \code{showPanel} - whether of not to show the tools panel.
+#'  \item \code{transitionDuration} - duration of the transtions between any two states of the chart. If 0,
 #'  no animated transition is shown. It can be useful to turn the transition off, when lots of frequent 
-#'  changes happen to the chart.}
+#'  changes happen to the chart.
 #' } 
 #' 
 #' @examples 
@@ -1301,69 +1302,70 @@ barDataFun <- function(l) {
 #' it has only one layer and the \code{layerId} is not defined. 
 #' 
 #' @section Available properties: 
-#' You can read more about different properties in the vignette.
+#' You can read more about different properties 
+#' \href{https://anders-biostat.github.io/linked-charts/rlc/tutorials/props.html}{here}.
 #' 
 #' \itemize{
-#'  \item{\code{value} - heights of bars/stacks.}
-#'  \item{\code{stackIds} - IDs for all stacks (if necessary). Must be the same size as \code{values}.}
-#'  \item{\code{barIds} - IDs for all bars (if necessary). Must be the same size as \code{values}.}
-#'  \item{\code{groupIds} - IDs for all groups (if necessary). Must be the same size as \code{values}.} 
-#'  \item{\code{groupWidth} - ratio of width of a group of bars to the space, available to the group.} }
+#'  \item \code{value} - heights of bars/stacks.
+#'  \item \code{stackIds} - IDs for all stacks (if necessary). Must be the same size as \code{values}.
+#'  \item \code{barIds} - IDs for all bars (if necessary). Must be the same size as \code{values}.
+#'  \item \code{groupIds} - IDs for all groups (if necessary). Must be the same size as \code{values}.
+#'  \item \code{groupWidth} - ratio of width of a group of bars to the space, available to the group. }
 #' 
 #' Style settings
 #' \itemize{
-#'  \item{\code{opacity} - opacity of each bar|stack in the range from 0 to 1.}
-#'  \item{\code{colour} - colour of each bar|stack. Must be a colour name or hexidecimal code.}
-#'  \item{\code{colourValue} - grouping values for different colours. Can be numbers or charachters.}
-#'  \item{\code{colourDomain} - vector of all possible values for discrete colour scales 
-#'  or range of all possible colour values for the continuous ones.}
-#'  \item{\code{palette} - vector of colours to construct the colour scale.}
-#'  \item{\code{colourLegendTitle} - title for the colour legend.}
-#'  \item{\code{addColourScaleToLegend} - whether or not to show colour legend for the current layer.}
-#'  \item{\code{globalColourScale} - whether or not to use one colour scale for all the layers.} 
-#'  \item{\code{stroke} -  stroke colour of each bar|stack. Must be a colour name or hexidecimal code.}
-#'  \item{\code{strokeWidth} - width of the strokes of each bar|stack.} }
+#'  \item \code{opacity} - opacity of each bar|stack in the range from 0 to 1.
+#'  \item \code{colour} - colour of each bar|stack. Must be a colour name or hexidecimal code.
+#'  \item \code{colourValue} - grouping values for different colours. Can be numbers or charachters.
+#'  \item \code{colourDomain} - vector of all possible values for discrete colour scales 
+#'  or range of all possible colour values for the continuous ones.
+#'  \item \code{palette} - vector of colours to construct the colour scale.
+#'  \item \code{colourLegendTitle} - title for the colour legend.
+#'  \item \code{addColourScaleToLegend} - whether or not to show colour legend for the current layer.
+#'  \item \code{globalColourScale} - whether or not to use one colour scale for all the layers.
+#'  \item \code{stroke} -  stroke colour of each bar|stack. Must be a colour name or hexidecimal code.
+#'  \item \code{strokeWidth} - width of the strokes of each bar|stack. }
 #'  
 #' Axes settings
 #' \itemize{
-#'  \item{\code{logScaleX, logScaleY} - a base of logarithm for logarithmic scale transformation.
-#'  If 0 or \code{FALSE} no transformation will be performed.}
-#'  \item{\code{layerDomainX, layerDomainY} - default axes ranges for the given layer.}
-#'  \item{\code{domainX, domainY} - default axes ranges for the entire chart. If not defined, 
-#'  is automatically set to include all layer domains.}
-#'  \item{\code{contScaleX, consScaleY} - whether or not the axis should be continuous.}
-#'  \item{\code{aspectRatio} - aspect ratio.}
-#'  \item{\code{axisTitleX, axisTitleY} - axes titles.}
-#'  \item{\code{ticksRotateX, ticksRotateY} - degrees of angle to rotate ticks. Must be between 
-#'  0 (horisontal ticks, default) and 90 (vertical ticks).}
-#'  \item{\code{ticksX, ticksY} - set of ticks for the axes.} }
+#'  \item \code{logScaleX, logScaleY} - a base of logarithm for logarithmic scale transformation.
+#'  If 0 or \code{FALSE} no transformation will be performed.
+#'  \item \code{layerDomainX, layerDomainY} - default axes ranges for the given layer.
+#'  \item \code{domainX, domainY} - default axes ranges for the entire chart. If not defined, 
+#'  is automatically set to include all layer domains.
+#'  \item \code{contScaleX, consScaleY} - whether or not the axis should be continuous.
+#'  \item \code{aspectRatio} - aspect ratio.
+#'  \item \code{axisTitleX, axisTitleY} - axes titles.
+#'  \item \code{ticksRotateX, ticksRotateY} - degrees of angle to rotate ticks. Must be between 
+#'  0 (horisontal ticks, default) and 90 (vertical ticks).
+#'  \item \code{ticksX, ticksY} - set of ticks for the axes.}
 #'
 #' Interactivity settings
 #' \itemize{
-#'  \item{\code{on_click} - function, to be called, when one of the bars is clicked. Gets an
-#'  index of the clicked bar as an argument.}
-#'  \item{\code{on_mouseover} - function, to be called, when mouse hovers over one of the bars.
-#'  Gets an index of the clicked bar as an argument.}
-#'  \item{\code{on_mouseout} - function, to be called, when mouse moves out of one of the bars.}
-#'  \item{\code{on_marked} - function, to be called, when any of the bars are selected (marked) 
-#'  or deselected. Use \code{\link{getMarked}} function to get the IDs of the currently marked bars.} }
+#'  \item \code{on_click} - function, to be called, when one of the bars is clicked. Gets an
+#'  index of the clicked bar as an argument.
+#'  \item \code{on_mouseover} - function, to be called, when mouse hovers over one of the bars.
+#'  Gets an index of the clicked bar as an argument.
+#'  \item \code{on_mouseout} - function, to be called, when mouse moves out of one of the bars.
+#'  \item \code{on_marked} - function, to be called, when any of the bars are selected (marked) 
+#'  or deselected. Use \code{\link{getMarked}} function to get the IDs of the currently marked bars.} 
 #'  
 #' Global chart settings
 #' \itemize{
-#'  \item{\code{width} - width of the chart in pixels.}
-#'  \item{\code{heigth} - height of the chart in pixels.}
-#'  \item{\code{plotWidth} - width of the plotting area in pixels.}
-#'  \item{\code{plotHeight} - height of the plotting area in pixels.}
-#'  \item{\code{paddings} - paddings size in pixels. Must be a list with all the following fields: 
-#'  \code{"top", "bottom", "left", "right"}.}
-#'  \item{\code{title} - title of the chart.}
-#'  \item{\code{titleX, titleY} - coordinates of the chart title.}
-#'  \item{\code{titleSize} - font-size of the chart title.}
-#'  \item{\code{showLegend} - whether or not to show the legend.}
-#'  \item{\code{showPanel} - whether of not to show the tools panel.}
-#'  \item{\code{transitionDuration} - duration of the transtions between any two states of the chart. If 0,
+#'  \item \code{width} - width of the chart in pixels.
+#'  \item \code{heigth} - height of the chart in pixels.
+#'  \item \code{plotWidth} - width of the plotting area in pixels.
+#'  \item \code{plotHeight} - height of the plotting area in pixels.
+#'  \item \code{paddings} - paddings size in pixels. Must be a list with all the following fields: 
+#'  \code{"top", "bottom", "left", "right"}.
+#'  \item \code{title} - title of the chart.
+#'  \item \code{titleX, titleY} - coordinates of the chart title.
+#'  \item \code{titleSize} - font-size of the chart title.
+#'  \item \code{showLegend} - whether or not to show the legend. 
+#'  \item \code{showPanel} - whether of not to show the tools panel.
+#'  \item \code{transitionDuration} - duration of the transtions between any two states of the chart. If 0,
 #'  no animated transition is shown. It can be useful to turn the transition off, when lots of frequent 
-#'  changes happen to the chart.} }
+#'  changes happen to the chart.} 
 #'   
 #' @examples 
 #' data("esoph")
@@ -1418,8 +1420,8 @@ lc_bars <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL,
 #' @section Available properties:
 #' 
 #' \itemize{
-#'  \item{\code{value} - vector of data.}
-#'  \item{\code{nbins} - (only for \code{lc_hist}) number of bins.} }
+#'  \item \code{value} - vector of data. 
+#'  \item \code{nbins} - (only for \code{lc_hist}) number of bins.} 
 #' 
 #' These functions are extensions of \code{\link{lc_line}} (\code{lc_dens}) or \code{\link{lc_bars}} 
 #' (\code{lc_hist}) and therefore can also understand their properties.
@@ -1497,55 +1499,56 @@ lc_dens <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL,
 #' of cumbersome computations. May be important when the chart works in canvas mode.
 #' 
 #' @section Available properties: 
-#' You can read more about different properties in the vignette.
+#' You can read more about different properties 
+#' \href{https://anders-biostat.github.io/linked-charts/rlc/tutorials/props.html}{here}.
 #' 
 #' \itemize{
-#'  \item{\code{value} - matrix of values.}
-#'  \item{\code{rowLabel, colLabel} - vector of labels for all rows or columns.}
-#'  \item{\code{showDendogramRow, showDendogramCol} - whether to show dendograms when rows or columns are
-#'  clustered. Even if these properties are set to \code{FALSE}, rows and columns can still be clustered. }
-#'  \item{\code{clusterRows, clusterCols} - whether rows or columns should be clustered. If these
+#'  \item \code{value} - matrix of values.
+#'  \item \code{rowLabel, colLabel} - vector of labels for all rows or columns.
+#'  \item \code{showDendogramRow, showDendogramCol} - whether to show dendograms when rows or columns are
+#'  clustered. Even if these properties are set to \code{FALSE}, rows and columns can still be clustered. 
+#'  \item \code{clusterRows, clusterCols} - whether rows or columns should be clustered. If these
 #'  properties are set to \code{FALSE}, rows and columns can still be clustered later using the instrument
-#'  panel.} 
-#'  \item{\code{mode} - one of \code{"default", "svg", "canvas"}. Defines, whether to display heatmap as
+#'  panel.
+#'  \item \code{mode} - one of \code{"default", "svg", "canvas"}. Defines, whether to display heatmap as
 #'  an SVG or Canvas object. \code{"default"} mode switches between the two, turning heatmap into Canvas 
-#'  image, when there are too many cell, and into SVG object otherwise.}
-#'  \item{\code{heatmapRow, heatmapCol} - default order of rows and columns of the heatmap.}
-#'  \item{\code{showValue} - if \code{TRUE}, than in the values will be shown as text in each cell.} }
+#'  image, when there are too many cell, and into SVG object otherwise.
+#'  \item \code{heatmapRow, heatmapCol} - default order of rows and columns of the heatmap.
+#'  \item \code{showValue} - if \code{TRUE}, than in the values will be shown as text in each cell.} 
 #' 
 #' Style settings
 #' \itemize{
-#'  \item{\code{rowTitle, colTilte} - titles of rows and columns.}
-#'  \item{\code{palette} - vector of colours to construct the colour scale.}
-#'  \item{\code{colourDomain} - domain of the colour scale. All values outside it will
-#'  be clamped to its edges.} }
+#'  \item \code{rowTitle, colTilte} - titles of rows and columns.
+#'  \item \code{palette} - vector of colours to construct the colour scale.
+#'  \item \code{colourDomain} - domain of the colour scale. All values outside it will
+#'  be clamped to its edges.} 
 #'  
 #' Interactivity settings
 #' \itemize{
-#'  \item{\code{on_click} - function, to be called, when one of the cells is clicked. Gets row and column idices 
-#'  of the clicked cell as its arguments.}
-#'  \item{\code{on_mouseover} - function, to be called, when mouse hovers over one of the cells.
-#'  Gets row and column indices of the clicked cell as its arguments.}
-#'  \item{\code{on_mouseout} - function, to be called, when mouse moves out of one of the cells.}
-#'  \item{\code{on_marked} - function, to be called, when any of the cells are selected (marked) 
-#'  or deselected. Use \code{\link{getMarked}} function to get the IDs of the currently marked cells.} }
+#'  \item \code{on_click} - function, to be called, when one of the cells is clicked. Gets row and column idices 
+#'  of the clicked cell as its arguments.
+#'  \item \code{on_mouseover} - function, to be called, when mouse hovers over one of the cells.
+#'  Gets row and column indices of the clicked cell as its arguments.
+#'  \item \code{on_mouseout} - function, to be called, when mouse moves out of one of the cells.
+#'  \item \code{on_marked} - function, to be called, when any of the cells are selected (marked) 
+#'  or deselected. Use \code{\link{getMarked}} function to get the IDs of the currently marked cells.} 
 #'  
 #' Global chart settings
 #' \itemize{
-#'  \item{\code{width} - width of the chart in pixels.}
-#'  \item{\code{heigth} - height of the chart in pixels.}
-#'  \item{\code{plotWidth} - width of the plotting area in pixels.}
-#'  \item{\code{plotHeight} - height of the plotting area in pixels.}
-#'  \item{\code{paddings} - paddings size in pixels. Must be a list with all the following fields: 
-#'  \code{"top", "bottom", "left", "right"}.}
-#'  \item{\code{title} - title of the chart.}
-#'  \item{\code{titleX, titleY} - coordinates of the chart title.}
-#'  \item{\code{titleSize} - font-size of the chart title.}
-#'  \item{\code{showLegend} - whether or not to show the legend.}
-#'  \item{\code{showPanel} - whether of not to show the tools panel.}
-#'  \item{\code{transitionDuration} - duration of the transtions between any two states of the chart. If 0,
+#'  \item \code{width} - width of the chart in pixels.
+#'  \item \code{heigth} - height of the chart in pixels.
+#'  \item \code{plotWidth} - width of the plotting area in pixels.
+#'  \item \code{plotHeight} - height of the plotting area in pixels.
+#'  \item \code{paddings} - paddings size in pixels. Must be a list with all the following fields: 
+#'  \code{"top", "bottom", "left", "right"}.
+#'  \item \code{title} - title of the chart.
+#'  \item \code{titleX, titleY} - coordinates of the chart title.
+#'  \item \code{titleSize} - font-size of the chart title.
+#'  \item \code{showLegend} - whether or not to show the legend.
+#'  \item \code{showPanel} - whether of not to show the tools panel.
+#'  \item \code{transitionDuration} - duration of the transtions between any two states of the chart. If 0,
 #'  no animated transition is shown. It can be useful to turn the transition off, when lots of frequent 
-#'  changes happen to the chart.} }
+#'  changes happen to the chart.} 
 #' @examples 
 #' #create a test matrix
 #' test <- cbind(sapply(1:10, function(i) c(rnorm(10, mean = 1, sd = 3), 
@@ -1611,22 +1614,23 @@ lc_heatmap <- function(data = list(), place = NULL, ..., id = NULL, pacerStep = 
 #' first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} is the number of currently existing charts.
 #' 
 #' @section Available properties: 
-#' You can read more about different properties in the vignette.
+#' You can read more about different properties
+#' \href{https://anders-biostat.github.io/linked-charts/rlc/tutorials/props.html}{here}.
 #' 
 #' \itemize{
-#'  \item{\code{chart} - id of the chart whose colour scale should be linked to the colour slider.}
-#'  \item{\code{layer} - id of the layer whose colour scale should be linked to the colour slider.
-#'  If chart has only one layer, this property can be omitted.}}
+#'  \item \code{chart} - id of the chart whose colour scale should be linked to the colour slider.
+#'  \item \code{layer} - id of the layer whose colour scale should be linked to the colour slider.
+#'  If chart has only one layer, this property can be omitted.}
 #'  
 #' Global chart settings
 #' \itemize{
-#'  \item{\code{width} - width of the chart in pixels.}
-#'  \item{\code{heigth} - height of the chart in pixels.}
-#'  \item{\code{paddings} - paddings size in pixels. Must be a list with all the following fields: 
-#'  \code{"top", "bottom", "left", "right"}.}
-#'  \item{\code{title} - title of the chart.}
-#'  \item{\code{titleX, titleY} - coordinates of the chart title.}
-#'  \item{\code{titleSize} - font-size of the chart title.} }
+#'  \item \code{width} - width of the chart in pixels.
+#'  \item \code{heigth} - height of the chart in pixels.
+#'  \item \code{paddings} - paddings size in pixels. Must be a list with all the following fields: 
+#'  \code{"top", "bottom", "left", "right"}.
+#'  \item \code{title} - title of the chart.
+#'  \item \code{titleX, titleY} - coordinates of the chart title.
+#'  \item \code{titleSize} - font-size of the chart title.} 
 #' 
 #' @examples 
 #' data("iris")
@@ -1737,23 +1741,24 @@ lc_vLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL
 #' first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} is the number of currently existing charts.
 #' 
 #' @section Available properties: 
-#' You can read more about different properties in the vignette.
+#' You can read more about different properties 
+#' \href{https://anders-biostat.github.io/linked-charts/rlc/tutorials/props.html}{here}.
 #' 
 #' \itemize{
-#'  \item{\code{content} - HTML code to display on the page. Can also be a vector, data.frame or
-#'  any other structure, that can be transformed by \code{\link[hwriter]{hwrite}}. } }
+#'  \item \code{content} - HTML code to display on the page. Can also be a vector, data.frame or
+#'  any other structure, that can be transformed by \code{\link[hwriter]{hwrite}}. } 
 #'  
 #' Global chart settings
 #' \itemize{
-#'  \item{\code{width} - width of the chart in pixels. By default, the entire content will be displayed.
-#'  If width is defined and it's smaller than content's width, scrolling will be possible.}
-#'  \item{\code{heigth} - height of the chart in pixels. By default, the entire content will be displayed.
-#'  If height is defined and it's smaller than content's height, scrolling will be possible.}
-#'  \item{\code{paddings} - paddings size in pixels. Must be a list with all the following fields: 
-#'  \code{"top", "bottom", "left", "right"}.}
-#'  \item{\code{title} - title of the chart.}
-#'  \item{\code{titleX, titleY} - coordinates of the chart title.}
-#'  \item{\code{titleSize} - font-size of the chart title.} }
+#'  \item \code{width} - width of the chart in pixels. By default, the entire content will be displayed.
+#'  If width is defined and it's smaller than content's width, scrolling will be possible.
+#'  \item \code{heigth} - height of the chart in pixels. By default, the entire content will be displayed.
+#'  If height is defined and it's smaller than content's height, scrolling will be possible.
+#'  \item \code{paddings} - paddings size in pixels. Must be a list with all the following fields: 
+#'  \code{"top", "bottom", "left", "right"}.
+#'  \item \code{title} - title of the chart.
+#'  \item \code{titleX, titleY} - coordinates of the chart title. 
+#'  \item \code{titleSize} - font-size of the chart title.} 
 #'  
 #' @examples
 #' lc_html(content = "Some <b>HTML</b> <br> <i>code</i>.")

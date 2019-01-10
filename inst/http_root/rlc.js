@@ -43,9 +43,9 @@ rlc.addChart = function(id, type, place, layerId) {
   //if(layerId = "") layerId = undefined;
   charts[id] = lc[type](layerId, charts[id]);
   if(charts[id].on_click)
-    charts[id].on_click(function(d) {
-      if(Array.isArray(d))
-        d = "c(" + d + ")";
+    charts[id].on_click(function(d, d2) {
+      if(d2 != undefined)
+        d = "c(" + d + ", " + d2 + ")";
       jrc.sendCommand("rlc:::chartEvent("+ d + ", '" + id + "', '" + layerId + "', 'click')");
     });
   if(layerId == "main")
@@ -133,13 +133,13 @@ rlc.setProperty = function(name) {
       if(window[name][pr].right)
         window[name][pr].right = window[name][pr].right[0];
       charts[id].set_paddings(window[name][pr]);
-    } else if(pr == "orderRows") {
+    } else if(pr == "rankRows") {
       orderRow = window[name][pr];
       charts[id].rowIds(d3.range(window[name][pr].length));
       charts[id].reorder("Row", function(a, b) {
         return orderRow[a] - orderRow[b];
       })
-    } else if(pr == "orderCols") {
+    } else if(pr == "rankCols") {
       orderCol = window[name][pr];
       charts[id].colIds(d3.range(window[name][pr].length));
       charts[id].reorder("Col", function(a, b) {

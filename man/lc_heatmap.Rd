@@ -14,7 +14,7 @@ properties will be reevaluated on each \code{\link{updateCharts}} call.}
 \item{place}{An ID of a container, where to place the chart. Will be ignored if the chart already
 exists. If not defined, the chart will be placed directly in the body of the opened page.}
 
-\item{...}{Name value pairs of properties that can be evaluated only once and then will remain 
+\item{...}{Name value pairs of properties that can be evaluated only once and then will remain
 constant. These properties can still be changed later using the \code{\link{setProperties}} function}
 
 \item{id}{An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
@@ -29,56 +29,57 @@ of cumbersome computations. May be important when the chart works in canvas mode
 any layers.
 }
 \section{Available properties}{
- 
-You can read more about different properties in the vignette.
+
+You can read more about different properties
+\href{https://anders-biostat.github.io/linked-charts/rlc/tutorials/props.html}{here}.
 
 \itemize{
- \item{\code{value} - matrix of values.}
- \item{\code{rowLabel, colLabel} - vector of labels for all rows or columns.}
- \item{\code{showDendogramRow, showDendogramCol} - whether to show dendograms when rows or columns are
- clustered. Even if these properties are set to \code{FALSE}, rows and columns can still be clustered. }
- \item{\code{clusterRows, clusterCols} - whether rows or columns should be clustered. If these
- properties are set to \code{FALSE}, rows and columns can still be clustered later using the instrument
- panel.} 
- \item{\code{mode} - one of \code{"default", "svg", "canvas"}. Defines, whether to display heatmap as
- an SVG or Canvas object. \code{"default"} mode switches between the two, turning heatmap into Canvas 
- image, when there are too many cell, and into SVG object otherwise.}
- \item{\code{heatmapRow, heatmapCol} - default order of rows and columns of the heatmap.}
- \item{\code{showValue} - if \code{TRUE}, than in the values will be shown as text in each cell.} }
+\item \code{value} - matrix of values.
+\item \code{rowLabel, colLabel} - vector of labels for all rows or columns.
+\item \code{showDendogramRow, showDendogramCol} - whether to show dendograms when rows or columns are
+clustered. Even if these properties are set to \code{FALSE}, rows and columns can still be clustered.
+\item \code{clusterRows, clusterCols} - whether rows or columns should be clustered. If these
+properties are set to \code{FALSE}, rows and columns can still be clustered later using the instrument
+panel.
+\item \code{mode} - one of \code{"default", "svg", "canvas"}. Defines, whether to display heatmap as
+an SVG or Canvas object. \code{"default"} mode switches between the two, turning heatmap into Canvas
+image, when there are too many cell, and into SVG object otherwise.
+\item \code{heatmapRow, heatmapCol} - default order of rows and columns of the heatmap.
+\item \code{showValue} - if \code{TRUE}, than in the values will be shown as text in each cell.}
 
 Style settings
 \itemize{
- \item{\code{rowTitle, colTilte} - titles of rows and columns.}
- \item{\code{palette} - vector of colours to construct the colour scale.}
- \item{\code{colourDomain} - domain of the colour scale. All values outside it will
- be clamped to its edges.} }
- 
+\item \code{rowTitle, colTilte} - titles of rows and columns.
+\item \code{palette} - vector of colours to construct the colour scale.
+\item \code{colourDomain} - domain of the colour scale. All values outside it will
+be clamped to its edges.}
+
 Interactivity settings
 \itemize{
- \item{\code{on_click} - function, to be called, when one of the cells is clicked. Gets row and column idices 
- of the clicked cell as its arguments.}
- \item{\code{on_mouseover} - function, to be called, when mouse hovers over one of the cells.
- Gets row and column indices of the clicked cell as its arguments.}
- \item{\code{on_mouseout} - function, to be called, when mouse moves out of one of the cells.}
- \item{\code{on_marked} - function, to be called, when any of the cells are selected (marked) 
- or deselected. Use \code{\link{getMarked}} function to get the IDs of the currently marked cells.} }
- 
+\item \code{on_click} - function, to be called, when one of the cells is clicked. Gets row and column idices
+of the clicked cell as its arguments.
+\item \code{on_mouseover} - function, to be called, when mouse hovers over one of the cells.
+Gets row and column indices of the clicked cell as its arguments.
+\item \code{on_mouseout} - function, to be called, when mouse moves out of one of the cells.
+\item \code{on_marked} - function, to be called, when any of the cells are selected (marked)
+or deselected. Use \code{\link{getMarked}} function to get the IDs of the currently marked cells.}
+
 Global chart settings
 \itemize{
- \item{\code{width} - width of the chart in pixels.}
- \item{\code{heigth} - height of the chart in pixels.}
- \item{\code{plotWidth} - width of the plotting area in pixels.}
- \item{\code{plotHeight} - height of the plotting area in pixels.}
- \item{\code{paddings} - paddings size in pixels. Must be a list with all the following fields: 
- \code{"top", "bottom", "left", "right"}.}
- \item{\code{title} - title of the chart.}
- \item{\code{titleX, titleY} - coordinates of the chart title.}
- \item{\code{titleSize} - font-size of the chart title.}
- \item{\code{showLegend} - whether or not to show the legend.}
- \item{\code{showPanel} - whether of not to show the tools panel.}
- \item{\code{transitionDuration} - duration of the transtions between any two states of the chart. If 0,
- no animated transition is shown. It can be useful to turn the transition off, when lots of frequent 
- changes happen to the chart.} }
+\item \code{width} - width of the chart in pixels.
+\item \code{heigth} - height of the chart in pixels.
+\item \code{plotWidth} - width of the plotting area in pixels.
+\item \code{plotHeight} - height of the plotting area in pixels.
+\item \code{paddings} - paddings size in pixels. Must be a list with all the following fields:
+\code{"top", "bottom", "left", "right"}.
+\item \code{title} - title of the chart.
+\item \code{titleX, titleY} - coordinates of the chart title.
+\item \code{titleSize} - font-size of the chart title.
+\item \code{showLegend} - whether or not to show the legend.
+\item \code{showPanel} - whether of not to show the tools panel.
+\item \code{transitionDuration} - duration of the transtions between any two states of the chart. If 0,
+no animated transition is shown. It can be useful to turn the transition off, when lots of frequent
+changes happen to the chart.}
 }
 
 \examples{

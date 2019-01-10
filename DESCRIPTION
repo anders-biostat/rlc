@@ -9,3 +9,4 @@ Description: to be filled in
 License: GPL-3
 Imports: httpuv, jsonlite, stringr, hwriter
 RoxygenNote: 6.1.0
+Roxygen: list(markdown = TRUE)

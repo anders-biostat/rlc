@@ -13,7 +13,7 @@ properties will be reevaluated on each \code{\link{updateCharts}} call.}
 \item{place}{An ID of a container, where to place the chart. Will be ignored if the chart already
 exists. If not defined, the chart will be placed directly in the body of the opened page.}
 
-\item{...}{Name value pairs of properties that can be evaluated only once and then will remain 
+\item{...}{Name value pairs of properties that can be evaluated only once and then will remain
 constant. These properties can still be changed later using the \code{\link{setProperties}} function}
 
 \item{id}{An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
@@ -25,24 +25,25 @@ first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} i
 to transform some data structures (e.g. data frames) to HTML tables.
 }
 \section{Available properties}{
- 
-You can read more about different properties in the vignette.
+
+You can read more about different properties
+\href{https://anders-biostat.github.io/linked-charts/rlc/tutorials/props.html}{here}.
 
 \itemize{
- \item{\code{content} - HTML code to display on the page. Can also be a vector, data.frame or
- any other structure, that can be transformed by \code{\link[hwriter]{hwrite}}. } }
- 
+\item \code{content} - HTML code to display on the page. Can also be a vector, data.frame or
+any other structure, that can be transformed by \code{\link[hwriter]{hwrite}}. }
+
 Global chart settings
 \itemize{
- \item{\code{width} - width of the chart in pixels. By default, the entire content will be displayed.
- If width is defined and it's smaller than content's width, scrolling will be possible.}
- \item{\code{heigth} - height of the chart in pixels. By default, the entire content will be displayed.
- If height is defined and it's smaller than content's height, scrolling will be possible.}
- \item{\code{paddings} - paddings size in pixels. Must be a list with all the following fields: 
- \code{"top", "bottom", "left", "right"}.}
- \item{\code{title} - title of the chart.}
- \item{\code{titleX, titleY} - coordinates of the chart title.}
- \item{\code{titleSize} - font-size of the chart title.} }
+\item \code{width} - width of the chart in pixels. By default, the entire content will be displayed.
+If width is defined and it's smaller than content's width, scrolling will be possible.
+\item \code{heigth} - height of the chart in pixels. By default, the entire content will be displayed.
+If height is defined and it's smaller than content's height, scrolling will be possible.
+\item \code{paddings} - paddings size in pixels. Must be a list with all the following fields:
+\code{"top", "bottom", "left", "right"}.
+\item \code{title} - title of the chart.
+\item \code{titleX, titleY} - coordinates of the chart title.
+\item \code{titleSize} - font-size of the chart title.}
 }
 
 \examples{

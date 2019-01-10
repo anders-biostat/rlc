@@ -11,23 +11,23 @@ openPage(useViewer = T, rootDirectory = NULL, startPage = NULL,
 \item{useViewer}{If \code{TRUE}, the page will be opened in the RStudio Viewer. If \code{FALSE}
 a default web browser will be used.}
 
-\item{rootDirectory}{A path to the root directory of the server. If \code{rootDirectory} is not 
+\item{rootDirectory}{A path to the root directory of the server. If \code{rootDirectory} is not
 defined, the \code{http_root} in the package directory will be used as a root directory.}
 
 \item{startPage}{A path to the HTML file that should be opened, when the server is initialised.
 This can be an absolute path to a local file, or it can be relative from the \code{rootDirectory}
-or to the current R working directory. If \code{startPage} is not defined, this function opens an 
+or to the current R working directory. If \code{startPage} is not defined, this function opens an
 empty HTML page. The file must have \emph{.html} extension.}
 
-\item{layout}{Adds one of the defaults layouts to the page. Currently, only tables of arbitrary 
+\item{layout}{Adds one of the defaults layouts to the page. Currently, only tables of arbitrary
 size are supported. To add a table set this parameter to \code{tableNxM}, where \code{N} is the
-number of rows and \code{M} is the number of columns. Each cell will get an ID that consists of 
-a letter (inticating the row) and a number (indicating the column) (e.g. \code{B3} is an ID of 
+number of rows and \code{M} is the number of columns. Each cell will get an ID that consists of
+a letter (inticating the row) and a number (indicating the column) (e.g. \code{B3} is an ID of
 the second row and third column).}
 }
 \description{
 \code{openPage} creates a server, establishes a websocket connection between it and the current
-R session and loads linked-charts JS library with all the dependencies. If there is already an 
+R session and loads linked-charts JS library with all the dependencies. If there is already an
 opened page, it will be automatically closed.
 }
 \examples{

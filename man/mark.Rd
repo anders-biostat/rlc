@@ -9,7 +9,7 @@ mark(elements, chartId = NULL, layerId = NULL, preventEvent = T)
 \arguments{
 \item{elements}{numeric vector of indices of the elements to select.}
 
-\item{chartId}{ID of the chart where to select elements (can be omitted if 
+\item{chartId}{ID of the chart where to select elements (can be omitted if
 there is only one chart).}
 
 \item{layerId}{ID of the layer where to select elements (can be omitted if
@@ -20,7 +20,7 @@ called.}
 }
 \description{
 \code{mark} selects a set of elements in a given chart. It is equivalent to
-selecting elemnts interactively by drawing a rectangle with the mouse 
+selecting elemnts interactively by drawing a rectangle with the mouse
 while holding the \code{Shift} key.
 }
 \examples{

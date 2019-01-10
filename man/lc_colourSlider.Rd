@@ -13,7 +13,7 @@ properties will be reevaluated on each \code{\link{updateCharts}} call.}
 \item{place}{An ID of a container, where to place the chart. Will be ignored if the chart already
 exists. If not defined, the chart will be placed directly in the body of the opened page.}
 
-\item{...}{Name value pairs of properties that can be evaluated only once and then will remain 
+\item{...}{Name value pairs of properties that can be evaluated only once and then will remain
 constant. These properties can still be changed later using the \code{\link{setProperties}} function}
 
 \item{id}{An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
@@ -22,28 +22,29 @@ first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} i
 }
 \description{
 Colour slider provides an easy way to change any continuous colour scale
-interactively. If your chart uses a continuous colour scale, you can just 
+interactively. If your chart uses a continuous colour scale, you can just
 link a colour slider and it will be automatically synchronized with your
 chart's colour scale.
 }
 \section{Available properties}{
- 
-You can read more about different properties in the vignette.
+
+You can read more about different properties
+\href{https://anders-biostat.github.io/linked-charts/rlc/tutorials/props.html}{here}.
 
 \itemize{
- \item{\code{chart} - id of the chart whose colour scale should be linked to the colour slider.}
- \item{\code{layer} - id of the layer whose colour scale should be linked to the colour slider.
- If chart has only one layer, this property can be omitted.}}
- 
+\item \code{chart} - id of the chart whose colour scale should be linked to the colour slider.
+\item \code{layer} - id of the layer whose colour scale should be linked to the colour slider.
+If chart has only one layer, this property can be omitted.}
+
 Global chart settings
 \itemize{
- \item{\code{width} - width of the chart in pixels.}
- \item{\code{heigth} - height of the chart in pixels.}
- \item{\code{paddings} - paddings size in pixels. Must be a list with all the following fields: 
- \code{"top", "bottom", "left", "right"}.}
- \item{\code{title} - title of the chart.}
- \item{\code{titleX, titleY} - coordinates of the chart title.}
- \item{\code{titleSize} - font-size of the chart title.} }
+\item \code{width} - width of the chart in pixels.
+\item \code{heigth} - height of the chart in pixels.
+\item \code{paddings} - paddings size in pixels. Must be a list with all the following fields:
+\code{"top", "bottom", "left", "right"}.
+\item \code{title} - title of the chart.
+\item \code{titleX, titleY} - coordinates of the chart title.
+\item \code{titleSize} - font-size of the chart title.}
 }
 
 \examples{

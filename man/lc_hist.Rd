@@ -18,7 +18,7 @@ properties will be reevaluated on each \code{\link{updateCharts}} call.}
 \item{place}{An ID of a container, where to place the chart. Will be ignored if the chart already
 exists. If not defined, the chart will be placed directly in the body of the opened page.}
 
-\item{...}{Name value pairs of properties that can be evaluated only once and then will remain 
+\item{...}{Name value pairs of properties that can be evaluated only once and then will remain
 constant. These properties can still be changed later using the \code{\link{setProperties}} function}
 
 \item{id}{An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
@@ -26,14 +26,14 @@ exists, a new layer will be added to it. If you want to replace one chart with a
 first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} is the number of currently existing charts.}
 
 \item{layerId}{An ID for the new layer. All layers within one chart must have different IDs. If a layer with the same
-ID already exists, it will be replaced. If not defined, will be set to \code{LayerN}, where \code{N - 1} 
+ID already exists, it will be replaced. If not defined, will be set to \code{LayerN}, where \code{N - 1}
 is the number of currently existing layers in this chart.}
 
 \item{addLayer}{whether to add a new layer or to replace the existing one. This argument influences the chart only if
 it has only one layer and the \code{layerId} is not defined.}
 }
 \description{
-These functions make either a histogram or a density plot of the given data 
+These functions make either a histogram or a density plot of the given data
 and either add them as a new layer to an existing chart or create a new chart.
 }
 \section{Functions}{
@@ -47,10 +47,10 @@ and either add them as a new layer to an existing chart or create a new chart.
 
 
 \itemize{
- \item{\code{value} - vector of data.}
- \item{\code{nbins} - (only for \code{lc_hist}) number of bins.} }
+\item \code{value} - vector of data.
+\item \code{nbins} - (only for \code{lc_hist}) number of bins.}
 
-These functions are extensions of \code{\link{lc_line}} (\code{lc_dens}) or \code{\link{lc_bars}} 
+These functions are extensions of \code{\link{lc_line}} (\code{lc_dens}) or \code{\link{lc_bars}}
 (\code{lc_hist}) and therefore can also understand their properties.
 }
 

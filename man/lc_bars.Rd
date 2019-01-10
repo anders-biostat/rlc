@@ -14,7 +14,7 @@ properties will be reevaluated on each \code{\link{updateCharts}} call.}
 \item{place}{An ID of a container, where to place the chart. Will be ignored if the chart already
 exists. If not defined, the chart will be placed directly in the body of the opened page.}
 
-\item{...}{Name value pairs of properties that can be evaluated only once and then will remain 
+\item{...}{Name value pairs of properties that can be evaluated only once and then will remain
 constant. These properties can still be changed later using the \code{\link{setProperties}} function}
 
 \item{id}{An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
@@ -22,7 +22,7 @@ exists, a new layer will be added to it. If you want to replace one chart with a
 first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} is the number of currently existing charts.}
 
 \item{layerId}{An ID for the new layer. All layers within one chart must have different IDs. If a layer with the same
-ID already exists, it will be replaced. If not defined, will be set to \code{LayerN}, where \code{N - 1} 
+ID already exists, it will be replaced. If not defined, will be set to \code{LayerN}, where \code{N - 1}
 is the number of currently existing layers in this chart.}
 
 \item{addLayer}{whether to add a new layer or to replace the existing one. This argument influences the chart only if
@@ -33,70 +33,71 @@ it has only one layer and the \code{layerId} is not defined.}
 as a new chart or as a new layer of an existing chart.
 }
 \section{Available properties}{
- 
-You can read more about different properties in the vignette.
+
+You can read more about different properties
+\href{https://anders-biostat.github.io/linked-charts/rlc/tutorials/props.html}{here}.
 
 \itemize{
- \item{\code{value} - heights of bars/stacks.}
- \item{\code{stackIds} - IDs for all stacks (if necessary). Must be the same size as \code{values}.}
- \item{\code{barIds} - IDs for all bars (if necessary). Must be the same size as \code{values}.}
- \item{\code{groupIds} - IDs for all groups (if necessary). Must be the same size as \code{values}.} 
- \item{\code{groupWidth} - ratio of width of a group of bars to the space, available to the group.} }
+\item \code{value} - heights of bars/stacks.
+\item \code{stackIds} - IDs for all stacks (if necessary). Must be the same size as \code{values}.
+\item \code{barIds} - IDs for all bars (if necessary). Must be the same size as \code{values}.
+\item \code{groupIds} - IDs for all groups (if necessary). Must be the same size as \code{values}.
+\item \code{groupWidth} - ratio of width of a group of bars to the space, available to the group. }
 
 Style settings
 \itemize{
- \item{\code{opacity} - opacity of each bar|stack in the range from 0 to 1.}
- \item{\code{colour} - colour of each bar|stack. Must be a colour name or hexidecimal code.}
- \item{\code{colourValue} - grouping values for different colours. Can be numbers or charachters.}
- \item{\code{colourDomain} - vector of all possible values for discrete colour scales 
- or range of all possible colour values for the continuous ones.}
- \item{\code{palette} - vector of colours to construct the colour scale.}
- \item{\code{colourLegendTitle} - title for the colour legend.}
- \item{\code{addColourScaleToLegend} - whether or not to show colour legend for the current layer.}
- \item{\code{globalColourScale} - whether or not to use one colour scale for all the layers.} 
- \item{\code{stroke} -  stroke colour of each bar|stack. Must be a colour name or hexidecimal code.}
- \item{\code{strokeWidth} - width of the strokes of each bar|stack.} }
- 
+\item \code{opacity} - opacity of each bar|stack in the range from 0 to 1.
+\item \code{colour} - colour of each bar|stack. Must be a colour name or hexidecimal code.
+\item \code{colourValue} - grouping values for different colours. Can be numbers or charachters.
+\item \code{colourDomain} - vector of all possible values for discrete colour scales
+or range of all possible colour values for the continuous ones.
+\item \code{palette} - vector of colours to construct the colour scale.
+\item \code{colourLegendTitle} - title for the colour legend.
+\item \code{addColourScaleToLegend} - whether or not to show colour legend for the current layer.
+\item \code{globalColourScale} - whether or not to use one colour scale for all the layers.
+\item \code{stroke} -  stroke colour of each bar|stack. Must be a colour name or hexidecimal code.
+\item \code{strokeWidth} - width of the strokes of each bar|stack. }
+
 Axes settings
 \itemize{
- \item{\code{logScaleX, logScaleY} - a base of logarithm for logarithmic scale transformation.
- If 0 or \code{FALSE} no transformation will be performed.}
- \item{\code{layerDomainX, layerDomainY} - default axes ranges for the given layer.}
- \item{\code{domainX, domainY} - default axes ranges for the entire chart. If not defined, 
- is automatically set to include all layer domains.}
- \item{\code{contScaleX, consScaleY} - whether or not the axis should be continuous.}
- \item{\code{aspectRatio} - aspect ratio.}
- \item{\code{axisTitleX, axisTitleY} - axes titles.}
- \item{\code{ticksRotateX, ticksRotateY} - degrees of angle to rotate ticks. Must be between 
- 0 (horisontal ticks, default) and 90 (vertical ticks).}
- \item{\code{ticksX, ticksY} - set of ticks for the axes.} }
+\item \code{logScaleX, logScaleY} - a base of logarithm for logarithmic scale transformation.
+If 0 or \code{FALSE} no transformation will be performed.
+\item \code{layerDomainX, layerDomainY} - default axes ranges for the given layer.
+\item \code{domainX, domainY} - default axes ranges for the entire chart. If not defined,
+is automatically set to include all layer domains.
+\item \code{contScaleX, consScaleY} - whether or not the axis should be continuous.
+\item \code{aspectRatio} - aspect ratio.
+\item \code{axisTitleX, axisTitleY} - axes titles.
+\item \code{ticksRotateX, ticksRotateY} - degrees of angle to rotate ticks. Must be between
+0 (horisontal ticks, default) and 90 (vertical ticks).
+\item \code{ticksX, ticksY} - set of ticks for the axes.}
 
 Interactivity settings
 \itemize{
- \item{\code{on_click} - function, to be called, when one of the bars is clicked. Gets an
- index of the clicked bar as an argument.}
- \item{\code{on_mouseover} - function, to be called, when mouse hovers over one of the bars.
- Gets an index of the clicked bar as an argument.}
- \item{\code{on_mouseout} - function, to be called, when mouse moves out of one of the bars.}
- \item{\code{on_marked} - function, to be called, when any of the bars are selected (marked) 
- or deselected. Use \code{\link{getMarked}} function to get the IDs of the currently marked bars.} }
- 
+\item \code{on_click} - function, to be called, when one of the bars is clicked. Gets an
+index of the clicked bar as an argument.
+\item \code{on_mouseover} - function, to be called, when mouse hovers over one of the bars.
+Gets an index of the clicked bar as an argument.
+\item \code{on_mouseout} - function, to be called, when mouse moves out of one of the bars.
+\item \code{on_marked} - function, to be called, when any of the bars are selected (marked)
+or deselected. Use \code{\link{getMarked}} function to get the IDs of the currently marked bars.}
+
 Global chart settings
 \itemize{
- \item{\code{width} - width of the chart in pixels.}
- \item{\code{heigth} - height of the chart in pixels.}
- \item{\code{plotWidth} - width of the plotting area in pixels.}
- \item{\code{plotHeight} - height of the plotting area in pixels.}
- \item{\code{paddings} - paddings size in pixels. Must be a list with all the following fields: 
- \code{"top", "bottom", "left", "right"}.}
- \item{\code{title} - title of the chart.}
- \item{\code{titleX, titleY} - coordinates of the chart title.}
- \item{\code{titleSize} - font-size of the chart title.}
- \item{\code{showLegend} - whether or not to show the legend.}
- \item{\code{showPanel} - whether of not to show the tools panel.}
- \item{\code{transitionDuration} - duration of the transtions between any two states of the chart. If 0,
- no animated transition is shown. It can be useful to turn the transition off, when lots of frequent 
- changes happen to the chart.} }
+\item \code{width} - width of the chart in pixels.
+\item \code{heigth} - height of the chart in pixels.
+\item \code{plotWidth} - width of the plotting area in pixels.
+\item \code{plotHeight} - height of the plotting area in pixels.
+\item \code{paddings} - paddings size in pixels. Must be a list with all the following fields:
+\code{"top", "bottom", "left", "right"}.
+\item \code{title} - title of the chart.
+\item \code{titleX, titleY} - coordinates of the chart title.
+\item \code{titleSize} - font-size of the chart title.
+\item \code{showLegend} - whether or not to show the legend.
+\item \code{showPanel} - whether of not to show the tools panel.
+\item \code{transitionDuration} - duration of the transtions between any two states of the chart. If 0,
+no animated transition is shown. It can be useful to turn the transition off, when lots of frequent
+changes happen to the chart.}
 }
 
 \examples{

@@ -19,7 +19,7 @@ second columns contain, respectively, row and colunm indices of the marked cells
 \description{
 \code{getMarked} returns indices of the chart's elements that are currently
 marked. To mark elements select them with you mouse while pressing the \emph{Shift} key.
-Double click on the chart while pressing the \emph{Shift} key will unmark all the 
+Double click on the chart while pressing the \emph{Shift} key will unmark all the
 elements.
 }
 \examples{

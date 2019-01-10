@@ -34,7 +34,7 @@ properties will be reevaluated on each \code{\link{updateCharts}} call.}
 \item{place}{An ID of a container, where to place the chart. Will be ignored if the chart already
 exists. If not defined, the chart will be placed directly in the body of the opened page.}
 
-\item{...}{Name value pairs of properties that can be evaluated only once and then will remain 
+\item{...}{Name value pairs of properties that can be evaluated only once and then will remain
 constant. These properties can still be changed later using the \code{\link{setProperties}} function}
 
 \item{id}{An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
@@ -42,14 +42,14 @@ exists, a new layer will be added to it. If you want to replace one chart with a
 first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} is the number of currently existing charts.}
 
 \item{layerId}{An ID for the new layer. All layers within one chart must have different IDs. If a layer with the same
-ID already exists, it will be replaced. If not defined, will be set to \code{LayerN}, where \code{N - 1} 
+ID already exists, it will be replaced. If not defined, will be set to \code{LayerN}, where \code{N - 1}
 is the number of currently existing layers in this chart.}
 
 \item{addLayer}{whether to add a new layer or to replace the existing one. This argument influences the chart only if
 it has only one layer and the \code{layerId} is not defined.}
 }
 \description{
-These functions create different kind of lines. They connect observations or 
+These functions create different kind of lines. They connect observations or
 create filled area, bordered by a line. Each layer may have one or several lines.
 }
 \section{Functions}{
@@ -68,78 +68,79 @@ create filled area, bordered by a line. Each layer may have one or several lines
 }}
 
 \section{Available properties}{
- 
-You can read more about different properties in the vignette.
+
+You can read more about different properties
+\href{https://anders-biostat.github.io/linked-charts/rlc/tutorials/props.html}{here}.
 
 \itemize{
- \item{\code{x, y} - vector of x and y coordinates of the points to connect. Can be 
- vectors for a single line or \code{m x n} matrix for \code{n} lines.}
- \item{\code{ymax, ymin} - (only for \code{lc_ribbon}) vectors of maximal and minimal values of the ribbon.} 
- \item{\code{a, b} - (only for \code{lc_abLine}) vectors of slope and intercept values respectively.}
- \item{\code{v} - (only for \code{lc_vLine}) vector of x-intercepts.}  
- \item{\code{h} - (only for \code{lc_hLine}) vector of y-intercepts.}
- \item{\code{lineWidth} - width of each line.}
- \item{\code{opacity} - opacity of the lines in the range from 0 to 1.}
- \item{\code{label} - vector of text labels for each line.} 
- \item{\code{dasharray} - defines pattern of dashes and gaps for each line.} }
+\item \code{x, y} - vector of x and y coordinates of the points to connect. Can be
+vectors for a single line or \code{m x n} matrix for \code{n} lines.
+\item \code{ymax, ymin} - (only for \code{lc_ribbon}) vectors of maximal and minimal values of the ribbon.
+\item \code{a, b} - (only for \code{lc_abLine}) vectors of slope and intercept values respectively.
+\item \code{v} - (only for \code{lc_vLine}) vector of x-intercepts.
+\item \code{h} - (only for \code{lc_hLine}) vector of y-intercepts.
+\item \code{lineWidth} - width of each line.
+\item \code{opacity} - opacity of the lines in the range from 0 to 1.
+\item \code{label} - vector of text labels for each line.
+\item \code{dasharray} - defines pattern of dashes and gaps for each line. }
 
 Colour settings
 \itemize{
- \item{\code{colour} - colour of the lines. Must be a colour name or hexidecimal code. For
- \code{lc_ribbon} this property defined the colour of the ribbon, not the strokes.}
- \item{\code{fill} - colour with wich to fill area inside the line. 
- Must be a colour name or hexidecimal code.}
- \item{\code{colourValue} - grouping values for different colours. Can be numbers or charachters.}
- \item{\code{colourDomain} - vector of all possible values for discrete colour scales 
- or range of all possible colour values for the continuous ones.}
- \item{\code{palette} - vector of colours to construct the colour scale.}
- \item{\code{colourLegendTitle} - title for the colour legend.}
- \item{\code{addColourScaleToLegend} - whether or not to show colour legend for the current layer.}
- \item{\code{globalColourScale} - whether or not to use one colour scale for all the layers.} 
- \item{\code{stroke} - (only for \code{lc_ribbon}) stroke colour for each ribbon. 
- Must be a colour name or hexidecimal code.}
- \item{\code{strokeWidth} - (only for \code{lc_ribbon}) width of the strokes for each ribbon.} }
- 
+\item \code{colour} - colour of the lines. Must be a colour name or hexidecimal code. For
+\code{lc_ribbon} this property defined the colour of the ribbon, not the strokes.
+\item \code{fill} - colour with wich to fill area inside the line.
+Must be a colour name or hexidecimal code.
+\item \code{colourValue} - grouping values for different colours. Can be numbers or charachters.
+\item \code{colourDomain} - vector of all possible values for discrete colour scales
+or range of all possible colour values for the continuous ones.
+\item \code{palette} - vector of colours to construct the colour scale.
+\item \code{colourLegendTitle} - title for the colour legend.
+\item \code{addColourScaleToLegend} - whether or not to show colour legend for the current layer.
+\item \code{globalColourScale} - whether or not to use one colour scale for all the layers.
+\item \code{stroke} - (only for \code{lc_ribbon}) stroke colour for each ribbon.
+Must be a colour name or hexidecimal code.
+\item \code{strokeWidth} - (only for \code{lc_ribbon}) width of the strokes for each ribbon. }
+
 Axes settings
 \itemize{
- \item{\code{logScaleX, logScaleY} - a base of logarithm for logarithmic scale transformation.
- If 0 or \code{FALSE} no transformation will be performed.}
- \item{\code{layerDomainX, layerDomainY} - default axes ranges for the given layer.}
- \item{\code{domainX, domainY} - default axes ranges for the entire chart. If not defined, 
- is automatically set to include all layer domains.}
- \item{\code{contScaleX, consScaleY} - whether or not the axis should be continuous.}
- \item{\code{aspectRatio} - aspect ratio.}
- \item{\code{axisTitleX, axisTitleY} - axes titles.}
- \item{\code{ticksRotateX, ticksRotateY} - degrees of angle to rotate ticks. Must be between 
- 0 (horisontal ticks, default) and 90 (vertical ticks).}
- \item{\code{ticksX, ticksY} - set of ticks for the axes.} }
+\item \code{logScaleX, logScaleY} - a base of logarithm for logarithmic scale transformation.
+If 0 or \code{FALSE} no transformation will be performed.
+\item \code{layerDomainX, layerDomainY} - default axes ranges for the given layer.
+\item \code{domainX, domainY} - default axes ranges for the entire chart. If not defined,
+is automatically set to include all layer domains.
+\item \code{contScaleX, consScaleY} - whether or not the axis should be continuous.
+\item \code{aspectRatio} - aspect ratio.
+\item \code{axisTitleX, axisTitleY} - axes titles.
+\item \code{ticksRotateX, ticksRotateY} - degrees of angle to rotate ticks. Must be between
+0 (horisontal ticks, default) and 90 (vertical ticks).
+\item \code{ticksX, ticksY} - set of ticks for the axes.}
 
 Interactivity settings
 \itemize{
- \item{\code{on_click} - function, to be called, when one of the lines is clicked. Gets an
- index of the clicked line as an argument.}
- \item{\code{on_mouseover} - function, to be called, when mouse hovers over one of the lines.
- Gets an index of the clicked line as an argument.}
- \item{\code{on_mouseout} - function, to be called, when mouse moves out of one of the lines.}
- \item{\code{on_marked} - function, to be called, when any of the lines are selected (marked) 
- or deselected. Use \code{\link{getMarked}} function to get the IDs of the currently marked lines.} }
- 
+\item \code{on_click} - function, to be called, when one of the lines is clicked. Gets an
+index of the clicked line as an argument.
+\item \code{on_mouseover} - function, to be called, when mouse hovers over one of the lines.
+Gets an index of the clicked line as an argument.
+\item \code{on_mouseout} - function, to be called, when mouse moves out of one of the lines.
+\item \code{on_marked} - function, to be called, when any of the lines are selected (marked)
+or deselected. Use \code{\link{getMarked}} function to get the IDs of the currently marked lines.}
+
 Global chart settings
 \itemize{
- \item{\code{width} - width of the chart in pixels.}
- \item{\code{heigth} - height of the chart in pixels.}
- \item{\code{plotWidth} - width of the plotting area in pixels.}
- \item{\code{plotHeight} - height of the plotting area in pixels.}
- \item{\code{paddings} - paddings size in pixels. Must be a list with all the following fields: 
- \code{"top", "bottom", "left", "right"}.}
- \item{\code{title} - title of the chart.}
- \item{\code{titleX, titleY} - coordinates of the chart title.}
- \item{\code{titleSize} - font-size of the chart title.}
- \item{\code{showLegend} - whether or not to show the legend.}
- \item{\code{showPanel} - whether of not to show the tools panel.}
- \item{\code{transitionDuration} - duration of the transtions between any two states of the chart. If 0,
- no animated transition is shown. It can be useful to turn the transition off, when lots of frequent 
- changes happen to the chart.}
+\item \code{width} - width of the chart in pixels.
+\item \code{heigth} - height of the chart in pixels.
+\item \code{plotWidth} - width of the plotting area in pixels.
+\item \code{plotHeight} - height of the plotting area in pixels.
+\item \code{paddings} - paddings size in pixels. Must be a list with all the following fields:
+\code{"top", "bottom", "left", "right"}.
+\item \code{title} - title of the chart.
+\item \code{titleX, titleY} - coordinates of the chart title.
+\item \code{titleSize} - font-size of the chart title.
+\item \code{showLegend} - whether or not to show the legend.
+\item \code{showPanel} - whether of not to show the tools panel.
+\item \code{transitionDuration} - duration of the transtions between any two states of the chart. If 0,
+no animated transition is shown. It can be useful to turn the transition off, when lots of frequent
+changes happen to the chart.
 }
 }
 
