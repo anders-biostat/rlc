@@ -43,7 +43,15 @@ rlc.addChart = function(id, type, place, layerId) {
   //if(layerId = "") layerId = undefined;
   charts[id] = lc[type](layerId, charts[id]);
   if(charts[id].on_click)
-    charts[id].on_click(function(d, d2) {
+    charts[id].on_click(function(d, d2, d3) {
+      //bar charts
+      if(d3 != undefined) {
+        if(isNaN(+d)) d = "'" + d + "'";
+        if(isNaN(+d2)) d2 = "'" + d2 + "'";
+        if(isNaN(+d3)) d3 = "'" + d3 + "'";
+        d2 = d2 + ", " + d3; 
+      }
+      //heatmaps
       if(d2 != undefined)
         d = "c(" + d + ", " + d2 + ")";
       jrc.sendCommand("rlc:::chartEvent("+ d + ", '" + id + "', '" + layerId + "', 'click')");
