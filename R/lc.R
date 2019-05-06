@@ -1,4 +1,4 @@
-#' @import JsRCom
+#' @import jrc
 #' @import stringr
 
 lc <- new.env()
@@ -128,7 +128,7 @@ openPage <- function(useViewer = T, rootDirectory = NULL, startPage = NULL, layo
   lc$charts <- list()
   lc$pageOpened <- F
   lc$useViewer <- useViewer
-  JsRCom::openPage(useViewer = useViewer, rootDirectory = rootDirectory, startPage = startPage)
+  jrc::openPage(useViewer = useViewer, rootDirectory = rootDirectory, startPage = startPage)
   srcDir <- "http_root_rlc"
 
   scriptCount <- 0
@@ -783,7 +783,7 @@ dat <- function( ... ) {
 closePage <- function() {
   lc$charts <- list()
   lc$pageOpened <- F
-  JsRCom::closePage()
+  jrc::closePage()
 }
 
 scatterDataFun <- function(l) {

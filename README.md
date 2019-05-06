@@ -15,7 +15,6 @@ To install rlc from GitHub use the following commands:
 
 ```
 install.packages("devtools")
-devtools::install_github("anders-biostat/JsRCom")
 devtools::install_github("anders-biostat/rlc")
 ```
 
