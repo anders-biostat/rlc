@@ -123,12 +123,14 @@ lc$charts <- list()
 #' 
 #' @export
 #' @importFrom later run_now
-openPage <- function(useViewer = T, rootDirectory = NULL, startPage = NULL, layout = NULL) {
+openPage <- function(useViewer = T, rootDirectory = NULL, startPage = NULL, layout = NULL, newPage = TRUE) {
   
   lc$charts <- list()
   lc$pageOpened <- F
   lc$useViewer <- useViewer
-  jrc::openPage(useViewer = useViewer, rootDirectory = rootDirectory, startPage = startPage)
+  if(newPage == TRUE)
+    jrc::openPage(useViewer = useViewer, rootDirectory = rootDirectory, startPage = startPage)
+  
   srcDir <- "http_root_rlc"
 
   scriptCount <- 0
