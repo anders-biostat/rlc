@@ -24,28 +24,6 @@ first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} i
 \code{lc_html} adds a block with HTML code. It uses \code{\link[hwriter]{hwrite}} function
 to transform some data structures (e.g. data frames) to HTML tables.
 }
-\section{Available properties}{
-
-You can read more about different properties
-\href{https://anders-biostat.github.io/linked-charts/rlc/tutorials/props.html}{here}.
-
-\itemize{
-\item \code{content} - HTML code to display on the page. Can also be a vector, data.frame or
-any other structure, that can be transformed by \code{\link[hwriter]{hwrite}}. }
-
-Global chart settings
-\itemize{
-\item \code{width} - width of the chart in pixels. By default, the entire content will be displayed.
-If width is defined and it's smaller than content's width, scrolling will be possible.
-\item \code{heigth} - height of the chart in pixels. By default, the entire content will be displayed.
-If height is defined and it's smaller than content's height, scrolling will be possible.
-\item \code{paddings} - paddings size in pixels. Must be a list with all the following fields:
-\code{"top", "bottom", "left", "right"}.
-\item \code{title} - title of the chart.
-\item \code{titleX, titleY} - coordinates of the chart title.
-\item \code{titleSize} - font-size of the chart title.}
-}
-
 \examples{
 lc_html(content = "Some <b>HTML</b> <br> <i>code</i>.")
 lc_html(dat(content = matrix(1:12, nrow = 4)))

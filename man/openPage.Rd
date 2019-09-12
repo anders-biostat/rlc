@@ -5,7 +5,7 @@
 \title{Open a new empty page}
 \usage{
 openPage(useViewer = T, rootDirectory = NULL, startPage = NULL,
-  layout = NULL)
+  layout = NULL, newPage = TRUE)
 }
 \arguments{
 \item{useViewer}{If \code{TRUE}, the page will be opened in the RStudio Viewer. If \code{FALSE}

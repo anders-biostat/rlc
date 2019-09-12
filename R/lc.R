@@ -27,7 +27,7 @@ lc$props <- list(scatter = c("x", "y", "size", "stroke", "strokeWidth", "symbol"
                         "showLegend", "showPanel", "transitionDuration", "value", "rowLabel", "colLabel", "showDendogramRow",
                         "clusterRows", "clusterCols", "mode", "heatmapRow", "heatmapCol", "showValue", "rowTitle", 
                         "colTitle", "palette", "colourDomain", "on_click", "on_mouseover", "on_mouseout", "on_marked", 
-                        "chart", "layer", "content", "domainX", "domainY", "apectRatio", "axisTitleX", "axisTitleY",
+                        "chart", "layer", "content", "type", "domainX", "domainY", "apectRatio", "axisTitleX", "axisTitleY",
                         "logScaleX", "logScaleY", "ticksRotateX", "ticksRotateY", "globalColourScale", "aspectRatio",
                         "rankRows", "rankCols", "ticksX", "ticksY", "showDendogramCol", "on_labelClickCol", "on_labelClickRow"))
 
@@ -493,7 +493,7 @@ sendProperties <- function(chart, layerId = ls(chart$layers)){
   }
 }
 
-setChart <- function(type, data, ..., place, id, layerId, dataFun, addLayer, pacerStep = 50) {
+setChart <- function(.type, data, ..., place, id, layerId, dataFun, addLayer, pacerStep = 50) {
   if(!lc$pageOpened) openPage()
   
   if(is.null(place))
@@ -528,7 +528,7 @@ setChart <- function(type, data, ..., place, id, layerId, dataFun, addLayer, pac
   if(!is.null(chart$getLayer(layerId)))
     chart$removeLayer(layerId)
   
-  layer <- chart$addLayer(layerId, type)
+  layer <- chart$addLayer(layerId, .type)
   layer$dataFun <- dataFun
   
   layer$pacerStep <- pacerStep
@@ -1240,7 +1240,7 @@ barDataFun <- function(l) {
   if(is.null(l$barIds) & is.null(l$stackIds))
     l$addColourScaleToLegend <- FALSE
   
-  if(is.null(l$groupIds)) l$groupIds <- rep(1, length(l$value))
+  if(is.null(l$groupIds)) l$groupIds <- rep("group", length(l$value))
   if(is.null(l$barIds)) l$barIds <- rep(1, length(l$value))
   if(is.null(l$stackIds)) l$stackIds <- rep(1, length(l$value))
   
@@ -1758,9 +1758,6 @@ lc_vLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL
 #'  If height is defined and it's smaller than content's height, scrolling will be possible.
 #'  \item \code{paddings} - paddings size in pixels. Must be a list with all the following fields: 
 #'  \code{"top", "bottom", "left", "right"}.
-#'  \item \code{title} - title of the chart.
-#'  \item \code{titleX, titleY} - coordinates of the chart title. 
-#'  \item \code{titleSize} - font-size of the chart title.} 
 #'  
 #' @examples
 #' lc_html(content = "Some <b>HTML</b> <br> <i>code</i>.")
@@ -1778,6 +1775,12 @@ lc_html <- function(data = list(), place = NULL, ..., id = NULL) {
     #l$content <- gsub("[\r\n]", "", l$content)
     #l$content <- str_replace_all(l$content, "(\\W)", "\\\\\\1")
     
+    l
+  })
+}
+#' @export
+lc_input <- function(data = list(), place = NULL, ..., id = NULL) {
+  setChart("input", data, ..., place = place, id = id, layerId = "main", dataFun = function(l){
     l
   })
 }

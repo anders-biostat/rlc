@@ -61,8 +61,23 @@ rlc.addChart = function(id, type, place, layerId) {
   else
     if(charts[id].container) {
       charts[id].place_layer(layerId);
-      
     }
+  //inputs
+  if(charts[id].on_change)
+    charts[id].on_change(
+      function(value) {
+        if(typeof value === "string")
+          d = "'" + value + "'";
+        if(typeof value === "object")
+          if(Array.isArray(value)) {
+            d = "c(" + value.map(el => el ? "TRUE" : "FALSE").join(", ") + ")";  
+          } else {
+            d = "c(" + Object.keys(value).map(el => el + " = '" + value[el] + "'").join(", ") + ")";
+          }
+
+        jrc.sendCommand("rlc:::chartEvent("+ d + ", '" + id + "', '" + layerId + "', 'click')");
+      }
+    )
 }
 
 rlc.setCustomMouseOver = function(id, layerId, pacerStep) {
