@@ -1,6 +1,6 @@
 # rlc
 
-This package is an R wrapper fot JavaScript 
+This package is an R wrapper for the JavaScript 
 [linked-charts](https://kloivenn.github.io/linked-charts) library.
 **rlc** is an easy to use instrument for interactive data visualisation.
 It allows to open interactive charts either in the RStudio Viewer or
@@ -33,7 +33,7 @@ Currently supported types of charts are:
 - ```lc_bars``` - barchart
 
 ### Other elements
-- ```lc_colourSlider``` - an additional element that can interactively change a continuous colour scale of any other chart
+- ```lc_colourSlider``` - an additional element to interactively change a continuous colour scale of any other chart
 - ```lc_html``` - customary HTML code to be inserted in the web page
 
 ## Examples
