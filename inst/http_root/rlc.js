@@ -72,7 +72,7 @@ rlc.addChart = function(id, type, place, layerId) {
           if(Array.isArray(value)) {
             d = "c(" + value.map(el => el ? "TRUE" : "FALSE").join(", ") + ")";  
           } else {
-            d = "c(" + Object.keys(value).map(el => el + " = '" + value[el] + "'").join(", ") + ")";
+            d = "c(" + Object.keys(value).map(el => el == "" ? "'" + value[el] + "'" : el + " = '" + value[el] + "'").join(", ") + ")";
           }
 
         jrc.sendCommand("rlc:::chartEvent("+ d + ", '" + id + "', '" + layerId + "', 'click')");
