@@ -6,7 +6,7 @@ Date: 2017-07-31
 Author: Simon Anders, Svetlana Ovchinnikova 
 Maintainer: Simon Anders <sanders@fs.tum.de>
 Description: to be filled in
-License: GPL-3
+License: GPL-3+
 Imports: httpuv, jsonlite, stringr, hwriter, jrc
 RoxygenNote: 6.1.1
 Roxygen: list(markdown = TRUE)
