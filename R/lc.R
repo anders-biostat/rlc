@@ -128,12 +128,17 @@ openPage <- function(useViewer = T, rootDirectory = NULL, startPage = NULL, layo
   lc$charts <- list()
   lc$pageOpened <- F
   lc$useViewer <- useViewer
-  if(newPage == TRUE)
-    jrc::openPage(useViewer = useViewer, rootDirectory = rootDirectory, startPage = startPage)
+  if(newPage == TRUE){
+    jrc::openPage(useViewer = useViewer, rootDirectory = rootDirectory, startPage = startPage, 
+                  allowedFunctions = "chartEvent", allowedVariables = c("marked", "s1", "s2"))
+    jrc::limitStorage(n = 0)
+    
+  }
   
   srcDir <- "http_root_rlc"
 
-  scriptCount <- 0
+  s1 <- 0
+  s2 <- 0
   setEnvironment(environment())
   sendCommand(str_c("link = document.createElement('link');", 
                     "link.rel = 'stylesheet';", 
@@ -141,23 +146,23 @@ openPage <- function(useViewer = T, rootDirectory = NULL, startPage = NULL, layo
                     "document.head.appendChild(link);", collapse = "\n")) 
   sendCommand(str_c("script = document.createElement('script');", 
                     "script.src = '", srcDir, "/rlc.js';",
-                    "script.onload = function() {jrc.sendCommand('scriptCount <- scriptCount + 1')};",
+                    "script.onload = function() {jrc.sendData('s1', 1)};",
                     "document.head.appendChild(script);", collapse = "\n"))
     
   sendCommand(str_c("script = document.createElement('script');", 
                     "script.src = '", srcDir, "/linked-charts.min.js';",
-                    "script.onload = function() {jrc.sendCommand('scriptCount <- scriptCount + 1')};",                    
+                    "script.onload = function() {jrc.sendData('s2', 1)};",                    
                     "document.head.appendChild(script);", collapse = "\n"))
   for( i in 1:(10/0.05) ) {
     run_now()
-    if( scriptCount == 2) {
+    if( s1 == 1 & s2 == 1) {
       setEnvironment(globalenv())
       break
     } 
     Sys.sleep( .05 )
   }
   
-  if( scriptCount < 2 ) {
+  if( s1 == 0 | s2 == 0 ) {
     closePage()
     stop( "Can't load linked-charts.js or rlc.js" )
   }
@@ -544,8 +549,10 @@ setChart <- function(.type, data, ..., place, id, layerId, dataFun, addLayer, pa
   invisible(chart)
 }
 
+#' @export
 chartEvent <- function(d, id, layerId, event) {
   
+  if(d == "NULL") d <- NULL
   if(is.numeric(d)) d <- d + 1 
   
   chart <- getChart(id)

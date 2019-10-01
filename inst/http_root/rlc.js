@@ -44,17 +44,12 @@ rlc.addChart = function(id, type, place, layerId) {
   charts[id] = lc[type](layerId, charts[id]);
   if(charts[id].on_click)
     charts[id].on_click(function(d, d2, d3) {
-      //bar charts
-      if(d3 != undefined) {
-        if(isNaN(+d)) d = "'" + d + "'";
-        if(isNaN(+d2)) d2 = "'" + d2 + "'";
-        if(isNaN(+d3)) d3 = "'" + d3 + "'";
-        d2 = d2 + ", " + d3; 
-      }
-      //heatmaps
       if(d2 != undefined)
-        d = "c(" + d + ", " + d2 + ")";
-      jrc.sendCommand("rlc:::chartEvent("+ d + ", '" + id + "', '" + layerId + "', 'click')");
+        d = [d, d2];
+      if(d3 != undefined)
+        d = d.concat(d3);
+
+      jrc.callFunction("chartEvent", {d: d, id: id, layerId: layerId, event: "click"}, null, "rlc");
     });
   if(layerId == "main")
     charts[id].placeIn = place
@@ -66,16 +61,7 @@ rlc.addChart = function(id, type, place, layerId) {
   if(charts[id].on_change)
     charts[id].on_change(
       function(value) {
-        if(typeof value === "string")
-          d = "'" + value + "'";
-        if(typeof value === "object")
-          if(Array.isArray(value)) {
-            d = "c(" + value.map(el => el ? "TRUE" : "FALSE").join(", ") + ")";  
-          } else {
-            d = "c(" + Object.keys(value).map(el => el == "" ? "'" + value[el] + "'" : el + " = '" + value[el] + "'").join(", ") + ")";
-          }
-
-        jrc.sendCommand("rlc:::chartEvent("+ d + ", '" + id + "', '" + layerId + "', 'click')");
+        jrc.callFunction("chartEvent", {d: value, id: id, layerId: layerId, event: "click"}, null, "rlc");
       }
     )
 }
@@ -87,13 +73,13 @@ rlc.setCustomMouseOver = function(id, layerId, pacerStep) {
     if(layerId != "main")
       charts[id].get_layer(layerId)
         .on_mouseover(function(d) {
-          pacer.do(function() {jrc.sendCommand("rlc:::chartEvent("+ d + ", '" + id + "', '" + layerId + "', 'mouseover')")}); 
-        })
+          pacer.do(function() {jrc.callFunction("chartEvent", {d: d, id: id, layerId: layerId, event: "mouseover"}, null, "rlc")})
+        });
     else
       charts[id]
         .on_mouseover(function(d) {
-          pacer.do(function() {jrc.sendCommand("rlc:::chartEvent("+ d + ", '" + id + "', '" + layerId + "', 'mouseover')")}); 
-        });      
+          pacer.do(function() {jrc.callFunction("chartEvent", {d: d, id: id, layerId: layerId, event: "mouseover"}, null, "rlc")}); 
+        });
     charts[id].customMouseOver = true;
   }
 }
@@ -103,12 +89,12 @@ rlc.setCustomMouseOut = function(id, layerId) {
     if(layerId != "main")
       charts[id].get_layer(layerId)
         .on_mouseout(function() {
-          jrc.sendCommand("rlc:::chartEvent(NULL, '" + id + "', '" + layerId + "', 'mouseout')");
+          jrc.callFunction("chartEvent", {d: "NULL", id: id, layerId: layerId, event: "mouseout"}, null, "rlc");
         })
     else
       charts[id]
         .on_mouseout(function() {
-          jrc.sendCommand("rlc:::chartEvent(NULL, '" + id + "', '" + layerId + "', 'mouseout')");
+          jrc.callFunction("chartEvent", {d: "NULL", id: id, layerId: layerId, event: "mouseout"}, null, "rlc");
         });      
     charts[id].customMouseOut = true;
   }
@@ -119,12 +105,12 @@ rlc.setCustomOnMarked = function(id, layerId) {
     if(layerId != "main")
       charts[id].get_layer(layerId)
         .on_marked(function() {
-          jrc.sendCommand("rlc:::chartEvent(NULL, '" + id + "', '" + layerId + "', 'marked')");
+          jrc.callFunction("chartEvent", {d: "NULL", id: id, layerId: layerId, event: "marked"}, null, "rlc");
         })
     else
       charts[id]
         .on_marked(function(d) {
-          jrc.sendCommand("rlc:::chartEvent(NULL, '" + id + "', '" + layerId + "', 'marked')");
+          jrc.callFunction("chartEvent", {d: "NULL", id: id, layerId: layerId, event: "marked"}, null, "rlc");
         });      
     charts[id].customOnMarked = true;
   }
@@ -134,7 +120,7 @@ rlc.setCustomClickLabel = function(id, type) {
   if(!charts[id]["customClickLabel" + type]){
     charts[id]
       ["on_labelClick" + type](function(d) {
-        jrc.sendCommand("rlc:::chartEvent("+ d + ", '" + id + "', 'main', 'labelClick" + type + "')");
+        jrc.callFunction("chartEvent", {d: d, id: id, layerId: "main", event: "labelClick" + type}, null, "rlc")
       });      
     charts[id]["customClickLabel" + type] = true;
   }
