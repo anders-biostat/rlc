@@ -57,8 +57,8 @@ rlc.addChart = function(id, type, place, layerId) {
     if(charts[id].container) {
       charts[id].place_layer(layerId);
     }
-  //inputs
-  if(charts[id].on_change)
+  //inputs, but not a colour slider
+  if(charts[id].on_change && !charts[id].on_drag)
     charts[id].on_change(
       function(value) {
         jrc.callFunction("chartEvent", {d: value, id: id, layerId: layerId, event: "click"}, null, "rlc");
