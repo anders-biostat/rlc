@@ -1788,6 +1788,20 @@ lc_html <- function(data = list(), place = NULL, ..., id = NULL) {
 #' @export
 lc_input <- function(data = list(), place = NULL, ..., id = NULL) {
   setChart("input", data, ..., place = place, id = id, layerId = "main", dataFun = function(l){
+    if(!(l$type %in% c("checkbox", "radio", "text", "button", "range")))
+       stop("Unsupported type of input. Please, use one of \"checkbox\", \"radio\", \"text\", \"button\", \"range\"")
+    if(is.null(l$elementIds) & !is.null(l$label))
+      l$elementIds <- l$label
+    if(is.null(l$elementIds))
+      stop("At least one of the properties 'labels' and 'elementIds' must be specified.")
+    if(!is.null(l$label)) {
+      l$label <- as.list(l$label)
+      names(l$label) <- l$elementIds
+    }
+    if(!is.null(l$on_change)) {
+      l$on_click <- l$on_change
+      l$on_change <- NULL
+    }
     l
   })
 }
