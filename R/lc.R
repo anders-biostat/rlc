@@ -1798,6 +1798,17 @@ lc_input <- function(data = list(), place = NULL, ..., id = NULL) {
       l$label <- as.list(l$label)
       names(l$label) <- l$elementIds
     }
+    if(is.null(l$value) & l$type == "checkbox") 
+      l$value <- rep(F, length(l$elementIds))
+    if(l$type == "checkbox") {
+      if(length(l$value) == 1)
+        l$value <- rep(l$value, length(l$elementIds))
+      if(length(l$value) != length(l$elementIds))
+        stop("Number of values must be equal to number of elements.")
+      l$value <- as.list(l$value)
+      names(l$value) <- l$elementIds
+    }
+    
     if(!is.null(l$on_change)) {
       l$on_click <- l$on_change
       l$on_change <- NULL
