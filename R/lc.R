@@ -9,7 +9,7 @@ lc$nameList <- c("labels" = "label", "color" = "colour", "colorValue" = "colourV
                  "colorLegendTitle" = "colourLegendTitle", "addColorScaleToLegend" = "addColourScaleToLegend",
                  "symbols" = "symbol", "symbolValues" = "symbolValue", "strokes" = "stroke", "values" = "value",
                  "heatmapRows" = "heatmapRow", "heatmapCols" = "heatmapCol", "showValues" = "showValue",
-                 "globalColorScale" = "globalColourScale")
+                 "globalColorScale" = "globalColourScale", "steps" = "step")
 
 lc$props <- list(scatter = c("x", "y", "size", "stroke", "strokeWidth", "symbol", "symbolValue", "symbolLegendTitle",
                              "jitterX", "jitterY", "shiftX", "shiftY"),
@@ -23,6 +23,7 @@ lc$props <- list(scatter = c("x", "y", "size", "stroke", "strokeWidth", "symbol"
                 layer = c("nelements", "elementIds", "label", "layerDomainX", "layerDomainY", "contScaleX", "contScaleY",
                           "colour", "colourValue", "palette", "colourDomain", "colourLegendTitle", "addColourScaleToLegend", "opacity", "on_click",
                           "informText", "on_mouseover", "on_mouseout", "on_marked"),
+                input = c("step", "min", "max"),
                 all = c("width", "height", "plotWidth", "plotHeight", "paddings", "title", "titleX", "titleY", "titleSize",
                         "showLegend", "showPanel", "transitionDuration", "value", "rowLabel", "colLabel", "showDendogramRow",
                         "clusterRows", "clusterCols", "mode", "heatmapRow", "heatmapCol", "showValue", "rowTitle", 
@@ -550,9 +551,15 @@ setChart <- function(.type, data, ..., place, id, layerId, dataFun, addLayer, pa
 }
 
 #' @export
+#' @importFrom utils type.convert
 chartEvent <- function(d, id, layerId, event) {
   
-  if(d == "NULL") d <- NULL
+  if(length(d) == 1)
+    if(d == "NULL")
+      d <- NULL
+  
+  #lame. This also must go to jrc with the nearest update
+  d <- type.convert(d, as.is = T)
   if(is.numeric(d)) d <- d + 1
   # should we move that to jrc? And add some parameter, like 'flatten'?
   if(is.list(d))
@@ -1794,23 +1801,40 @@ lc_input <- function(data = list(), place = NULL, ..., id = NULL) {
   setChart("input", data, ..., place = place, id = id, layerId = "main", dataFun = function(l){
     if(!(l$type %in% c("checkbox", "radio", "text", "button", "range")))
        stop("Unsupported type of input. Please, use one of \"checkbox\", \"radio\", \"text\", \"button\", \"range\"")
-    if(is.null(l$elementIds) & !is.null(l$label))
-      l$elementIds <- l$label
-    if(is.null(l$elementIds))
-      stop("At least one of the properties 'labels' and 'elementIds' must be specified.")
+    
     if(!is.null(l$label)) {
-      l$label <- as.list(l$label)
-      names(l$label) <- l$elementIds
+      l$nelements <- length(l$label)
+    } else {
+      l$nelements <- 1
     }
-    if(is.null(l$value) & l$type == "checkbox") 
-      l$value <- rep(F, length(l$elementIds))
-    if(l$type == "checkbox") {
-      if(length(l$value) == 1)
-        l$value <- rep(l$value, length(l$elementIds))
-      if(length(l$value) != length(l$elementIds))
-        stop("Number of values must be equal to number of elements.")
-      l$value <- as.list(l$value)
-      names(l$value) <- l$elementIds
+    
+    if(l$type == "checkbox")
+      if(!is.null(l$values))
+        if(length(l$value) != 1 & length(l$value) != l$nelements)
+          stop("Length of 'values' vector must be either 1 or equal to the number of checkboxes.")
+    
+    if(l$type == "radio")
+      if(!is.null(l$value))
+        if(length(l$value) != 1 | !is.numeric(l$value)) {
+          stop("'value' must be a number of the checked radio button")
+        } else {
+          l$value = l$value - 1
+        }
+          
+    
+    if(l$type == "text")
+      if(!is.null(l$value) & length(l$value) != l$nelements)
+        stop("Length of 'values' must be equal to the number of text fields.")
+    
+    if(l$type == "range") {
+      if(!is.null(l$value) & length(l$value) != 1 & length(l$value) != l$nelements)
+        stop("Length of 'values' vector must be either 1 or equal to the number of ranges.")
+      if(!is.null(l$step) & length(l$step) != 1 & length(l$step) != l$nelements)
+        stop("Length of 'step' vector must be either 1 or equal to the number of ranges.")
+      if(!is.null(l$min) & length(l$min) != 1 & length(l$min) != l$nelements)
+        stop("Length of 'min' vector must be either 1 or equal to the number of ranges.")
+      if(!is.null(l$max) & length(l$max) != 1 & length(l$max) != l$nelements)
+        stop("Length of 'max' vector must be either 1 or equal to the number of ranges.")
     }
     
     if(!is.null(l$on_change)) {
