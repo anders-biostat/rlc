@@ -553,7 +553,11 @@ setChart <- function(.type, data, ..., place, id, layerId, dataFun, addLayer, pa
 chartEvent <- function(d, id, layerId, event) {
   
   if(d == "NULL") d <- NULL
-  if(is.numeric(d)) d <- d + 1 
+  if(is.numeric(d)) d <- d + 1
+  # should we move that to jrc? And add some parameter, like 'flatten'?
+  if(is.list(d))
+    if(all(sapply(d, function(el) length(el) == 1)))
+      d <- unlist(d)
   
   chart <- getChart(id)
   if(is.null(chart))
