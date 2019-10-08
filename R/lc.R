@@ -510,13 +510,17 @@ setChart <- function(.type, data, ..., place, id, layerId, dataFun, addLayer, pa
     id <- place
   
   chart <- getChart(id)
+  if(!is.null(chart) && !is.null(layerId) && layerId == "main") {
+    removeChart(chart$id)
+    chart <- getChart(id)
+  }
   
   if(is.null(chart)) {
     chart <- addChart(id, place)
     if(is.null(layerId) || layerId != "main")
       chart$addLayer("main", "axesChart")
-  } 
-  
+  }
+
   if(is.null(layerId)){
     if(!addLayer & chart$nLayers() > 1) {
       warning(str_c("Chart '", id, "' has ", chart$nLayers(), " layers and the layer ID is not specified. ", 
