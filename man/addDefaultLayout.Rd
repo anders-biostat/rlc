@@ -18,10 +18,11 @@ Currently the only supported type
 of a default layout is table with arbitrary number of rows and columns.
 To use it set the layout argument to \code{tableMxN}, where \code{N} is the
 number of rows and \code{M} is the number of columns. Each cell will get an ID that consists of
-a letter (inticating the row) and a number (indicating the column) (e.g. \code{B3} is an ID of
+a letter (indicating the row) and a number (indicating the column) (e.g. \code{B3} is an ID of
 the second row and third column).
 }
 \examples{
-addDefaultLayout("table3x2")
+\donttest{openPage(useViewer = FALSE)
+addDefaultLayout("table3x2")}
 
 }

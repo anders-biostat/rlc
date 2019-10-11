@@ -99,7 +99,7 @@ lc$charts <- list()
 
 #' Open a new empty page
 #' 
-#' \code{openPage} creates a server, establishes a websocket connection between it and the current
+#' \code{openPage} creates a server, establishes a web socket connection between it and the current
 #' R session and loads linked-charts JS library with all the dependencies. If there is already an 
 #' opened page, it will be automatically closed.
 #' 
@@ -107,23 +107,23 @@ lc$charts <- list()
 #' a default web browser will be used.
 #' @param rootDirectory A path to the root directory of the server. If \code{rootDirectory} is not 
 #' defined, the \code{http_root} in the package directory will be used as a root directory.
-#' @param startPage A path to the HTML file that should be opened, when the server is initialised.
+#' @param startPage A path to the HTML file that should be opened, when the server is initialized.
 #' This can be an absolute path to a local file, or it can be relative from the \code{rootDirectory}
 #' or to the current R working directory. If \code{startPage} is not defined, this function opens an 
 #' empty HTML page. The file must have \emph{.html} extension.
 #' @param layout Adds one of the defaults layouts to the page. Currently, only tables of arbitrary 
 #' size are supported. To add a table set this parameter to \code{tableNxM}, where \code{N} is the
 #' number of rows and \code{M} is the number of columns. Each cell will get an ID that consists of 
-#' a letter (inticating the row) and a number (indicating the column) (e.g. \code{B3} is an ID of 
+#' a letter (indicating the row) and a number (indicating the column) (e.g. \code{B3} is an ID of 
 #' the second row and third column).
 #' @param newPage Determines whether or not to open a new page. If \code{FALSE}, one can add 
 #' interactive charts to another apps, created the with \code{\link{jrc}} package.
 #' @param ... Further arguments passed to \code{\link[jrc]{openPage}}.
 #' 
 #' @examples
-#' openPage()
+#' \donttest{openPage()
 #' 
-#' openPage(useViewer = F, layout = "table2x3")
+#' openPage(useViewer = F, layout = "table2x3")}
 #' 
 #' @export
 #' @importFrom later run_now
@@ -187,13 +187,14 @@ openPage <- function(useViewer = T, rootDirectory = NULL, startPage = NULL, layo
 #' of a default layout is table with arbitrary number of rows and columns.
 #' To use it set the layout argument to \code{tableMxN}, where \code{N} is the
 #' number of rows and \code{M} is the number of columns. Each cell will get an ID that consists of 
-#' a letter (inticating the row) and a number (indicating the column) (e.g. \code{B3} is an ID of 
+#' a letter (indicating the row) and a number (indicating the column) (e.g. \code{B3} is an ID of 
 #' the second row and third column).
 #' 
 #' @param layoutName Type of the layout. See 'Details' for more information.
 #' 
-#' @examples 
-#' addDefaultLayout("table3x2")
+#' @examples
+#' \donttest{openPage(useViewer = FALSE)
+#' addDefaultLayout("table3x2")}
 #' 
 #' @export
 addDefaultLayout <- function(layoutName) {
@@ -216,15 +217,15 @@ getChart <- function(id) {
   lc$charts[[id]]
 }
 
-#' Remove cahrt from the page
+#' Remove chart from the page
 #' 
 #' Removes an existing chart.
 #' 
 #' @param id A vector of IDs of the charts to be removed.
 #' 
 #' @examples 
-#' lc_scatter(dat(x = 1:10, y = 1:10 * 2), id = "scatter")
-#' removeChart("scatter") 
+#' \donttest{lc_scatter(dat(x = 1:10, y = 1:10 * 2), id = "scatter")
+#' removeChart("scatter")}
 #' 
 #' @export
 removeChart <- function(id) {
@@ -259,14 +260,14 @@ addChart <- function(id, place) {
 #' layer or doesn't have layers, default value (which is NULL) can be used.
 #' 
 #' @examples
-#' data("iris")
+#' \donttest{data("iris")
 #' lc_scatter(dat(x = iris$Sepal.Length, y = iris$Sepal.Width), id = "irisScatter")
 #' setProperties(dat(symbolValue = iris$Species, y = iris$Petal.Length), id = "irisScatter")
 #' updateCharts("irisScatter")
 #' 
 #' lc_line(dat(x = iris$Sepal.Length, y = iris$Petal.Length), id = "irisScatter", layerId = "line")
 #' setProperties(dat(colour = "red"), id = "irisScatter", layerId = "line")
-#' updateCharts("irisScatter")
+#' updateCharts("irisScatter")}
 #' 
 #' @export
 #' @importFrom plyr rename
@@ -313,10 +314,10 @@ setProperties <- function(data, id, layerId = NULL) {
 #' \code{updateCharts} redraws a chart or a single layer of the chart to make it up
 #' to date with the current state of the environment.
 #' 
-#' Linked charts of the \emph{rlc} package are based on the idea that variables
-#' used to define the chart are not constant, but can change as a result of user's
-#' actions. Each time the \code{updateCharts} is called, all the properties passed
-#' via \code{\link{dat}} function are reevaluated and cahrt is changed in accordance with the
+#' Linked charts of the \emph{rlc} package are based on the idea that the variables
+#' used to define a chart are not constant, but can change as a result of user's
+#' actions. Each time the \code{updateCharts} function is called, all the properties passed
+#' via \code{\link{dat}} function are reevaluated and the chart is changed in accordance with the
 #' new state.
 #' 
 #' @section Update types: 
@@ -330,7 +331,7 @@ setProperties <- function(data, id, layerId = NULL) {
 #'   of all its elements).
 #'   \item \code{Title} changes the title of the chart.
 #'   \item \code{Canvas} If number of elements is too high the 
-#'   charts switch to the canvas mode and istead of multiple SVG point or cells
+#'   charts switch to the canvas mode and instead of multiple SVG point or cells
 #'   a single Canvas image is generated. This type of update redraws the Canvas
 #'   image. \emph{It is not recommended to use this function.}
 #' }
@@ -380,7 +381,7 @@ setProperties <- function(data, id, layerId = NULL) {
 #' \code{Canvas}, \code{Size}. See details for more information.
 #' 
 #' @examples
-#' data(iris)
+#' \donttest{data(iris)
 #'
 #' #store some properties in global variables
 #' width <- 300
@@ -402,7 +403,7 @@ setProperties <- function(data, id, layerId = NULL) {
 #' #add another property
 #' setProperties(dat(symbolValue = iris$Species), "iris")
 #' #this will change only colour and symbols
-#' updateCharts("iris", updateOnly = "ElementStyle")
+#' updateCharts("iris", updateOnly = "ElementStyle")}
 #' 
 #' @export
 updateCharts <- function(id = NULL, layerId = NULL, updateOnly = NULL) {
@@ -561,21 +562,23 @@ setChart <- function(.type, data, ..., place, id, layerId, dataFun, addLayer, pa
 #' 
 #' This function is called whenever user clicks, selects or hover over elements of a chart. In turn,
 #' it calls a corresponding callback function, if any was specified by the user. This function
-#' is meant to be used internally. However an experienced user can still use it to custumise app
-#' behaviour in some complicated cases. This function can also emulate events triggered by non-existing
+#' is meant to be used internally. However, an experienced user can still use it to customize app
+#' behavior in some complicated cases. This function can also emulate events triggered by non-existing
 #' elements.
 #' 
 #' @param d ID of an element that triggered the event. May be index of a point or line, vector or
 #' row and column indices for a heatmap, value of an input block (please, check \code{\link{lc_input}}
 #' for more details about values). Should be \code{NULL} for \code{mouseout} or \code{marked} events.
+#' N.B. This function is called from the web page and therefore all element indices start from zero as it is
+#' used in JavaScript.
 #' @param id ID of the chart.
 #' @param layerId ID of the layer. You can get IDs of all charts and their layers with \code{\link{listCharts}}.
 #' @param event Type of event. Must be one of \code{"click", "mouseover", "mouseout", "marked", "labelClickRow", "labelClickCol"}.
 #' 
 #' @examples 
-#' x <- rnorm(50)
+#' \donttest{x <- rnorm(50)
 #' lc_scatter(x = x, y = 2*x + rnorm(50, 0.1), on_click = function(d) print(d))
-#' chartEvent(51, "Chart1", "Layer1", "click")
+#' chartEvent(51, "Chart1", "Layer1", "click")}
 #' 
 #' @export
 #' @importFrom utils type.convert
@@ -620,17 +623,17 @@ chartEvent <- function(d, id, layerId = "main", event) {
 #' \code{listCharts} prints a list of IDs of all existing charts and layers.
 #' 
 #' @examples 
-#' noise <- rnorm(30)
+#' \donttest{noise <- rnorm(30)
 #' x <- seq(-4, 4, length.out = 30)
 #' 
 #' lc_scatter(dat(x = x,
 #'                y = sin(x) + noise,
 #'                colourValue = noise), 
 #'            id = "plot", layerId = "points")
-#' lc_line(dat(x = x, y = sin(x)), id = "plot")
+#' lc_line(dat(x = x, y = sin(x)), id = "plot", addLayer = TRUE)
 #' lc_colourSlider(chart = "plot", layer = "points")
 #' 
-#' listCharts()
+#' listCharts()}
 #' @export
 listCharts <- function() {
   for(chartId in names(lc$charts)) {
@@ -659,16 +662,16 @@ listCharts <- function() {
 #' than one layer.
 #' 
 #' @return a vector of indices or, in case of heatmaps, an \emph{n x 2} matrix were first and
-#' second columns contain, respectively, row and colunm indices of the marked cells.
+#' second columns contain, respectively, row and column indices of the marked cells.
 #' 
 #' @examples
-#' data(iris)
+#' \donttest{data(iris)
 #' 
 #' lc_scatter(dat(x = iris$Sepal.Length, y = iris$Petal.Length))
 #' 
 #' #now mark some points by selecting them with your mouse with Shift pressed
 #' 
-#' getMarked("Chart1")
+#' getMarked("Chart1")}
 #' 
 #' @export
 getMarked <- function(chartId = NULL, layerId = NULL) {
@@ -719,7 +722,7 @@ getMarked <- function(chartId = NULL, layerId = NULL) {
 #' Mark elements of a chart
 #' 
 #' \code{mark} selects a set of elements in a given chart. It is equivalent to
-#' selecting elemnts interactively by drawing a rectangle with the mouse 
+#' selecting elements interactively by drawing a rectangle with the mouse 
 #' while holding the \code{Shift} key.
 #' 
 #' @param elements numeric vector of indices of the elements to select.
@@ -731,8 +734,11 @@ getMarked <- function(chartId = NULL, layerId = NULL) {
 #' called.
 #'
 #' @examples 
-#' data("iris")
+#' \donttest{data("iris")
 #' openPage(F, layout = "table1x2")
+#' 
+#' #brushing example
+#' #Hold Shift pressed and select a group of point on one of the charts
 #' 
 #' lc_scatter(dat(
 #'   x = iris$Sepal.Length,
@@ -750,7 +756,7 @@ getMarked <- function(chartId = NULL, layerId = NULL) {
 #'   on_marked = function() {
 #'     mark(getMarked("A2"), "A1")
 #'   }
-#' ), "A2")
+#' ), "A2")}
 #'
 #' @export
 mark <- function(elements, chartId = NULL, layerId = NULL, preventEvent = T) {
@@ -805,9 +811,9 @@ mark <- function(elements, chartId = NULL, layerId = NULL, preventEvent = T) {
 #' @param ... List of name values pair to define the properties. 
 #' 
 #' @examples 
-#' lc_scatter(dat(x = rnorm(30)), y = rnorm(30))
+#' \donttest{lc_scatter(dat(x = rnorm(30)), y = rnorm(30))
 #' #note that the Y values remain the same after each updateCharts call
-#' updateCharts()
+#' updateCharts()}
 #' 
 #' @export
 dat <- function( ... ) {
@@ -823,8 +829,8 @@ dat <- function( ... ) {
 #' Close an opened web page and clear the list of charts.
 #' 
 #' @examples 
-#' openPage(useViewer = F)
-#' closePage()
+#' \donttest{openPage(useViewer = F)
+#' closePage()}
 #' 
 #' @export
 closePage <- function() {
@@ -899,7 +905,7 @@ scatterDataFun <- function(l) {
 #' is the number of currently existing layers in this chart.
 #' @param addLayer whether to add a new layer or to replace the existing one. This argument influences the chart only if
 #' it has only one layer and the \code{layerId} is not defined. 
-#' @param pacerStep Time in ms between to consequentive calls of onmouseover event. Prevents overqueuing in case
+#' @param pacerStep Time in ms between two consecutive calls of an \code{onmouseover} event. Prevents overqueuing in case
 #' of cumbersome computations. May be important when the chart works in canvas mode.
 #' 
 #' @section Available properties: 
@@ -916,8 +922,8 @@ scatterDataFun <- function(l) {
 #' 
 #' Colour and shape settings
 #' \itemize{
-#'  \item \code{colour} - colour of the points. Must be a colour name or hexidecimal code.
-#'  \item \code{colourValue} - grouping values for different colours. Can be numbers or charachters.
+#'  \item \code{colour} - colour of the points. Must be a colour name or hexadecimal code.
+#'  \item \code{colourValue} - grouping values for different colours. Can be numbers or characters.
 #'  \item \code{colourDomain} - vector of all possible values for discrete colour scales 
 #'  or range of all possible colour values for the continuous ones.
 #'  \item \code{palette} - vector of colours to construct the colour scale.
@@ -928,7 +934,7 @@ scatterDataFun <- function(l) {
 #'  "Square", "Star", "Triangle", "Wye"}.
 #'  \item \code{symbolValue} - grouping values for different symbols.
 #'  \item \code{symbolLegendTitle} - title for the symbol value.
-#'  \item \code{stroke} - stroke colour for each element. Must be a colour name or hexidecimal code.
+#'  \item \code{stroke} - stroke colour for each element. Must be a colour name or hexadecimal code.
 #'  \item \code{strokeWidth} - width of the strokes for each point.} 
 #'  
 #' Axes settings
@@ -939,7 +945,7 @@ scatterDataFun <- function(l) {
 #'  points along one of the axes. 0 means no variation. 1 stands for distance between \code{x} and
 #'  \code{x + 1} for linear scale, \code{x} and \code{b*x} for logarithmic scale (\code{b} is a base
 #'  of the logarithm), and between neighbouring ticks for categorical scale.
-#'  \item \code{shiftX, shiftY} - shift for each poitn from its original position along one of the
+#'  \item \code{shiftX, shiftY} - shift for each point from its original position along one of the
 #'  axes. 0 means no shift. 1 stands for distance between \code{x} and
 #'  \code{x + 1} for linear scale, \code{x} and \code{b*x} for logarithmic scale (\code{b} is a base
 #'  of the logarithm), and between neighbouring ticks for categorical scale.
@@ -950,7 +956,7 @@ scatterDataFun <- function(l) {
 #'  \item \code{aspectRatio} - aspect ratio.
 #'  \item \code{axisTitleX, axisTitleY} - axes titles.
 #'  \item \code{ticksRotateX, ticksRotateY} - degrees of angle to rotate ticks. Must be between 
-#'  0 (horisontal ticks, default) and 90 (vertical ticks).
+#'  0 (horizontal ticks, default) and 90 (vertical ticks).
 #'  \item \code{ticksX, ticksY} - set of ticks for the axes.} 
 #'
 #' Interactivity settings
@@ -976,7 +982,7 @@ scatterDataFun <- function(l) {
 #'  \item \code{titleSize} - font-size of the chart title.
 #'  \item \code{showLegend} - whether or not to show the legend.
 #'  \item \code{showPanel} - whether of not to show the tools panel.
-#'  \item \code{transitionDuration} - duration of the transtions between any two states of the chart. If 0,
+#'  \item \code{transitionDuration} - duration of the transitions between any two states of the chart. If 0,
 #'  no animated transition is shown. It can be useful to turn the transition off, when lots of frequent 
 #'  changes happen to the chart.} 
 #' 
@@ -1114,11 +1120,11 @@ lineDataFun <- function(l) {
 #' 
 #' Colour settings
 #' \itemize{
-#'  \item \code{colour} - colour of the lines. Must be a colour name or hexidecimal code. For
+#'  \item \code{colour} - colour of the lines. Must be a colour name or hexadecimal code. For
 #'  \code{lc_ribbon} this property defined the colour of the ribbon, not the strokes.
-#'  \item \code{fill} - colour with wich to fill area inside the line. 
-#'  Must be a colour name or hexidecimal code.
-#'  \item \code{colourValue} - grouping values for different colours. Can be numbers or charachters.
+#'  \item \code{fill} - colour with which to fill area inside the line. 
+#'  Must be a colour name or hexadecimal code.
+#'  \item \code{colourValue} - grouping values for different colours. Can be numbers or characters.
 #'  \item \code{colourDomain} - vector of all possible values for discrete colour scales 
 #'  or range of all possible colour values for the continuous ones.
 #'  \item \code{palette} - vector of colours to construct the colour scale.
@@ -1126,7 +1132,7 @@ lineDataFun <- function(l) {
 #'  \item \code{addColourScaleToLegend} - whether or not to show colour legend for the current layer.
 #'  \item \code{globalColourScale} - whether or not to use one colour scale for all the layers.
 #'  \item \code{stroke} - (only for \code{lc_ribbon}) stroke colour for each ribbon. 
-#'  Must be a colour name or hexidecimal code.
+#'  Must be a colour name or hexadecimal code.
 #'  \item \code{strokeWidth} - (only for \code{lc_ribbon}) width of the strokes for each ribbon. }
 #'  
 #' Axes settings
@@ -1140,7 +1146,7 @@ lineDataFun <- function(l) {
 #'  \item \code{aspectRatio} - aspect ratio.
 #'  \item \code{axisTitleX, axisTitleY} - axes titles.
 #'  \item \code{ticksRotateX, ticksRotateY} - degrees of angle to rotate ticks. Must be between 
-#'  0 (horisontal ticks, default) and 90 (vertical ticks).
+#'  0 (horizontal ticks, default) and 90 (vertical ticks).
 #'  \item \code{ticksX, ticksY} - set of ticks for the axes.} 
 #'
 #' Interactivity settings
@@ -1166,7 +1172,7 @@ lineDataFun <- function(l) {
 #'  \item \code{titleSize} - font-size of the chart title.
 #'  \item \code{showLegend} - whether or not to show the legend.
 #'  \item \code{showPanel} - whether of not to show the tools panel.
-#'  \item \code{transitionDuration} - duration of the transtions between any two states of the chart. If 0,
+#'  \item \code{transitionDuration} - duration of the transitions between any two states of the chart. If 0,
 #'  no animated transition is shown. It can be useful to turn the transition off, when lots of frequent 
 #'  changes happen to the chart.
 #' } 
@@ -1362,15 +1368,15 @@ barDataFun <- function(l) {
 #' Style settings
 #' \itemize{
 #'  \item \code{opacity} - opacity of each bar|stack in the range from 0 to 1.
-#'  \item \code{colour} - colour of each bar|stack. Must be a colour name or hexidecimal code.
-#'  \item \code{colourValue} - grouping values for different colours. Can be numbers or charachters.
+#'  \item \code{colour} - colour of each bar|stack. Must be a colour name or hexadecimal code.
+#'  \item \code{colourValue} - grouping values for different colours. Can be numbers or characters.
 #'  \item \code{colourDomain} - vector of all possible values for discrete colour scales 
 #'  or range of all possible colour values for the continuous ones.
 #'  \item \code{palette} - vector of colours to construct the colour scale.
 #'  \item \code{colourLegendTitle} - title for the colour legend.
 #'  \item \code{addColourScaleToLegend} - whether or not to show colour legend for the current layer.
 #'  \item \code{globalColourScale} - whether or not to use one colour scale for all the layers.
-#'  \item \code{stroke} -  stroke colour of each bar|stack. Must be a colour name or hexidecimal code.
+#'  \item \code{stroke} -  stroke colour of each bar|stack. Must be a colour name or hexadecimal code.
 #'  \item \code{strokeWidth} - width of the strokes of each bar|stack. }
 #'  
 #' Axes settings
@@ -1384,7 +1390,7 @@ barDataFun <- function(l) {
 #'  \item \code{aspectRatio} - aspect ratio.
 #'  \item \code{axisTitleX, axisTitleY} - axes titles.
 #'  \item \code{ticksRotateX, ticksRotateY} - degrees of angle to rotate ticks. Must be between 
-#'  0 (horisontal ticks, default) and 90 (vertical ticks).
+#'  0 (horizontal ticks, default) and 90 (vertical ticks).
 #'  \item \code{ticksX, ticksY} - set of ticks for the axes.}
 #'
 #' Interactivity settings
@@ -1410,7 +1416,7 @@ barDataFun <- function(l) {
 #'  \item \code{titleSize} - font-size of the chart title.
 #'  \item \code{showLegend} - whether or not to show the legend. 
 #'  \item \code{showPanel} - whether of not to show the tools panel.
-#'  \item \code{transitionDuration} - duration of the transtions between any two states of the chart. If 0,
+#'  \item \code{transitionDuration} - duration of the transitions between any two states of the chart. If 0,
 #'  no animated transition is shown. It can be useful to turn the transition off, when lots of frequent 
 #'  changes happen to the chart.} 
 #'   
@@ -1543,7 +1549,7 @@ lc_dens <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL,
 #' @param id An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
 #' exists, a new layer will be added to it. If you want to replace one chart with another, use \code{\link{removeChart}}
 #' first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} is the number of currently existing charts.
-#' @param pacerStep Time in ms between to consequentive calls of onmouseover event. Prevents overqueuing in case
+#' @param pacerStep Time in ms between two consecutive calls of an \code{onmouseover} event. Prevents overqueuing in case
 #' of cumbersome computations. May be important when the chart works in canvas mode.
 #' 
 #' @section Available properties: 
@@ -1573,7 +1579,7 @@ lc_dens <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL,
 #'  
 #' Interactivity settings
 #' \itemize{
-#'  \item \code{on_click} - function, to be called, when one of the cells is clicked. Gets row and column idices 
+#'  \item \code{on_click} - function, to be called, when one of the cells is clicked. Gets row and column indices 
 #'  of the clicked cell as its arguments.
 #'  \item \code{on_mouseover} - function, to be called, when mouse hovers over one of the cells.
 #'  Gets row and column indices of the clicked cell as its arguments.
@@ -1594,7 +1600,7 @@ lc_dens <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL,
 #'  \item \code{titleSize} - font-size of the chart title.
 #'  \item \code{showLegend} - whether or not to show the legend.
 #'  \item \code{showPanel} - whether of not to show the tools panel.
-#'  \item \code{transitionDuration} - duration of the transtions between any two states of the chart. If 0,
+#'  \item \code{transitionDuration} - duration of the transitions between any two states of the chart. If 0,
 #'  no animated transition is shown. It can be useful to turn the transition off, when lots of frequent 
 #'  changes happen to the chart.} 
 #' @examples 
@@ -1737,7 +1743,7 @@ lc_abLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NUL
   })
 }
 
-#' @describeIn lc_line creates horisontal lines by y-intercept values
+#' @describeIn lc_line creates horizontal lines by y-intercept values
 #' @export
 lc_hLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = F) {
   setChart("xLine", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer, dataFun = function(l) {

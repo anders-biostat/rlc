@@ -2,7 +2,7 @@
 % Please edit documentation in R/lc.R
 \name{removeChart}
 \alias{removeChart}
-\title{Remove cahrt from the page}
+\title{Remove chart from the page}
 \usage{
 removeChart(id)
 }
@@ -13,7 +13,7 @@ removeChart(id)
 Removes an existing chart.
 }
 \examples{
-lc_scatter(dat(x = 1:10, y = 1:10 * 2), id = "scatter")
-removeChart("scatter") 
+\donttest{lc_scatter(dat(x = 1:10, y = 1:10 * 2), id = "scatter")
+removeChart("scatter")}
 
 }

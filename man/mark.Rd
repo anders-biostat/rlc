@@ -20,12 +20,15 @@ called.}
 }
 \description{
 \code{mark} selects a set of elements in a given chart. It is equivalent to
-selecting elemnts interactively by drawing a rectangle with the mouse
+selecting elements interactively by drawing a rectangle with the mouse
 while holding the \code{Shift} key.
 }
 \examples{
-data("iris")
+\donttest{data("iris")
 openPage(F, layout = "table1x2")
+
+#brushing example
+#Hold Shift pressed and select a group of point on one of the charts
 
 lc_scatter(dat(
   x = iris$Sepal.Length,
@@ -43,6 +46,6 @@ lc_scatter(dat(
   on_marked = function() {
     mark(getMarked("A2"), "A1")
   }
-), "A2")
+), "A2")}
 
 }

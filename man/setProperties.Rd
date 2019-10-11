@@ -20,13 +20,13 @@ Changes already defined properties or sets the new ones for an
 existing chart.
 }
 \examples{
-data("iris")
+\donttest{data("iris")
 lc_scatter(dat(x = iris$Sepal.Length, y = iris$Sepal.Width), id = "irisScatter")
 setProperties(dat(symbolValue = iris$Species, y = iris$Petal.Length), id = "irisScatter")
 updateCharts("irisScatter")
 
 lc_line(dat(x = iris$Sepal.Length, y = iris$Petal.Length), id = "irisScatter", layerId = "line")
 setProperties(dat(colour = "red"), id = "irisScatter", layerId = "line")
-updateCharts("irisScatter")
+updateCharts("irisScatter")}
 
 }

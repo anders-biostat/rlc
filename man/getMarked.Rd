@@ -14,7 +14,7 @@ than one layer.}
 }
 \value{
 a vector of indices or, in case of heatmaps, an \emph{n x 2} matrix were first and
-second columns contain, respectively, row and colunm indices of the marked cells.
+second columns contain, respectively, row and column indices of the marked cells.
 }
 \description{
 \code{getMarked} returns indices of the chart's elements that are currently
@@ -23,12 +23,12 @@ Double click on the chart while pressing the \emph{Shift} key will unmark all th
 elements.
 }
 \examples{
-data(iris)
+\donttest{data(iris)
 
 lc_scatter(dat(x = iris$Sepal.Length, y = iris$Petal.Length))
 
 #now mark some points by selecting them with your mouse with Shift pressed
 
-getMarked("Chart1")
+getMarked("Chart1")}
 
 }

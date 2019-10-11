@@ -10,15 +10,15 @@ listCharts()
 \code{listCharts} prints a list of IDs of all existing charts and layers.
 }
 \examples{
-noise <- rnorm(30)
+\donttest{noise <- rnorm(30)
 x <- seq(-4, 4, length.out = 30)
 
 lc_scatter(dat(x = x,
                y = sin(x) + noise,
                colourValue = noise), 
            id = "plot", layerId = "points")
-lc_line(dat(x = x, y = sin(x)), id = "plot")
+lc_line(dat(x = x, y = sin(x)), id = "plot", addLayer = TRUE)
 lc_colourSlider(chart = "plot", layer = "points")
 
-listCharts()
+listCharts()}
 }

@@ -14,7 +14,7 @@ a default web browser will be used.}
 \item{rootDirectory}{A path to the root directory of the server. If \code{rootDirectory} is not
 defined, the \code{http_root} in the package directory will be used as a root directory.}
 
-\item{startPage}{A path to the HTML file that should be opened, when the server is initialised.
+\item{startPage}{A path to the HTML file that should be opened, when the server is initialized.
 This can be an absolute path to a local file, or it can be relative from the \code{rootDirectory}
 or to the current R working directory. If \code{startPage} is not defined, this function opens an
 empty HTML page. The file must have \emph{.html} extension.}
@@ -22,7 +22,7 @@ empty HTML page. The file must have \emph{.html} extension.}
 \item{layout}{Adds one of the defaults layouts to the page. Currently, only tables of arbitrary
 size are supported. To add a table set this parameter to \code{tableNxM}, where \code{N} is the
 number of rows and \code{M} is the number of columns. Each cell will get an ID that consists of
-a letter (inticating the row) and a number (indicating the column) (e.g. \code{B3} is an ID of
+a letter (indicating the row) and a number (indicating the column) (e.g. \code{B3} is an ID of
 the second row and third column).}
 
 \item{newPage}{Determines whether or not to open a new page. If \code{FALSE}, one can add
@@ -31,13 +31,13 @@ interactive charts to another apps, created the with \code{\link{jrc}} package.}
 \item{...}{Further arguments passed to \code{\link[jrc]{openPage}}.}
 }
 \description{
-\code{openPage} creates a server, establishes a websocket connection between it and the current
+\code{openPage} creates a server, establishes a web socket connection between it and the current
 R session and loads linked-charts JS library with all the dependencies. If there is already an
 opened page, it will be automatically closed.
 }
 \examples{
-openPage()
+\donttest{openPage()
 
-openPage(useViewer = F, layout = "table2x3")
+openPage(useViewer = F, layout = "table2x3")}
 
 }

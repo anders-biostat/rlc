@@ -16,8 +16,8 @@ will be automatically reevaluated and the chart will be changed accordingly. One
 put properties outside of the \code{dat} function, if they are going to be constant.
 }
 \examples{
-lc_scatter(dat(x = rnorm(30)), y = rnorm(30))
+\donttest{lc_scatter(dat(x = rnorm(30)), y = rnorm(30))
 #note that the Y values remain the same after each updateCharts call
-updateCharts()
+updateCharts()}
 
 }

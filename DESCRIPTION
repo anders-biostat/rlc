@@ -1,13 +1,17 @@
 Package: rlc
 Type: Package
-Title: Use linked-charts from R
-Version: 0.0.1
-Date: 2017-07-31
-Author: Simon Anders, Svetlana Ovchinnikova 
-Maintainer: Simon Anders <sanders@fs.tum.de>
-Description: to be filled in
-License: GPL-3+
-Imports: httpuv, jsonlite, stringr, hwriter, jrc
+Title: Create interactive linked charts with minimal code
+Version: 0.1.0
+Date: 2019-10-11
+Authors@R: c(
+	person("Svetlana", "Ovchinnikova", role = c("aut", "cre"), email = "s.ovchinnikova@zmbh.uni-heidelberg.de"),
+	person("Simon", "Anders", role = c("aut"), email = "sanders@fs.tum.de")
+	)
+Description: An easy-to-use tool to employ interactivity in every-day exploratory analysis. It contains 
+	a collection of most commonly used types of charts (such as scatter plots, line plots, heatmaps, bar charts),
+	which can be linked to each other or to other interactive elements with just few lines of code.
+License: GPL-3
+Imports: httpuv, jsonlite, stringr, hwriter, jrc(>= 0.2.0)
 NeedsCompilation: no
 RoxygenNote: 6.1.1
 Roxygen: list(markdown = TRUE)

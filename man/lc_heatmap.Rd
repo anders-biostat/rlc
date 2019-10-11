@@ -21,7 +21,7 @@ constant. These properties can still be changed later using the \code{\link{setP
 exists, a new layer will be added to it. If you want to replace one chart with another, use \code{\link{removeChart}}
 first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} is the number of currently existing charts.}
 
-\item{pacerStep}{Time in ms between to consequentive calls of onmouseover event. Prevents overqueuing in case
+\item{pacerStep}{Time in ms between two consecutive calls of an \code{onmouseover} event. Prevents overqueuing in case
 of cumbersome computations. May be important when the chart works in canvas mode.}
 }
 \description{
@@ -56,7 +56,7 @@ be clamped to its edges.}
 
 Interactivity settings
 \itemize{
-\item \code{on_click} - function, to be called, when one of the cells is clicked. Gets row and column idices
+\item \code{on_click} - function, to be called, when one of the cells is clicked. Gets row and column indices
 of the clicked cell as its arguments.
 \item \code{on_mouseover} - function, to be called, when mouse hovers over one of the cells.
 Gets row and column indices of the clicked cell as its arguments.
@@ -77,7 +77,7 @@ Global chart settings
 \item \code{titleSize} - font-size of the chart title.
 \item \code{showLegend} - whether or not to show the legend.
 \item \code{showPanel} - whether of not to show the tools panel.
-\item \code{transitionDuration} - duration of the transtions between any two states of the chart. If 0,
+\item \code{transitionDuration} - duration of the transitions between any two states of the chart. If 0,
 no animated transition is shown. It can be useful to turn the transition off, when lots of frequent
 changes happen to the chart.}
 }

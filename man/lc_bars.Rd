@@ -47,15 +47,15 @@ You can read more about different properties
 Style settings
 \itemize{
 \item \code{opacity} - opacity of each bar|stack in the range from 0 to 1.
-\item \code{colour} - colour of each bar|stack. Must be a colour name or hexidecimal code.
-\item \code{colourValue} - grouping values for different colours. Can be numbers or charachters.
+\item \code{colour} - colour of each bar|stack. Must be a colour name or hexadecimal code.
+\item \code{colourValue} - grouping values for different colours. Can be numbers or characters.
 \item \code{colourDomain} - vector of all possible values for discrete colour scales
 or range of all possible colour values for the continuous ones.
 \item \code{palette} - vector of colours to construct the colour scale.
 \item \code{colourLegendTitle} - title for the colour legend.
 \item \code{addColourScaleToLegend} - whether or not to show colour legend for the current layer.
 \item \code{globalColourScale} - whether or not to use one colour scale for all the layers.
-\item \code{stroke} -  stroke colour of each bar|stack. Must be a colour name or hexidecimal code.
+\item \code{stroke} -  stroke colour of each bar|stack. Must be a colour name or hexadecimal code.
 \item \code{strokeWidth} - width of the strokes of each bar|stack. }
 
 Axes settings
@@ -69,7 +69,7 @@ is automatically set to include all layer domains.
 \item \code{aspectRatio} - aspect ratio.
 \item \code{axisTitleX, axisTitleY} - axes titles.
 \item \code{ticksRotateX, ticksRotateY} - degrees of angle to rotate ticks. Must be between
-0 (horisontal ticks, default) and 90 (vertical ticks).
+0 (horizontal ticks, default) and 90 (vertical ticks).
 \item \code{ticksX, ticksY} - set of ticks for the axes.}
 
 Interactivity settings
@@ -95,7 +95,7 @@ Global chart settings
 \item \code{titleSize} - font-size of the chart title.
 \item \code{showLegend} - whether or not to show the legend.
 \item \code{showPanel} - whether of not to show the tools panel.
-\item \code{transitionDuration} - duration of the transtions between any two states of the chart. If 0,
+\item \code{transitionDuration} - duration of the transitions between any two states of the chart. If 0,
 no animated transition is shown. It can be useful to turn the transition off, when lots of frequent
 changes happen to the chart.}
 }

@@ -32,7 +32,7 @@ is the number of currently existing layers in this chart.}
 \item{addLayer}{whether to add a new layer or to replace the existing one. This argument influences the chart only if
 it has only one layer and the \code{layerId} is not defined.}
 
-\item{pacerStep}{Time in ms between to consequentive calls of onmouseover event. Prevents overqueuing in case
+\item{pacerStep}{Time in ms between two consecutive calls of an \code{onmouseover} event. Prevents overqueuing in case
 of cumbersome computations. May be important when the chart works in canvas mode.}
 }
 \description{
@@ -63,8 +63,8 @@ which of the axes should not be changed. Must be \code{"x"} or \code{"y"}.}
 
 Colour and shape settings
 \itemize{
-\item \code{colour} - colour of the points. Must be a colour name or hexidecimal code.
-\item \code{colourValue} - grouping values for different colours. Can be numbers or charachters.
+\item \code{colour} - colour of the points. Must be a colour name or hexadecimal code.
+\item \code{colourValue} - grouping values for different colours. Can be numbers or characters.
 \item \code{colourDomain} - vector of all possible values for discrete colour scales
 or range of all possible colour values for the continuous ones.
 \item \code{palette} - vector of colours to construct the colour scale.
@@ -75,7 +75,7 @@ or range of all possible colour values for the continuous ones.
  "Square", "Star", "Triangle", "Wye"}.
 \item \code{symbolValue} - grouping values for different symbols.
 \item \code{symbolLegendTitle} - title for the symbol value.
-\item \code{stroke} - stroke colour for each element. Must be a colour name or hexidecimal code.
+\item \code{stroke} - stroke colour for each element. Must be a colour name or hexadecimal code.
 \item \code{strokeWidth} - width of the strokes for each point.}
 
 Axes settings
@@ -86,7 +86,7 @@ If 0 or \code{FALSE} no transformation will be performed.
 points along one of the axes. 0 means no variation. 1 stands for distance between \code{x} and
 \code{x + 1} for linear scale, \code{x} and \code{b*x} for logarithmic scale (\code{b} is a base
 of the logarithm), and between neighbouring ticks for categorical scale.
-\item \code{shiftX, shiftY} - shift for each poitn from its original position along one of the
+\item \code{shiftX, shiftY} - shift for each point from its original position along one of the
 axes. 0 means no shift. 1 stands for distance between \code{x} and
 \code{x + 1} for linear scale, \code{x} and \code{b*x} for logarithmic scale (\code{b} is a base
 of the logarithm), and between neighbouring ticks for categorical scale.
@@ -97,7 +97,7 @@ is automatically set to include all layer domains.
 \item \code{aspectRatio} - aspect ratio.
 \item \code{axisTitleX, axisTitleY} - axes titles.
 \item \code{ticksRotateX, ticksRotateY} - degrees of angle to rotate ticks. Must be between
-0 (horisontal ticks, default) and 90 (vertical ticks).
+0 (horizontal ticks, default) and 90 (vertical ticks).
 \item \code{ticksX, ticksY} - set of ticks for the axes.}
 
 Interactivity settings
@@ -123,7 +123,7 @@ Global chart settings
 \item \code{titleSize} - font-size of the chart title.
 \item \code{showLegend} - whether or not to show the legend.
 \item \code{showPanel} - whether of not to show the tools panel.
-\item \code{transitionDuration} - duration of the transtions between any two states of the chart. If 0,
+\item \code{transitionDuration} - duration of the transitions between any two states of the chart. If 0,
 no animated transition is shown. It can be useful to turn the transition off, when lots of frequent
 changes happen to the chart.}
 }

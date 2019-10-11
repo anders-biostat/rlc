@@ -9,7 +9,9 @@ chartEvent(d, id, layerId = "main", event)
 \arguments{
 \item{d}{ID of an element that triggered the event. May be index of a point or line, vector or
 row and column indices for a heatmap, value of an input block (please, check \code{\link{lc_input}}
-for more details about values). Should be \code{NULL} for \code{mouseout} or \code{marked} events.}
+for more details about values). Should be \code{NULL} for \code{mouseout} or \code{marked} events.
+N.B. This function is called from the web page and therefore all element indices start from zero as it is
+used in JavaScript.}
 
 \item{id}{ID of the chart.}
 
@@ -20,13 +22,13 @@ for more details about values). Should be \code{NULL} for \code{mouseout} or \co
 \description{
 This function is called whenever user clicks, selects or hover over elements of a chart. In turn,
 it calls a corresponding callback function, if any was specified by the user. This function
-is meant to be used internally. However an experienced user can still use it to custumise app
-behaviour in some complicated cases. This function can also emulate events triggered by non-existing
+is meant to be used internally. However, an experienced user can still use it to customize app
+behavior in some complicated cases. This function can also emulate events triggered by non-existing
 elements.
 }
 \examples{
-x <- rnorm(50)
+\donttest{x <- rnorm(50)
 lc_scatter(x = x, y = 2*x + rnorm(50, 0.1), on_click = function(d) print(d))
-chartEvent(51, "Chart1", "Layer1", "click")
+chartEvent(51, "Chart1", "Layer1", "click")}
 
 }

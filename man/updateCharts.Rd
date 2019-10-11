@@ -27,10 +27,10 @@ etc.). This argument can specify which part of chart to update. Possible options
 to date with the current state of the environment.
 }
 \details{
-Linked charts of the \emph{rlc} package are based on the idea that variables
-used to define the chart are not constant, but can change as a result of user's
-actions. Each time the \code{updateCharts} is called, all the properties passed
-via \code{\link{dat}} function are reevaluated and cahrt is changed in accordance with the
+Linked charts of the \emph{rlc} package are based on the idea that the variables
+used to define a chart are not constant, but can change as a result of user's
+actions. Each time the \code{updateCharts} function is called, all the properties passed
+via \code{\link{dat}} function are reevaluated and the chart is changed in accordance with the
 new state.
 }
 \section{Update types}{
@@ -45,7 +45,7 @@ These are valid for all the charts:
 of all its elements).
 \item \code{Title} changes the title of the chart.
 \item \code{Canvas} If number of elements is too high the
-charts switch to the canvas mode and istead of multiple SVG point or cells
+charts switch to the canvas mode and instead of multiple SVG point or cells
 a single Canvas image is generated. This type of update redraws the Canvas
 image. \emph{It is not recommended to use this function.}
 }
@@ -80,7 +80,7 @@ of the layer.
 }
 
 \examples{
-data(iris)
+\donttest{data(iris)
 
 #store some properties in global variables
 width <- 300
@@ -102,6 +102,6 @@ updateCharts("iris", updateOnly = "Size")
 #add another property
 setProperties(dat(symbolValue = iris$Species), "iris")
 #this will change only colour and symbols
-updateCharts("iris", updateOnly = "ElementStyle")
+updateCharts("iris", updateOnly = "ElementStyle")}
 
 }
