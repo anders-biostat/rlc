@@ -116,6 +116,9 @@ lc$charts <- list()
 #' number of rows and \code{M} is the number of columns. Each cell will get an ID that consists of 
 #' a letter (inticating the row) and a number (indicating the column) (e.g. \code{B3} is an ID of 
 #' the second row and third column).
+#' @param newPage Determines whether or not to open a new page. If \code{FALSE}, one can add 
+#' interactive charts to another apps, created the with \code{\link{jrc}} package.
+#' @param ... Further arguments passed to \code{\link[jrc]{openPage}}.
 #' 
 #' @examples
 #' openPage()
@@ -124,14 +127,14 @@ lc$charts <- list()
 #' 
 #' @export
 #' @importFrom later run_now
-openPage <- function(useViewer = T, rootDirectory = NULL, startPage = NULL, layout = NULL, newPage = TRUE) {
+openPage <- function(useViewer = T, rootDirectory = NULL, startPage = NULL, layout = NULL, newPage = TRUE, ...) {
   
   lc$charts <- list()
   lc$pageOpened <- F
   lc$useViewer <- useViewer
   if(newPage == TRUE){
     jrc::openPage(useViewer = useViewer, rootDirectory = rootDirectory, startPage = startPage, 
-                  allowedFunctions = "chartEvent", allowedVariables = c("marked", "s1", "s2"))
+                  allowedFunctions = "chartEvent", allowedVariables = c("marked", "s1", "s2"), ...)
     jrc::limitStorage(n = 0)
     
   }
@@ -187,7 +190,7 @@ openPage <- function(useViewer = T, rootDirectory = NULL, startPage = NULL, layo
 #' a letter (inticating the row) and a number (indicating the column) (e.g. \code{B3} is an ID of 
 #' the second row and third column).
 #' 
-#' @param layout Type of the layout. See 'Details' for more information.
+#' @param layoutName Type of the layout. See 'Details' for more information.
 #' 
 #' @examples 
 #' addDefaultLayout("table3x2")
@@ -554,9 +557,29 @@ setChart <- function(.type, data, ..., place, id, layerId, dataFun, addLayer, pa
   invisible(chart)
 }
 
+#' Trigger an event
+#' 
+#' This function is called whenever user clicks, selects or hover over elements of a chart. In turn,
+#' it calls a corresponding callback function, if any was specified by the user. This function
+#' is meant to be used internally. However an experienced user can still use it to custumise app
+#' behaviour in some complicated cases. This function can also emulate events triggered by non-existing
+#' elements.
+#' 
+#' @param d ID of an element that triggered the event. May be index of a point or line, vector or
+#' row and column indices for a heatmap, value of an input block (please, check \code{\link{lc_input}}
+#' for more details about values). Should be \code{NULL} for \code{mouseout} or \code{marked} events.
+#' @param id ID of the chart.
+#' @param layerId ID of the layer. You can get IDs of all charts and their layers with \code{\link{listCharts}}.
+#' @param event Type of event. Must be one of \code{"click", "mouseover", "mouseout", "marked", "labelClickRow", "labelClickCol"}.
+#' 
+#' @examples 
+#' x <- rnorm(50)
+#' lc_scatter(x = x, y = 2*x + rnorm(50, 0.1), on_click = function(d) print(d))
+#' chartEvent(51, "Chart1", "Layer1", "click")
+#' 
 #' @export
 #' @importFrom utils type.convert
-chartEvent <- function(d, id, layerId, event) {
+chartEvent <- function(d, id, layerId = "main", event) {
   
   if(length(d) == 1)
     if(d == "NULL")
@@ -1800,6 +1823,54 @@ lc_html <- function(data = list(), place = NULL, ..., id = NULL) {
     l
   })
 }
+
+#' Add input forms to the page
+#'
+#' \code{lc_input} adds an input form. This function is an rlc wrapper for an
+#' HTML \code{<input>} tag. Five types of input are supported: \code{"text", "range", "checkbox", "radio" and "button"}.
+#' 
+#' @section Available properties: 
+#' You can read more about different properties 
+#' \href{https://anders-biostat.github.io/linked-charts/rlc/tutorials/props.html}{here}.
+#' 
+#' \itemize{
+#'  \item \code{type} - type of input. Must be one of \code{"text", "range", "checkbox", "radio", "button"}
+#'  \item \code{value} - current state of the input block. For radio buttons it is an idex of the checked
+#'  button. For checkboxes - a vector of \code{TRUE} (for each checked box) and \code{FALSE} (for each unchecked one),
+#'  for ranges and textfiels - a vector of values for each text field or slider.
+#'  \item \code{step} (only for \code{type = "range"}) - stepping interval for values that can be selected with a slider.
+#'  Must be a numeric vector with one value for each slider in the input block.
+#'  \item \code{min, max} (only for \code{type = "range"}) - minimal and maximal values that can be selected with a slider.
+#'  Must be a numeric vector with one value for each slider in the input block.
+#'  }
+#'  
+#' Interactivity settings
+#' \itemize{
+#'   \item \code{on_click, on_change} - function, to be called, when user clicks on a button, enters text in a text field
+#'   or moves a slider. The two properties are complete synonymes and can replace one another.
+#' }
+#'  
+#' Global chart settings
+#' \itemize{
+#'  \item \code{title} - title of the input block.
+#'  \item \code{width} - width of the chart in pixels. By default, the entire content will be displayed.
+#'  If width is defined and it's smaller than content's width, scrolling will be possible.
+#'  \item \code{heigth} - height of the chart in pixels. By default, the entire content will be displayed.
+#'  If height is defined and it's smaller than content's height, scrolling will be possible.
+#'  \item \code{paddings} - paddings size in pixels. Must be a list with all the following fields: 
+#'  \code{"top", "bottom", "left", "right"}.
+#'
+#'@examples
+#' \donttest{lc_input(type = "checkbox", labels = paste0("el", 1:5), on_click = function(value) print(value),
+#' value = T)
+#' lc_input(type = "radio", labels = paste0("el", 1:5), on_click = function(value) print(value),
+#'          value = 1)
+#' lc_input(type = "text", labels = paste0("el", 1:5), on_click = function(value) print(value),
+#'          value = c("a", "b", "c", "e", "d"))
+#' lc_input(type = "range", labels = paste0("el", 1:5), on_click = function(value) print(value),
+#'          value = 10, max = c(10, 20, 30, 40, 50), step = c(0.5, 0.1, 1, 5, 25))
+#' lc_input(type = "button", labels = paste0("el", 1:5), on_click = function(value) print(value))}
+#'
 #' @export
 lc_input <- function(data = list(), place = NULL, ..., id = NULL) {
   setChart("input", data, ..., place = place, id = id, layerId = "main", dataFun = function(l){

@@ -7,7 +7,7 @@
 addDefaultLayout(layoutName)
 }
 \arguments{
-\item{layout}{Type of the layout. See 'Details' for more information.}
+\item{layoutName}{Type of the layout. See 'Details' for more information.}
 }
 \description{
 \code{addDefaultLayout} adds a layout that can be later used to arrange charts on the page (by
