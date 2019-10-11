@@ -117,7 +117,7 @@ lc$charts <- list()
 #' a letter (indicating the row) and a number (indicating the column) (e.g. \code{B3} is an ID of 
 #' the second row and third column).
 #' @param newPage Determines whether or not to open a new page. If \code{FALSE}, one can add 
-#' interactive charts to another apps, created the with \code{\link{jrc}} package.
+#' interactive charts to another apps, created the with \code{jrc} package.
 #' @param ... Further arguments passed to \code{\link[jrc]{openPage}}.
 #' 
 #' @examples
@@ -1793,7 +1793,7 @@ lc_vLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL
 #' @param id An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
 #' exists, a new layer will be added to it. If you want to replace one chart with another, use \code{\link{removeChart}}
 #' first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} is the number of currently existing charts.
-#' 
+#'
 #' @section Available properties: 
 #' You can read more about different properties 
 #' \href{https://anders-biostat.github.io/linked-charts/rlc/tutorials/props.html}{here}.
@@ -1809,7 +1809,7 @@ lc_vLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL
 #'  \item \code{heigth} - height of the chart in pixels. By default, the entire content will be displayed.
 #'  If height is defined and it's smaller than content's height, scrolling will be possible.
 #'  \item \code{paddings} - paddings size in pixels. Must be a list with all the following fields: 
-#'  \code{"top", "bottom", "left", "right"}.
+#'  \code{"top", "bottom", "left", "right"}. }
 #'  
 #' @examples
 #' \donttest{lc_html(content = "Some <b>HTML</b> <br> <i>code</i>.")
@@ -1835,6 +1835,16 @@ lc_html <- function(data = list(), place = NULL, ..., id = NULL) {
 #'
 #' \code{lc_input} adds an input form. This function is an rlc wrapper for an
 #' HTML \code{<input>} tag. Five types of input are supported: \code{"text", "range", "checkbox", "radio" and "button"}.
+#' 
+#' @param data Name value pairs of properties, passed through the \code{\link{dat}} function. These
+#' properties will be reevaluated on each \code{\link{updateCharts}} call. 
+#' @param place An ID of a container, where to place the chart. Will be ignored if the chart already
+#' exists. If not defined, the chart will be placed directly in the body of the opened page.
+#' @param ... Name value pairs of properties that can be evaluated only once and then will remain 
+#' constant. These properties can still be changed later using the \code{\link{setProperties}} function
+#' @param id An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
+#' exists, a new layer will be added to it. If you want to replace one chart with another, use \code{\link{removeChart}}
+#' first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} is the number of currently existing charts.
 #' 
 #' @section Available properties: 
 #' You can read more about different properties 
@@ -1865,7 +1875,7 @@ lc_html <- function(data = list(), place = NULL, ..., id = NULL) {
 #'  \item \code{heigth} - height of the chart in pixels. By default, the entire content will be displayed.
 #'  If height is defined and it's smaller than content's height, scrolling will be possible.
 #'  \item \code{paddings} - paddings size in pixels. Must be a list with all the following fields: 
-#'  \code{"top", "bottom", "left", "right"}.
+#'  \code{"top", "bottom", "left", "right"}.}
 #'
 #'@examples
 #' \donttest{lc_input(type = "checkbox", labels = paste0("el", 1:5), on_click = function(value) print(value),

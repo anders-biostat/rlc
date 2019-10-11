@@ -26,7 +26,7 @@ a letter (indicating the row) and a number (indicating the column) (e.g. \code{B
 the second row and third column).}
 
 \item{newPage}{Determines whether or not to open a new page. If \code{FALSE}, one can add
-interactive charts to another apps, created the with \code{\link{jrc}} package.}
+interactive charts to another apps, created the with \code{jrc} package.}
 
 \item{...}{Further arguments passed to \code{\link[jrc]{openPage}}.}
 }
