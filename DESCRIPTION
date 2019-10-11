@@ -11,7 +11,7 @@ Description: An easy-to-use tool to employ interactivity in every-day explorator
 	a collection of most commonly used types of charts (such as scatter plots, line plots, heatmaps, bar charts),
 	which can be linked to each other or to other interactive elements with just few lines of code.
 License: GPL-3
-Imports: httpuv, jsonlite, stringr, hwriter, jrc(>= 0.2.0)
+Imports: httpuv, jsonlite, stringr, hwriter, jrc(>= 0.2.0), plyr
 NeedsCompilation: no
 RoxygenNote: 6.1.1
 Roxygen: list(markdown = TRUE)

@@ -126,7 +126,7 @@ lc$charts <- list()
 #' openPage(useViewer = F, layout = "table2x3")}
 #' 
 #' @export
-#' @importFrom later run_now
+#' @importFrom httpuv service
 openPage <- function(useViewer = T, rootDirectory = NULL, startPage = NULL, layout = NULL, newPage = TRUE, ...) {
   
   lc$charts <- list()
@@ -158,7 +158,7 @@ openPage <- function(useViewer = T, rootDirectory = NULL, startPage = NULL, layo
                     "script.onload = function() {jrc.sendData('s2', 1)};",                    
                     "document.head.appendChild(script);", collapse = "\n"))
   for( i in 1:(10/0.05) ) {
-    run_now()
+    service()
     if( s1 == 1 & s2 == 1) {
       setEnvironment(globalenv())
       break
@@ -700,7 +700,7 @@ getMarked <- function(chartId = NULL, layerId = NULL) {
   setEnvironment(environment()) 
   sendCommand(str_interp("rlc.getMarked('${chartId}', '${layerId}')"))
   for( i in 1:(5/0.05) ) {
-    run_now()
+    service()
     if(!is.null(marked)) {
       setEnvironment(globalenv())
       break
