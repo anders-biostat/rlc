@@ -981,7 +981,7 @@ scatterDataFun <- function(l) {
 #'  changes happen to the chart.} 
 #' 
 #' @examples
-#' data("iris")
+#' \donttest{data("iris")
 #' lc_scatter(dat(x = iris$Sepal.Length, 
 #'                y = iris$Petal.Length,
 #'                colourValue = iris$Petal.Width,
@@ -998,7 +998,7 @@ scatterDataFun <- function(l) {
 #'             title = "Iris dataset",
 #'             axisTitleY = "Sepal Length",
 #'             axisTitleX = "Species",
-#'             colourLegendTitle = "Sepal Width")
+#'             colourLegendTitle = "Sepal Width")}
 #' @export
 lc_scatter <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = F, pacerStep = 50) {
   setChart("scatter", data, ...,  place = place, id = id, layerId = layerId, dataFun = scatterDataFun, addLayer = addLayer,
@@ -1172,7 +1172,7 @@ lineDataFun <- function(l) {
 #' } 
 #' 
 #' @examples 
-#' x <- seq(0, 8, 0.2)
+#' \donttest{x <- seq(0, 8, 0.2)
 #' lc_line(dat(x = x, y = cbind(cos(x), sin(x)),
 #'             aspectRatio = 1,
 #'             colour = c("blue", "red"),
@@ -1194,11 +1194,11 @@ lineDataFun <- function(l) {
 #'               ymax = pred$fit + 1.96 * pred$se.fit,
 #'               x = x,
 #'               colour = "#555555"), id = "ribbonTest")
-#' lc_scatter(dat(x = x, y = y), size = 2, id = "ribbonTest")
-#' lc_abLine(dat(a = fit$coefficients[2], b = fit$coefficients[1]), id = "ribbonTest")
+#' lc_scatter(dat(x = x, y = y), size = 2, id = "ribbonTest", addLayer = TRUE)
+#' lc_abLine(dat(a = fit$coefficients[2], b = fit$coefficients[1]), id = "ribbonTest", addLayer = TRUE)
 #' 
 #' lc_hLine(dat(h = seq(1, 9, 1), domainX = c(0, 10), domainY = c(0, 10)), id = "grid")
-#' lc_vLine(dat(v = seq(1, 9, 1)), id = "grid")
+#' lc_vLine(dat(v = seq(1, 9, 1)), id = "grid", addLayer = TRUE)}
 #' 
 #' @export
 lc_line <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = F) {
@@ -1415,7 +1415,7 @@ barDataFun <- function(l) {
 #'  changes happen to the chart.} 
 #'   
 #' @examples 
-#' data("esoph")
+#' \donttest{data("esoph")
 #' 
 #' lc_bars(dat(value = tapply(esoph$ncases, esoph$agegp, sum), 
 #'             title = "Number of cases per age group",
@@ -1425,7 +1425,7 @@ barDataFun <- function(l) {
 #' lc_bars(dat(value = c(tapply(esoph$ncases, esoph$agegp, sum), tapply(esoph$ncontrols, esoph$agegp, sum)),
 #'             stackIds = c(rep("case", 6), rep("control", 6))))
 #' 
-#' #It is ease to put data in a convenient form for barplots using tidyverse
+#' #It is easy to put data in a convenient form for barplots using tidyverse
 #' library(tidyverse)
 #' 
 #' esoph %>%
@@ -1437,7 +1437,7 @@ barDataFun <- function(l) {
 #' lc_bars(dat(value = newData$ncases,
 #'             stackIds = newData$type,
 #'             barIds = newData$alcgp,
-#'             groupIds = newData$agegp))
+#'             groupIds = newData$agegp))}
 #' 
 #' @export
 lc_bars <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = F) {
@@ -1476,8 +1476,9 @@ lc_bars <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL,
 #' @describeIn lc_hist makes a histogram. It is an extension of \code{\link{lc_bars}}.
 #' 
 #' @examples
+#' \donttest{
 #' lc_hist(dat(value = rnorm(1000), nbins = 30, height = 300))
-#' lc_dens(dat(value = rnorm(1000), height = 300))
+#' lc_dens(dat(value = rnorm(1000), height = 300)) }
 #' 
 #' @export 
 lc_hist <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = F) {
@@ -1680,7 +1681,7 @@ lc_heatmap <- function(data = list(), place = NULL, ..., id = NULL, pacerStep = 
 #'  \item \code{titleSize} - font-size of the chart title.} 
 #' 
 #' @examples 
-#' data("iris")
+#' \donttest{data("iris")
 #' lc_scatter(dat(x = iris$Sepal.Length, 
 #'                y = iris$Petal.Length,
 #'                colourValue = iris$Petal.Width,
@@ -1693,7 +1694,7 @@ lc_heatmap <- function(data = list(), place = NULL, ..., id = NULL, pacerStep = 
 #'            showLegend = F,
 #'            id = "scatter")
 #' 
-#' lc_colourSlider(chart = "scatter")
+#' lc_colourSlider(chart = "scatter")}
 #' 
 #' @export
 lc_colourSlider <- function(data = list(), place = NULL, ..., id = NULL) {
@@ -1805,10 +1806,10 @@ lc_vLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL
 #'  \code{"top", "bottom", "left", "right"}.
 #'  
 #' @examples
-#' lc_html(content = "Some <b>HTML</b> <br> <i>code</i>.")
+#' \donttest{lc_html(content = "Some <b>HTML</b> <br> <i>code</i>.")
 #' lc_html(dat(content = matrix(1:12, nrow = 4)))
 #' data(iris)
-#' lc_html(content = iris, height = 200)
+#' lc_html(content = iris, height = 200)}
 #' 
 #' @export
 #' @importFrom hwriter hwrite

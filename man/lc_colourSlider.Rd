@@ -48,7 +48,7 @@ Global chart settings
 }
 
 \examples{
-data("iris")
+\donttest{data("iris")
 lc_scatter(dat(x = iris$Sepal.Length, 
                y = iris$Petal.Length,
                colourValue = iris$Petal.Width,
@@ -61,6 +61,6 @@ lc_scatter(dat(x = iris$Sepal.Length,
            showLegend = F,
            id = "scatter")
 
-lc_colourSlider(chart = "scatter")
+lc_colourSlider(chart = "scatter")}
 
 }

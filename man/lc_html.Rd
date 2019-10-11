@@ -25,9 +25,9 @@ first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} i
 to transform some data structures (e.g. data frames) to HTML tables.
 }
 \examples{
-lc_html(content = "Some <b>HTML</b> <br> <i>code</i>.")
+\donttest{lc_html(content = "Some <b>HTML</b> <br> <i>code</i>.")
 lc_html(dat(content = matrix(1:12, nrow = 4)))
 data(iris)
-lc_html(content = iris, height = 200)
+lc_html(content = iris, height = 200)}
 
 }

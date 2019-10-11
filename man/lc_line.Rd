@@ -145,7 +145,7 @@ changes happen to the chart.
 }
 
 \examples{
-x <- seq(0, 8, 0.2)
+\donttest{x <- seq(0, 8, 0.2)
 lc_line(dat(x = x, y = cbind(cos(x), sin(x)),
             aspectRatio = 1,
             colour = c("blue", "red"),
@@ -167,10 +167,10 @@ lc_ribbon(dat(ymin = pred$fit - 1.96 * pred$se.fit,
               ymax = pred$fit + 1.96 * pred$se.fit,
               x = x,
               colour = "#555555"), id = "ribbonTest")
-lc_scatter(dat(x = x, y = y), size = 2, id = "ribbonTest")
-lc_abLine(dat(a = fit$coefficients[2], b = fit$coefficients[1]), id = "ribbonTest")
+lc_scatter(dat(x = x, y = y), size = 2, id = "ribbonTest", addLayer = TRUE)
+lc_abLine(dat(a = fit$coefficients[2], b = fit$coefficients[1]), id = "ribbonTest", addLayer = TRUE)
 
 lc_hLine(dat(h = seq(1, 9, 1), domainX = c(0, 10), domainY = c(0, 10)), id = "grid")
-lc_vLine(dat(v = seq(1, 9, 1)), id = "grid")
+lc_vLine(dat(v = seq(1, 9, 1)), id = "grid", addLayer = TRUE)}
 
 }

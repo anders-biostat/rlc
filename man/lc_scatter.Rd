@@ -129,7 +129,7 @@ changes happen to the chart.}
 }
 
 \examples{
-data("iris")
+\donttest{data("iris")
 lc_scatter(dat(x = iris$Sepal.Length, 
                y = iris$Petal.Length,
                colourValue = iris$Petal.Width,
@@ -146,5 +146,5 @@ lc_beeswarm(dat(x = iris$Species,
             title = "Iris dataset",
             axisTitleY = "Sepal Length",
             axisTitleX = "Species",
-            colourLegendTitle = "Sepal Width")
+            colourLegendTitle = "Sepal Width")}
 }

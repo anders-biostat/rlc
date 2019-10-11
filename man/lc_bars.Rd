@@ -101,7 +101,7 @@ changes happen to the chart.}
 }
 
 \examples{
-data("esoph")
+\donttest{data("esoph")
 
 lc_bars(dat(value = tapply(esoph$ncases, esoph$agegp, sum), 
             title = "Number of cases per age group",
@@ -111,7 +111,7 @@ lc_bars(dat(value = tapply(esoph$ncases, esoph$agegp, sum),
 lc_bars(dat(value = c(tapply(esoph$ncases, esoph$agegp, sum), tapply(esoph$ncontrols, esoph$agegp, sum)),
             stackIds = c(rep("case", 6), rep("control", 6))))
 
-#It is ease to put data in a convenient form for barplots using tidyverse
+#It is easy to put data in a convenient form for barplots using tidyverse
 library(tidyverse)
 
 esoph \%>\%
@@ -123,6 +123,6 @@ esoph \%>\%
 lc_bars(dat(value = newData$ncases,
             stackIds = newData$type,
             barIds = newData$alcgp,
-            groupIds = newData$agegp))
+            groupIds = newData$agegp))}
 
 }
