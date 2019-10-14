@@ -4,7 +4,7 @@
 \alias{mark}
 \title{Mark elements of a chart}
 \usage{
-mark(elements, chartId = NULL, layerId = NULL, preventEvent = T)
+mark(elements, chartId = NULL, layerId = NULL, preventEvent = TRUE)
 }
 \arguments{
 \item{elements}{numeric vector of indices of the elements to select.}
@@ -25,7 +25,7 @@ while holding the \code{Shift} key.
 }
 \examples{
 \donttest{data("iris")
-openPage(F, layout = "table1x2")
+openPage(FALSE, layout = "table1x2")
 
 #brushing example
 #Hold Shift pressed and select a group of point on one of the charts

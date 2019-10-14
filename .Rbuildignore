@@ -1,3 +1,6 @@
+^CRAN-RELEASE$
+^\.travis\.yml$
 generateMd.R
+LICENSE
 api.md
 test

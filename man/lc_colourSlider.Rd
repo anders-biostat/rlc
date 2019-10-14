@@ -58,7 +58,7 @@ lc_scatter(dat(x = iris$Sepal.Length,
            axisTitleX = "Sepal Length",
            colourLegendTitle = "Petal Width",
            symbolLegendTitle = "Species",
-           showLegend = F,
+           showLegend = FALSE,
            id = "scatter")
 
 lc_colourSlider(chart = "scatter")}

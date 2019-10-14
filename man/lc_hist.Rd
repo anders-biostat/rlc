@@ -6,10 +6,10 @@
 \title{Histograms and density plots}
 \usage{
 lc_hist(data = list(), place = NULL, ..., id = NULL,
-  layerId = NULL, addLayer = F)
+  layerId = NULL, addLayer = FALSE)
 
 lc_dens(data = list(), place = NULL, ..., id = NULL,
-  layerId = NULL, addLayer = F)
+  layerId = NULL, addLayer = FALSE)
 }
 \arguments{
 \item{data}{Name value pairs of properties, passed through the \code{\link{dat}} function. These

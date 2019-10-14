@@ -10,7 +10,7 @@ closePage()
 Close an opened web page and clear the list of charts.
 }
 \examples{
-\donttest{openPage(useViewer = F)
+\donttest{openPage(useViewer = FALSE)
 closePage()}
 
 }

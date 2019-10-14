@@ -4,7 +4,7 @@
 \alias{openPage}
 \title{Open a new empty page}
 \usage{
-openPage(useViewer = T, rootDirectory = NULL, startPage = NULL,
+openPage(useViewer = TRUE, rootDirectory = NULL, startPage = NULL,
   layout = NULL, newPage = TRUE, ...)
 }
 \arguments{
@@ -38,6 +38,6 @@ opened page, it will be automatically closed.
 \examples{
 \donttest{openPage()
 
-openPage(useViewer = F, layout = "table2x3")}
+openPage(useViewer = FALSE, layout = "table2x3")}
 
 }

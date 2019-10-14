@@ -1,5 +1,7 @@
 #' @import jrc
 #' @import stringr
+#' @importFrom methods setRefClass
+#' @importFrom methods new
 
 lc <- new.env()
 lc$pageOpened <- F
@@ -52,7 +54,7 @@ Chart$methods(
       stop(str_c("Layer with ID ", layerId, " already exists in chart ", id, ".", 
                  " Use 'chart$removeLayer(layerId)' to remove it."))
     
-    layers[[layerId]] <<- Layer$new(type = type, id = layerId, properties = list(), init = F,
+    layers[[layerId]] <<- Layer$new(type = type, id = layerId, properties = list(), init = FALSE,
                                     dataFun = function(l) l, on_click = function(d) NULL)
     layers[[layerId]]
   },
@@ -123,11 +125,11 @@ lc$charts <- list()
 #' @examples
 #' \donttest{openPage()
 #' 
-#' openPage(useViewer = F, layout = "table2x3")}
+#' openPage(useViewer = FALSE, layout = "table2x3")}
 #' 
 #' @export
 #' @importFrom httpuv service
-openPage <- function(useViewer = T, rootDirectory = NULL, startPage = NULL, layout = NULL, newPage = TRUE, ...) {
+openPage <- function(useViewer = TRUE, rootDirectory = NULL, startPage = NULL, layout = NULL, newPage = TRUE, ...) {
   
   lc$charts <- list()
   lc$pageOpened <- F
@@ -199,7 +201,7 @@ openPage <- function(useViewer = T, rootDirectory = NULL, startPage = NULL, layo
 #' @export
 addDefaultLayout <- function(layoutName) {
   if(grepl("^table", layoutName)){
-    size <- as.numeric(str_extract_all(layoutName, "\\d", simplify = T))
+    size <- as.numeric(str_extract_all(layoutName, "\\d", simplify = TRUE))
     if(length(size) != 2) stop("Size of the table is specified incorrectly")
     sendCommand(str_interp("rlc.addTable(${size[1]}, ${size[2]});"))
       
@@ -589,7 +591,7 @@ chartEvent <- function(d, id, layerId = "main", event) {
       d <- NULL
   
   #lame. This also must go to jrc with the nearest update
-  d <- type.convert(d, as.is = T)
+  d <- type.convert(d, as.is = TRUE)
   if(is.numeric(d)) d <- d + 1
   # should we move that to jrc? And add some parameter, like 'flatten'?
   if(is.list(d))
@@ -735,7 +737,7 @@ getMarked <- function(chartId = NULL, layerId = NULL) {
 #'
 #' @examples 
 #' \donttest{data("iris")
-#' openPage(F, layout = "table1x2")
+#' openPage(FALSE, layout = "table1x2")
 #' 
 #' #brushing example
 #' #Hold Shift pressed and select a group of point on one of the charts
@@ -759,7 +761,7 @@ getMarked <- function(chartId = NULL, layerId = NULL) {
 #' ), "A2")}
 #'
 #' @export
-mark <- function(elements, chartId = NULL, layerId = NULL, preventEvent = T) {
+mark <- function(elements, chartId = NULL, layerId = NULL, preventEvent = TRUE) {
   if(is.null(chartId))
     if(length(lc$charts)) {
       chartId <- lc$charts[[1]]$id
@@ -829,7 +831,7 @@ dat <- function( ... ) {
 #' Close an opened web page and clear the list of charts.
 #' 
 #' @examples 
-#' \donttest{openPage(useViewer = F)
+#' \donttest{openPage(useViewer = FALSE)
 #' closePage()}
 #' 
 #' @export
@@ -839,6 +841,7 @@ closePage <- function() {
   jrc::closePage()
 }
 
+#' @importFrom stats runif
 scatterDataFun <- function(l) {
   if(is.null(l$x) && is.null(l$y))
     stop("Required properties 'x' and 'y' are not defined.")
@@ -1006,7 +1009,7 @@ scatterDataFun <- function(l) {
 #'             axisTitleX = "Species",
 #'             colourLegendTitle = "Sepal Width")}
 #' @export
-lc_scatter <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = F, pacerStep = 50) {
+lc_scatter <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE, pacerStep = 50) {
   setChart("scatter", data, ...,  place = place, id = id, layerId = layerId, dataFun = scatterDataFun, addLayer = addLayer,
            pacerStep = pacerStep)
 }
@@ -1015,7 +1018,7 @@ lc_scatter <- function(data = list(), place = NULL, ..., id = NULL, layerId = NU
 #' the axes to avoid overlapping.
 #' 
 #' @export
-lc_beeswarm <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = F, pacerStep = 50) {
+lc_beeswarm <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE, pacerStep = 50) {
   setChart("beeswarm", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer, dataFun = function(l) {
     if(is.null(l$x) || is.null(l$y))
       stop("Required properties 'x' and 'y' are not defined.")
@@ -1195,7 +1198,7 @@ lineDataFun <- function(l) {
 #' x <- seq(0, 5, 0.1)
 #' y <- x*3 + rnorm(length(x), sd = 2)
 #' fit <- lm(y ~ x)
-#' pred <- predict(fit, data.frame(x = x), se.fit = T)
+#' pred <- predict(fit, data.frame(x = x), se.fit = TRUE)
 #' lc_ribbon(dat(ymin = pred$fit - 1.96 * pred$se.fit,
 #'               ymax = pred$fit + 1.96 * pred$se.fit,
 #'               x = x,
@@ -1207,7 +1210,7 @@ lineDataFun <- function(l) {
 #' lc_vLine(dat(v = seq(1, 9, 1)), id = "grid", addLayer = TRUE)}
 #' 
 #' @export
-lc_line <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = F) {
+lc_line <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE) {
   setChart("pointLine", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer,
            dataFun = function(l) {
              l <- lineDataFun(l)
@@ -1223,13 +1226,13 @@ lc_line <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL,
 
 #' @describeIn lc_line connects points in the order they are given.
 #' @export
-lc_path <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = F) {
+lc_path <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE) {
   setChart("pointLine", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer, dataFun = lineDataFun)
 }
 
 #' @describeIn lc_line displays a filled area, defined by \code{ymax} and \code{ymin} values.
 #' @export
-lc_ribbon <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = F) {
+lc_ribbon <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE) {
   setChart("pointRibbon", data, ...,  place = place, id = id, layerId = layerId, addLayer = addLayer, dataFun = function(l) {
     if(is.factor(l$x))
       l$layerDomainX <- levels(l$x)
@@ -1446,7 +1449,7 @@ barDataFun <- function(l) {
 #'             groupIds = newData$agegp))}
 #' 
 #' @export
-lc_bars <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = F) {
+lc_bars <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE) {
   setChart("barchart", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer, dataFun = barDataFun)
 }
 
@@ -1487,7 +1490,7 @@ lc_bars <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL,
 #' lc_dens(dat(value = rnorm(1000), height = 300)) }
 #' 
 #' @export 
-lc_hist <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = F) {
+lc_hist <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE) {
   # has a nbins property. Not implemented in JS
   setChart("barchart", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer, dataFun = function(l) {
     if(is.null(l$nbins)) {
@@ -1505,13 +1508,13 @@ lc_hist <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL,
     l$groupWidth <- 1
     
     if(!is.null(l$value)) {
-      minV <- min(l$value, na.rm = T)
-      maxV <- max(l$value, na.rm = T)
+      minV <- min(l$value, na.rm = TRUE)
+      maxV <- max(l$value, na.rm = TRUE)
       breaks <- seq(minV, maxV, length.out = nbins + 1)
       step <- breaks[2] - breaks[1]
       groupIds <- breaks - step/2
       groupIds <- groupIds[-1]
-      binned <- .bincode(l$value, breaks, include.lowest = T)
+      binned <- .bincode(l$value, breaks, include.lowest = TRUE)
       value <- sapply(1:nbins, function(i) {sum(binned == i)})
       
       l$groupIds <- groupIds
@@ -1523,7 +1526,8 @@ lc_hist <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL,
 
 #' @describeIn lc_hist makes a density plot. Is an extension of \code{\link{lc_line}}.
 #' @export
-lc_dens <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = F) {
+#' @importFrom stats density.default
+lc_dens <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE) {
   setChart("pointLine", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer, dataFun = function(l) {
     if(!is.null(l$value)) {
       dens <- density.default(l$value)
@@ -1604,6 +1608,8 @@ lc_dens <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL,
 #'  no animated transition is shown. It can be useful to turn the transition off, when lots of frequent 
 #'  changes happen to the chart.} 
 #' @examples 
+#' \donttest{
+#' library(RColorBrewer)
 #' #create a test matrix
 #' test <- cbind(sapply(1:10, function(i) c(rnorm(10, mean = 1, sd = 3), 
 #'                                          rnorm(6, mean = 5, sd = 2), 
@@ -1621,13 +1627,13 @@ lc_dens <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL,
 #' # a good idea to make bottom and right paddings larger to
 #' # fit labels
 #' lc_heatmap(dat(value = test),
-#'            clusterRows = T,
-#'            clusterCols = T,
+#'            clusterRows = TRUE,
+#'            clusterCols = TRUE,
 #'            paddings = list(top = 50, left = 30, bottom = 75, right = 75))
 #' 
 #' lc_heatmap(dat(value = cor(test), 
 #'                colourDomain = c(-1, 1),
-#'                palette = RColorBrewer::brewer.pal(11, "RdYlBu")))
+#'                palette = brewer.pal(11, "RdYlBu")))}
 #' @export
 lc_heatmap <- function(data = list(), place = NULL, ..., id = NULL, pacerStep = 50) {
   setChart("heatmap", data, ..., place = place, id = id, layerId = "main", dataFun = function(l) {
@@ -1697,7 +1703,7 @@ lc_heatmap <- function(data = list(), place = NULL, ..., id = NULL, pacerStep = 
 #'            axisTitleX = "Sepal Length",
 #'            colourLegendTitle = "Petal Width",
 #'            symbolLegendTitle = "Species",
-#'            showLegend = F,
+#'            showLegend = FALSE,
 #'            id = "scatter")
 #' 
 #' lc_colourSlider(chart = "scatter")}
@@ -1722,7 +1728,7 @@ lc_colourSlider <- function(data = list(), place = NULL, ..., id = NULL) {
 #' @describeIn lc_line creates straight lines by intercept and slope values
 #' @export
 #' @importFrom jsonlite toJSON
-lc_abLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = F) {
+lc_abLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE) {
   setChart("xLine", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer, dataFun = function(l) {
     if(is.null(l$a) || is.null(l$b))
       stop("Required properties 'a' and 'b' are not defined.");
@@ -1745,7 +1751,7 @@ lc_abLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NUL
 
 #' @describeIn lc_line creates horizontal lines by y-intercept values
 #' @export
-lc_hLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = F) {
+lc_hLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE) {
   setChart("xLine", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer, dataFun = function(l) {
     if(is.null(l$h))
       stop("Required property 'h' is not defined.");
@@ -1763,7 +1769,7 @@ lc_hLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL
 
 #' @describeIn lc_line creates vertical lines by x-intercept values
 #' @export
-lc_vLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = F) {
+lc_vLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE) {
   setChart("yLine", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer, dataFun = function(l) {
     if(is.null(l$v))
       stop("Required property 'v' is not defined.");
@@ -1879,7 +1885,7 @@ lc_html <- function(data = list(), place = NULL, ..., id = NULL) {
 #'
 #'@examples
 #' \donttest{lc_input(type = "checkbox", labels = paste0("el", 1:5), on_click = function(value) print(value),
-#' value = T)
+#' value = TRUE)
 #' lc_input(type = "radio", labels = paste0("el", 1:5), on_click = function(value) print(value),
 #'          value = 1)
 #' lc_input(type = "text", labels = paste0("el", 1:5), on_click = function(value) print(value),

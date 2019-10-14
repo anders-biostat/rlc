@@ -83,6 +83,8 @@ changes happen to the chart.}
 }
 
 \examples{
+\donttest{
+library(RColorBrewer)
 #create a test matrix
 test <- cbind(sapply(1:10, function(i) c(rnorm(10, mean = 1, sd = 3), 
                                          rnorm(6, mean = 5, sd = 2), 
@@ -100,11 +102,11 @@ lc_heatmap(dat(value = test))
 # a good idea to make bottom and right paddings larger to
 # fit labels
 lc_heatmap(dat(value = test),
-           clusterRows = T,
-           clusterCols = T,
+           clusterRows = TRUE,
+           clusterCols = TRUE,
            paddings = list(top = 50, left = 30, bottom = 75, right = 75))
 
 lc_heatmap(dat(value = cor(test), 
                colourDomain = c(-1, 1),
-               palette = RColorBrewer::brewer.pal(11, "RdYlBu")))
+               palette = brewer.pal(11, "RdYlBu")))}
 }
