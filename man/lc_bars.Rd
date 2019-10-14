@@ -108,7 +108,8 @@ lc_bars(dat(value = tapply(esoph$ncases, esoph$agegp, sum),
             axisTitleX = "Age group", 
             axisTitleY = "Number of esophageal cases"))
 
-lc_bars(dat(value = c(tapply(esoph$ncases, esoph$agegp, sum), tapply(esoph$ncontrols, esoph$agegp, sum)),
+lc_bars(dat(value = c(tapply(esoph$ncases, esoph$agegp, sum), 
+                      tapply(esoph$ncontrols, esoph$agegp, sum)),
             stackIds = c(rep("case", 6), rep("control", 6))))
 
 #It is easy to put data in a convenient form for barplots using tidyverse

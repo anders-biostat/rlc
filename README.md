@@ -1,3 +1,4 @@
+[![Travis Build Status](https://travis-ci.org/anders-biostat/rlc.svg?branch=master)](https://travis-ci.org/anders-biostat/rlc)
 # rlc
 
 This package is an R wrapper for the JavaScript 
