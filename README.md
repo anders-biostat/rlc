@@ -1,4 +1,7 @@
 [![Travis Build Status](https://travis-ci.org/anders-biostat/rlc.svg?branch=master)](https://travis-ci.org/anders-biostat/rlc)
+[![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/rlc)](https://cran.r-project.org/package=rlc)
+[![Downloads](http://cranlogs.r-pkg.org/badges/rlc?color=brightgreen)](http://www.r-pkg.org/pkg/rlc)
+
 # rlc
 
 This package is an R wrapper for the JavaScript 
@@ -12,7 +15,13 @@ of the others.
 
 ## Installation
 
-To install rlc from GitHub use the following commands:
+`rlc` can be installed from CRAN:
+
+```
+install.package("rlc")
+```
+
+You can also intall the latest devolopmental version from GitHub:
 
 ```
 install.packages("devtools")
