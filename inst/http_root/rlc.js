@@ -106,7 +106,6 @@ rlc.setCustomOnMarked = function(id, layerId) {
       charts[id].get_layer(layerId)
         .on_marked(function() {
           jrc.callFunction("chartEvent", {d: "NULL", id: id, layerId: layerId, event: "marked"}, null, "rlc");
-          console.log(new Error().stack)
         })
     else
       charts[id]
