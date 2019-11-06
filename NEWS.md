@@ -5,4 +5,7 @@
 
 * Now scatter plots in canvas mode also have ticks that indicate presence of points outside of the current axes range.
 
+* NAs are correctly processed.
+
 * Bug with mispositioning a click in Fireforx v.70 fixed.
+

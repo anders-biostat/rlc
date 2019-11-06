@@ -1,3 +1,5 @@
+library(rlc)
+
 data("iris")
 
 nas <- sample(nrow(iris), 3)
