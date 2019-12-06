@@ -1,78 +1,161 @@
 #' @import jrc
 #' @import stringr
-#' @importFrom methods setRefClass
-#' @importFrom methods new
+#' @import R6
+pkg.env <- new.env()
 
-lc <- new.env()
-lc$pageOpened <- F
+LCApp <- R6Class("LCApp", inherits = "App", public = list(
+  setLayout = function(layout) {
+    if(grepl("^table", layoutName)){
+      size <- as.numeric(str_extract_all(layoutName, "\\d", simplify = TRUE))
+      if(length(size) != 2) stop("Size of the table is specified incorrectly")
+      private$layout <- c("Table", size)
+    } else {
+      stop("Unknown default layout name")        
+    }
+    invisible(self)
+  },
+  initialize = function(layout = NULL, ...){
+    super$initialize(...)
+    if(!is.null(layout))
+      self$setLayout(layout)
+    
+    super$onStart <- function(session) {
 
-lc$nameList <- c("labels" = "label", "color" = "colour", "colorValue" = "colourValue",
-                 "colourValues" = "colourValue", "colorValues" = "colourValue", "colorDomain" = "colourDomain",
-                 "colorLegendTitle" = "colourLegendTitle", "addColorScaleToLegend" = "addColourScaleToLegend",
-                 "symbols" = "symbol", "symbolValues" = "symbolValue", "strokes" = "stroke", "values" = "value",
-                 "heatmapRows" = "heatmapRow", "heatmapCols" = "heatmapCol", "showValues" = "showValue",
-                 "globalColorScale" = "globalColourScale", "steps" = "step")
+      srcDir <- "http_root_rlc"
+      
+      s1 <- 0
+      s2 <- 0
+      setEnvironment(environment())
+      session$sendCommand(str_c("link = document.createElement('link');", 
+                        "link.rel = 'stylesheet';", 
+                        "link.href = '", srcDir, "/linked-charts.css';", 
+                        "document.head.appendChild(link);", collapse = "\n")) 
+      session$sendCommand(str_c("script = document.createElement('script');", 
+                        "script.src = '", srcDir, "/rlc.js';",
+                        "script.onload = function() {jrc.sendData('s1', 1)};",
+                        "document.head.appendChild(script);", collapse = "\n"), wait = 5)
+      
+      session$sendCommand(str_c("script = document.createElement('script');", 
+                        "script.src = '", srcDir, "/linked-charts.min.js';",
+                        "script.onload = function() {jrc.sendData('s2', 1)};",                    
+                        "document.head.appendChild(script);", collapse = "\n"), wait = 5)
 
-lc$props <- list(scatter = c("x", "y", "size", "stroke", "strokeWidth", "symbol", "symbolValue", "symbolLegendTitle",
-                             "jitterX", "jitterY", "shiftX", "shiftY"),
-                barchart = c("ngroups", "groupIds", "nbars", "barIds", "nstacks", "stackIds", "value", "groupWidth", "stroke", "strokeWidth",
-                             "nbins"), 
-                beeswarm = c("x", "y", "size", "stroke", "strokeWidth", "symbol", "symbolValue", "symbolLegendTitle", "valueAxis"),
-                pointLine = c("lineWidth", "dasharray", "x", "y", "nsteps", "value", "fill"),
-                xLine = c("lineWidth", "dasharray", "lineFun", "nsteps", "a", "b", "h", "fill"),
-                yLine = c("lineWidth", "dasharray", "lineFun", "nsteps", "v", "fill"),
-                pointRibbon = c("lineWidth", "dasharray", "x", "ymax", "ymin", "nsteps"),
-                layer = c("nelements", "elementIds", "label", "layerDomainX", "layerDomainY", "contScaleX", "contScaleY",
-                          "colour", "colourValue", "palette", "colourDomain", "colourLegendTitle", "addColourScaleToLegend", "opacity", "on_click",
-                          "informText", "on_mouseover", "on_mouseout", "on_marked"),
-                input = c("step", "min", "max"),
-                all = c("width", "height", "plotWidth", "plotHeight", "paddings", "title", "titleX", "titleY", "titleSize",
-                        "showLegend", "showPanel", "transitionDuration", "value", "rowLabel", "colLabel", "showDendogramRow",
-                        "clusterRows", "clusterCols", "mode", "heatmapRow", "heatmapCol", "showValue", "rowTitle", 
-                        "colTitle", "palette", "colourDomain", "on_click", "on_change", "on_mouseover", "on_mouseout", "on_marked", 
-                        "chart", "layer", "content", "type", "domainX", "domainY", "apectRatio", "axisTitleX", "axisTitleY",
-                        "logScaleX", "logScaleY", "ticksRotateX", "ticksRotateY", "globalColourScale", "aspectRatio",
-                        "rankRows", "rankCols", "ticksX", "ticksY", "showDendogramCol", "on_labelClickCol", "on_labelClickRow"))
-
-Layer <- setRefClass("Layer", fields = list(type = "character", id = "character", 
-                                            properties = "list", dataFun = "function",
-                                            on_click = "function", on_mouseover = "function",
-                                            on_mouseout = "function", init = "logical",
-                                            on_marked = "function", pacerStep = "numeric",
-                                            on_labelClickRow = "function", on_labelClickCol = "function"))
-Layer$methods(
-  setProperty = function(name, expr) {
-    properties[[name]] <<- expr
+      if( s1 == 0 | s2 == 0 ) {
+        super$closeSession(session)
+        stop( "Can't load linked-charts.js or rlc.js" )
+      }
+      
+      session$sendCommand("d3.select('title').text('R/linked-charts');")
+      
+      private$addLayout(session)
+      for(chart in private$charts){
+        chart$JSInitialize(session)
+        chart$update(session)
+      }
+    }
+    
+    invisible(self)
   }
-)
-Layer$accessors("type")
+), private = list(
+  props = list(scatter = c("x", "y", "size", "stroke", "strokeWidth", "symbol", "symbolValue", "symbolLegendTitle",
+                           "jitterX", "jitterY", "shiftX", "shiftY"),
+               barchart = c("ngroups", "groupIds", "nbars", "barIds", "nstacks", "stackIds", "value", "groupWidth", "stroke", "strokeWidth",
+                            "nbins"), 
+               beeswarm = c("x", "y", "size", "stroke", "strokeWidth", "symbol", "symbolValue", "symbolLegendTitle", "valueAxis"),
+               pointLine = c("lineWidth", "dasharray", "x", "y", "nsteps", "value", "fill"),
+               xLine = c("lineWidth", "dasharray", "lineFun", "nsteps", "a", "b", "h", "fill"),
+               yLine = c("lineWidth", "dasharray", "lineFun", "nsteps", "v", "fill"),
+               pointRibbon = c("lineWidth", "dasharray", "x", "ymax", "ymin", "nsteps"),
+               layer = c("nelements", "elementIds", "label", "layerDomainX", "layerDomainY", "contScaleX", "contScaleY",
+                         "colour", "colourValue", "palette", "colourDomain", "colourLegendTitle", "addColourScaleToLegend", "opacity", "on_click",
+                         "informText", "on_mouseover", "on_mouseout", "on_marked"),
+               input = c("step", "min", "max"),
+               all = c("width", "height", "plotWidth", "plotHeight", "paddings", "title", "titleX", "titleY", "titleSize",
+                       "showLegend", "showPanel", "transitionDuration", "value", "rowLabel", "colLabel", "showDendogramRow",
+                       "clusterRows", "clusterCols", "mode", "heatmapRow", "heatmapCol", "showValue", "rowTitle", 
+                       "colTitle", "palette", "colourDomain", "on_click", "on_change", "on_mouseover", "on_mouseout", "on_marked", 
+                       "chart", "layer", "content", "type", "domainX", "domainY", "apectRatio", "axisTitleX", "axisTitleY",
+                       "logScaleX", "logScaleY", "ticksRotateX", "ticksRotateY", "globalColourScale", "aspectRatio",
+                       "rankRows", "rankCols", "ticksX", "ticksY", "showDendogramCol", "on_labelClickCol", "on_labelClickRow")),
+  nameList = c("labels" = "label", "color" = "colour", "colorValue" = "colourValue",
+               "colourValues" = "colourValue", "colorValues" = "colourValue", "colorDomain" = "colourDomain",
+               "colorLegendTitle" = "colourLegendTitle", "addColorScaleToLegend" = "addColourScaleToLegend",
+               "symbols" = "symbol", "symbolValues" = "symbolValue", "strokes" = "stroke", "values" = "value",
+               "heatmapRows" = "heatmapRow", "heatmapCols" = "heatmapCol", "showValues" = "showValue",
+               "globalColorScale" = "globalColourScale", "steps" = "step"),
+  charts = list(),
+  layout = NULL,
+  addLayout = function(session) {
+    if(!is.null(private$layout)) {
+      pars <- str_c(private$layout[-1], sep = ", ")
+      session$sendCommand(str_interp("rlc.add${private$layout[1]}(${pars});"))
+    }
+    invisible(self)
+  },
+))
 
-Chart <- setRefClass("Chart", fields = list(layers = "list", id = "character", place = "character"))
-Chart$methods(
-  addLayer = function(layerId, type) {
-    if((length(layers) != 0) && (layerId %in% names(layers)))
-      stop(str_c("Layer with ID ", layerId, " already exists in chart ", id, ".", 
+
+Layer <- R6Class("Layer", public = list(
+  type = NULL,
+  id = NULL,
+  setProperty = function(name, expr = NULL) {
+    if(is.null(expr))
+      return(private$properties[[name]])
+    
+    private$properties[[name]] <- expr
+  },
+  initialize = function(type, id) {
+    self$type <- type
+    self$id <- id
+    
+    invisible(self)
+  }
+), private = list(
+  properties = list(),
+  dataFun = fucntion(l) {l},
+  on_click = function(d) {},
+  on_mouseover = NULL,
+  on_mouseout = NULL,
+  on_marked = NULL,
+  on_labelClickRow  = NULL,
+  on_labelClickCol = NULL,
+  init = FALSE,
+  
+))
+
+
+Chart <- R6Class("Chart", public = list(
+  id = NULL,
+  place = NULL,
+  addLayer = function(layerId, type){
+    if(layerId %in% names(private$layers))
+      stop(str_c("Layer with ID ", layerId, " already exists in chart ", self$id, ".", 
                  " Use 'chart$removeLayer(layerId)' to remove it."))
     
-    layers[[layerId]] <<- Layer$new(type = type, id = layerId, properties = list(), init = FALSE,
-                                    dataFun = function(l) l, on_click = function(d) NULL)
-    layers[[layerId]]
+    private$layers[[layerId]] <<- Layer$new(type, layerId)
+    invisible(private$layers[[layerId]])    
   },
+  
   getLayer = function(layerId = NULL) {
     if(is.null(layerId))
-      if(length(layers) == 2) {
+      if(length(private$layers) == 2) {
         #1st layer is always 'main', which is a dummy
-        layerId <- layers[[2]]$id
+        layerId <- private$layers[[2]]$id
       } else {
-        stop(str_c("Chart ", id, " has multiple or no layers. You need to specify the 'layerID'."))
+        stop(str_c("Chart ", self$id, " has multiple or no layers. You need to specify the 'layerID'."))
       }
-    layers[[layerId]]
+    private$layers[[layerId]]
   },
+  
+  nLayers = function() {
+    length(private$layers) - 1
+  }
+  
   removeLayer = function(layerId) {
     if(layerId == "main"){
-      warning(str_c("You are attempting to remove the main layer of the chart ", id, 
-              ". The entire chart will be removed."))
-      removeChart(id)
+      warning(str_c("You are attempting to remove the main layer of the chart ", self$id, 
+                    ". The entire chart will be removed."))
+      privte$app$removeChart(self$id)
     } else {
       if(!(layerId %in% names(layers))) {
         stop(str_c("There is no layer with ID ", layerId))
@@ -81,24 +164,22 @@ Chart$methods(
         layers[[layerId]] <<- NULL
       }
     }
-  },
-  nLayers = function() {
-    length(layers) - 1
-  },
-  JSinitialize = function() {
-    lapply(layers, function(layer) {
+  },  
+), private = list(
+  layers = list(),
+  app = NULL,
+  JSinitialize = function(session) {
+    lapply(private$layers, function(layer) {
       if(!layer$init) {
         if(layer$id != "main")
-          message(str_interp("Layer '${layer$id}' is added to chart '${id}'."))
-        sendCommand(str_interp("rlc.addChart('${id}', '${layer$type}', '${place}', '${layer$id}');"))
-        layer$init <- T
+          message(str_interp("Layer '${layer$id}' is added to chart '${self$id}'."))
+        session$sendCommand(str_interp("rlc.addChart('${self$id}', '${layer$type}', '${self$place}', '${layer$id}');"))
+        layer$init <- TRUE
       }
     })
-  })
-                                    
-Chart$accessors("place")
-lc$charts <- list()
-
+  }
+))                 
+                   
 #' Open a new empty page
 #' 
 #' \code{openPage} creates a server, establishes a web socket connection between it and the current
@@ -118,8 +199,6 @@ lc$charts <- list()
 #' number of rows and \code{M} is the number of columns. Each cell will get an ID that consists of 
 #' a letter (indicating the row) and a number (indicating the column) (e.g. \code{B3} is an ID of 
 #' the second row and third column).
-#' @param newPage Determines whether or not to open a new page. If \code{FALSE}, one can add 
-#' interactive charts to another apps, created the with \code{jrc} package.
 #' @param ... Further arguments passed to \code{\link[jrc]{openPage}}.
 #' 
 #' @examples
@@ -129,51 +208,14 @@ lc$charts <- list()
 #' 
 #' @export
 #' @importFrom httpuv service
-openPage <- function(useViewer = TRUE, rootDirectory = NULL, startPage = NULL, layout = NULL, newPage = TRUE, ...) {
+openPage <- function(useViewer = TRUE, rootDirectory = NULL, startPage = NULL, layout = NULL, port = NULL, 
+                     browser = NULL, ...) {
   
-  lc$charts <- list()
-  lc$pageOpened <- F
-  lc$useViewer <- useViewer
-  if(newPage == TRUE){
-    jrc::openPage(useViewer = useViewer, rootDirectory = rootDirectory, startPage = startPage, 
-                  allowedFunctions = "chartEvent", allowedVariables = c("marked", "s1", "s2"), ...)
-    jrc::limitStorage(n = 0)
-    
-  }
-  
-  srcDir <- "http_root_rlc"
+  app <- LCApp$new(rootDirectory = rootDirectory, startPage = startPage, layout = layout, 
+                   allowedFunctions = "chartEvent", allowedVariables = c("marked", "s1", "s2"), ...)
+  app$startServer(port)
+  app$openPage(useViewer, browser)
 
-  s1 <- 0
-  s2 <- 0
-  setEnvironment(environment())
-  sendCommand(str_c("link = document.createElement('link');", 
-                    "link.rel = 'stylesheet';", 
-                    "link.href = '", srcDir, "/linked-charts.css';", 
-                    "document.head.appendChild(link);", collapse = "\n")) 
-  sendCommand(str_c("script = document.createElement('script');", 
-                    "script.src = '", srcDir, "/rlc.js';",
-                    "script.onload = function() {jrc.sendData('s1', 1)};",
-                    "document.head.appendChild(script);", collapse = "\n"))
-    
-  sendCommand(str_c("script = document.createElement('script');", 
-                    "script.src = '", srcDir, "/linked-charts.min.js';",
-                    "script.onload = function() {jrc.sendData('s2', 1)};",                    
-                    "document.head.appendChild(script);", collapse = "\n"))
-  for( i in 1:(10/0.05) ) {
-    service()
-    if( s1 == 1 & s2 == 1) {
-      setEnvironment(globalenv())
-      break
-    } 
-    Sys.sleep( .05 )
-  }
-  
-  if( s1 == 0 | s2 == 0 ) {
-    closePage()
-    stop( "Can't load linked-charts.js or rlc.js" )
-  }
-  
-  sendCommand("d3.select('title').text('R/linked-charts');")
   
   if(!is.null(layout)) addDefaultLayout(layout)
   
