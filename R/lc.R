@@ -4,6 +4,24 @@
 pkg.env <- new.env()
 
 LCApp <- R6Class("LCApp", inherits = "App", public = list(
+  removeChart = function(chartId) {
+    if(!is.vector(chartId) | !is.character(chartId))
+      stop("Chart ID must be a vector of characters")
+
+    sessionId <- names(super$sessions)
+
+    for(id in chartId){
+      private$charts[[id]] <- NULL
+      for(sid in sessionId){
+        session <- super$getSession(sid)
+        if(!is.null(session))
+          session$sendCommand(str_interp("rlc.removeChart('${chartId}');"))      
+      }
+    }
+    
+    invisible(self)
+  },
+  
   setLayout = function(layout) {
     if(grepl("^table", layoutName)){
       size <- as.numeric(str_extract_all(layoutName, "\\d", simplify = TRUE))
@@ -14,6 +32,45 @@ LCApp <- R6Class("LCApp", inherits = "App", public = list(
     }
     invisible(self)
   },
+
+  setProperties = function(data, chartId, layerId = NULL){
+    chart <- private$getChart(chartId)
+    if(is.null(chart))
+      stop(str_c("Chart with ID ", chartId, " is not defined."))
+    
+    if(is.null(layerId))
+      if(chart$getLayer("main")$type != "axesChart") {
+        layerId <- "main"
+      } else {
+        if(chart$nLayers() == 1) {
+          layerId <- names(chart$layers)[2]
+        } else {
+          stop("The chart ", chart$id, " has more then one layer. Please, specify the 'layerId'.")
+        }
+      }
+    
+    layer <- chart$getLayer(layerId)
+    mainLayer <- chart$getLayer("main")
+    
+    data <- plyr::rename(data, private$nameList, warn_missing = FALSE)
+    
+    if(is.null(layer))
+      stop(str_c("Layer with ID ", layerId, " is not defined."))
+    
+    for(prop in names(data))
+      if(prop %in% private$props[[layer$type]] | prop %in% private$props$layer) {
+        layer$setProperty(prop, data[[prop]])
+      } else {
+        if(prop %in% private$props$all) {
+          mainLayer$setProperty(prop, data[[prop]])
+        } else {
+          warning(str_c("In chart '", chart$id, "': Property '", prop, "' doesn't exist."))
+        }
+      }
+    
+    invisible(self)
+  }  
+  
   initialize = function(layout = NULL, ...){
     super$initialize(...)
     if(!is.null(layout))
@@ -23,9 +80,7 @@ LCApp <- R6Class("LCApp", inherits = "App", public = list(
 
       srcDir <- "http_root_rlc"
       
-      s1 <- 0
-      s2 <- 0
-      setEnvironment(environment())
+      session$sessionVariables(list(s1 = 0, s2 = 0))
       session$sendCommand(str_c("link = document.createElement('link');", 
                         "link.rel = 'stylesheet';", 
                         "link.href = '", srcDir, "/linked-charts.css';", 
@@ -40,10 +95,12 @@ LCApp <- R6Class("LCApp", inherits = "App", public = list(
                         "script.onload = function() {jrc.sendData('s2', 1)};",                    
                         "document.head.appendChild(script);", collapse = "\n"), wait = 5)
 
-      if( s1 == 0 | s2 == 0 ) {
+      if( session$sessionVariables(varName = "s1") == 0 || 
+          session$sessionVariables(varName = "s2") == 0 ) {
         super$closeSession(session)
         stop( "Can't load linked-charts.js or rlc.js" )
       }
+      session$sessionVariables(remove = c("s1", "s2"))
       
       session$sendCommand("d3.select('title').text('R/linked-charts');")
       
@@ -85,6 +142,7 @@ LCApp <- R6Class("LCApp", inherits = "App", public = list(
                "globalColorScale" = "globalColourScale", "steps" = "step"),
   charts = list(),
   layout = NULL,
+
   addLayout = function(session) {
     if(!is.null(private$layout)) {
       pars <- str_c(private$layout[-1], sep = ", ")
@@ -92,6 +150,26 @@ LCApp <- R6Class("LCApp", inherits = "App", public = list(
     }
     invisible(self)
   },
+
+  getChart = function(id) {
+    if(is.character(id))
+      stop("Chart ID must be a character")
+    if(length(id) > 1) {
+      warning("Attempt to supply several chart IDs at once. Only the first one will be used.")
+      id <- id[1]
+    }
+    
+    private$charts[[id]]
+  },
+  
+  addChart <- function(chartId, place) {
+    chart <- Chart$new(chartId, place)
+    private$charts[[chartId]] <- chart
+    
+    message(str_interp("Chart '${chartId}' added."))
+    
+    invisible(chart)
+  }  
 ))
 
 
@@ -149,7 +227,7 @@ Chart <- R6Class("Chart", public = list(
   
   nLayers = function() {
     length(private$layers) - 1
-  }
+  },
   
   removeLayer = function(layerId) {
     if(layerId == "main"){
@@ -164,11 +242,18 @@ Chart <- R6Class("Chart", public = list(
         layers[[layerId]] <<- NULL
       }
     }
-  },  
+  },
+  initialize = function(id, place) {
+    self$id <- id
+    self$place <- place
+    invisible(self)
+  }
 ), private = list(
   layers = list(),
   app = NULL,
   JSinitialize = function(session) {
+    session$sendCommand(str_interp("rlc.prepareContainer('${self$place}');"))
+    
     lapply(private$layers, function(layer) {
       if(!layer$init) {
         if(layer$id != "main")
@@ -215,50 +300,10 @@ openPage <- function(useViewer = TRUE, rootDirectory = NULL, startPage = NULL, l
                    allowedFunctions = "chartEvent", allowedVariables = c("marked", "s1", "s2"), ...)
   app$startServer(port)
   app$openPage(useViewer, browser)
-
   
-  if(!is.null(layout)) addDefaultLayout(layout)
+  pkg.env$app <- app
   
-  lc$pageOpened <- T
-}
-
-#' Add a default layout to the opened web page
-#' 
-#' \code{addDefaultLayout} adds a layout that can be later used to arrange charts on the page (by
-#' default each new chart is added to the bottom of the page).
-#' 
-#' Currently the only supported type
-#' of a default layout is table with arbitrary number of rows and columns.
-#' To use it set the layout argument to \code{tableMxN}, where \code{N} is the
-#' number of rows and \code{M} is the number of columns. Each cell will get an ID that consists of 
-#' a letter (indicating the row) and a number (indicating the column) (e.g. \code{B3} is an ID of 
-#' the second row and third column).
-#' 
-#' @param layoutName Type of the layout. See 'Details' for more information.
-#' 
-#' @examples
-#' \donttest{openPage(useViewer = FALSE)
-#' addDefaultLayout("table3x2")}
-#' 
-#' @export
-addDefaultLayout <- function(layoutName) {
-  if(grepl("^table", layoutName)){
-    size <- as.numeric(str_extract_all(layoutName, "\\d", simplify = TRUE))
-    if(length(size) != 2) stop("Size of the table is specified incorrectly")
-    sendCommand(str_interp("rlc.addTable(${size[1]}, ${size[2]});"))
-      
-    invisible(return())
-  }
-  stop("Unknown default layout name")
-}
-
-#Makes sure that a container exists. Otherwise just creates a 'div' with the provided id
-prepareContainer <- function(place) {
-    sendCommand(str_interp("rlc.prepareContainer('${place}');"))
-}
-
-getChart <- function(id) {
-  lc$charts[[id]]
+  invisible(app)
 }
 
 #' Remove chart from the page
@@ -272,24 +317,11 @@ getChart <- function(id) {
 #' removeChart("scatter")}
 #' 
 #' @export
-removeChart <- function(id) {
-  if(!is.vector(id))
-    stop("Error in 'removeChart': 'id' should be a vector of IDs")
-  for(i in id){
-    lc$charts[[i]] <- NULL
-    sendCommand(str_interp("rlc.removeChart('${i}');"))  
-  }
-}
-
-addChart <- function(id, place) {
+removeChart <- function(chartId) {
+  if(is.null(pkg.env$app))
+    stop("There is no opened page. Please, use 'openPage()' function to create one.") 
   
-  chart <- Chart$new(layers = list(), id = id)
-  chart$setPlace(place)
-  lc$charts[[id]] <- chart
-  
-  message(str_interp("Chart '${id}' added."))
-  
-  invisible(chart)
+  pkg.env$app$removeChart(chartId)
 }
 
 #' Set properties of the chart
@@ -299,7 +331,7 @@ addChart <- function(id, place) {
 #' 
 #' @param data Set of properties to be redefined for this layer or chart. Created by \code{\link{dat}}
 #' function.
-#' @param id ID of the chart, whose properties you want to redefine.
+#' @param chartId ID of the chart, whose properties you want to redefine.
 #' @param layerId ID of the layer, whose properties you want to redefine. If the chart has a single
 #' layer or doesn't have layers, default value (which is NULL) can be used.
 #' 
@@ -315,42 +347,12 @@ addChart <- function(id, place) {
 #' 
 #' @export
 #' @importFrom plyr rename
-setProperties <- function(data, id, layerId = NULL) {
-  chart <- getChart(id)
-  if(is.null(chart))
-    stop(str_c("Chart with ID ", id, " is not defined."))
+setProperties <- function(data, chartId, layerId = NULL) {
+  if(is.null(pkg.env$app))
+    stop("There is no opened page. Please, use 'openPage()' function to create one.") 
   
-  if(is.null(layerId))
-    if(chart$getLayer("main")$type != "axesChart") {
-      layerId <- "main"
-    } else {
-      if(chart$nLayers() == 1) {
-        layerId <- names(chart$layers)[2]
-      } else {
-        stop("The chart ", chart$id, " has more then one layer. Please, specify the 'layerId'.")
-      }
-    }
-    
-  layer <- chart$getLayer(layerId)
-  mainLayer <- chart$getLayer("main")
+  pkg.env$app$removeChart(data, chartId, layerId)
   
-  data <- plyr::rename(data, lc$nameList, warn_missing = FALSE)
-    
-  if(is.null(layer))
-    stop(str_c("Layer with ID ", id, " is not defined."))
-  
-  for(prop in names(data))
-    if(prop %in% lc$props[[layer$type]] | prop %in% lc$props$layer) {
-      layer$setProperty(prop, data[[prop]])
-    } else {
-      if(prop %in% lc$props$all) {
-        mainLayer$setProperty(prop, data[[prop]])
-      } else {
-        warning(str_c("In chart '", chart$id, "': Property '", prop, "' doesn't exist."))
-      }
-    }
-  
-  invisible(chart)
 }
 
 #' Update a chart
