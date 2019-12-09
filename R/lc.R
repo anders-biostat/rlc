@@ -69,7 +69,227 @@ LCApp <- R6Class("LCApp", inherits = "App", public = list(
       }
     
     invisible(self)
-  }  
+  },
+  
+  if(length(lc$charts) == 0) {
+    warning("There are no charts yet.")
+    return ();
+  }
+  
+  if(is.null(id)) id <- ls(lc$charts)
+  if(!is.vector(id))
+    stop("'id' should be a vector of IDs")
+  
+  
+  if(!is.null(layerId) & length(layerId) != length(id))
+    stop("Lengths of 'id' and 'layerId' differ")
+  if(!is.null(updateOnly) & length(updateOnly) != length(id))
+    stop("Lengths of 'id' and 'updateOnly' differ")
+  
+  for(i in 1:length(id)){
+    chart <- getChart(id[i])
+    if(is.null(chart))
+      stop(str_c("Chart with ID ", id[i], " is not defined."))
+    args <- str_c("'", id[i], "', '")
+    
+    if(!is.null(updateOnly)) {
+      args <- str_c(args, updateOnly[i], "', '")
+    } else {
+      args <- str_c(args, "', '")
+    }
+    
+    if(!is.null(layerId)) {
+      args <- str_c(args, layerId[i], "'")
+      sendProperties(chart, layerId[i])
+    } else {
+      sendProperties(chart)
+      args <- str_c(args, "'")
+    }
+    sendCommand(str_interp("rlc.updateCharts(${args});"))
+  },
+  
+  updateCharts = function(chartId = NULL, layerId = NULL, updateOnly = NULL) {
+    if(length(private$charts) == 0) {
+      stop("There are no charts yet.")
+    }
+    
+    if(is.null(chartId)) chartId <- names(private$charts)
+    if(!is.vector(chartId))
+      stop("'chartId' should be a vector of IDs")
+
+    maxL <- max(length(chartId), length(layerId), length(updateOnly))
+    if(maxL > 1) {
+      if(length(chartId) == 1) chartId <- rep(chartId, maxL)
+      if(length(layerId) == 1) layerId <- rep(layerId, maxL)
+      if(length(updateOnly) == 1) updateOnly <- rep(updateOnly, maxL)
+    }
+    
+    if(!is.null(layerId) & length(layerId) != length(chartId))
+      stop("Lengths of 'chartId' and 'layerId' differ")
+    if(!is.null(updateOnly) & length(updateOnly) != length(chartId))
+      stop("Lengths of 'chartId' and 'updateOnly' differ")        
+    
+    if(exists(".id")){
+      sessionId <- .id
+    } else {
+      sessionId <- names(super$sessions)
+    }
+
+    for(i in 1:length(chartId)) {
+      chart <- private$getChart(chartId[i])
+      if(!is.null(chart)) {
+        chart$update(sessionId, layerId[i], updateOnly[i])
+      } else {
+        warning(str_c("There is no chart with ID ", chartId[i]))
+      }
+    }
+  },
+  
+  chartEvent = function(d, chartId, layerId = "main", event, sesionId) {
+    #lame. This also must go to jrc with the nearest update
+    d <- type.convert(d, as.is = TRUE)
+    if(is.numeric(d)) d <- d + 1
+    # should we move that to jrc? And add some parameter, like 'flatten'?
+    if(is.list(d))
+      if(all(sapply(d, function(el) length(el) == 1)))
+        d <- unlist(d)
+      
+    chart <- private$getChart(id)
+    if(is.null(chart))
+      stop(str_interp("Chart with ID ${id} is not defined"))
+      
+    layer <- chart$getLayer(layerId)
+    if(is.null(layer))
+      stop(str_interp("Chart ${id} doesn't have layer ${layerId}"))
+      
+    if(event == "click")
+      layer$on_click(d)
+    if(event == "mouseover")
+      layer$on_mouseover(d)
+    if(event == "mouseout")
+      layer$on_mouseout()
+    if(event == "marked")
+      layer$on_marked()
+    if(event == "labelClickRow")
+      layer$on_labelClickRow(d)
+    if(event == "labelClickCol")
+      layer$on_labelClickCol(d)
+    
+    invisible(self)  
+  },
+  
+  listCharts = function() {
+    for(chartId in names(private$charts)) {
+      print(str_interp("Chart: ${chartId}"))
+      chart <- private$getChart(chartId)
+      if(chart$nLayers() > 1) {
+        print("- Layers:")
+        for(layerId in names(chart$layers)){
+          layer <- chart$getLayer(layerId)
+          if(layer$id != "main")
+            print(str_interp("-- ${layer$id} - ${layer$type}"))
+        }
+      }
+    }
+    
+    invisible(self)
+  },
+  
+  getMarked = function(chartId = NULL, layerId = NULL, sessionId = NULL) {
+    if(is.null(sessionId) && exists(".id")) {
+      session <- super$getSession(.id)
+    } else {
+        session <- getSession(sessionId)
+    }
+    
+    if(is.null(session))
+      stop("Can't retreive the session")
+
+    if(is.null(chartId))
+      if(length(private$charts) == 1) {
+        chartId <- private$charts[[1]]$id
+      } else {
+        stop(str_c("There are more than one chart on the page. 'chartId' must be ",
+                   "specified. Use 'listCharts()' to get IDs of all existing charts."))
+      }
+    
+    chart <- private$getChart(chartId)
+    if(is.null(chart))
+      stop(str_c("Chart ", chartId, " is not defined."))
+    
+    if(is.null(layerId)) {
+      if(chart$nLayers() == 0)
+        layerId <- "main"
+      if(chart$nLayers() == 1)
+        layerId <- names(chart$layers)[2]
+      if(chart$nLayers() > 1)
+        stop(str_c("There is more than one layer in this chart. 'layerId' must be specified. ",
+                   "Use 'listCharts()' to get IDs of all existing charts and their layers."))
+    }
+    session$sessionVariables(list(.marked = NULL))
+    session$sendCommand(str_interp("rlc.getMarked('${chartId}', '${layerId}')"), wait = 5)
+    marked <- session$sessionVariables(varName = ".marked", remove = ".marked")
+    
+    if( is.null(marked) ) {
+      warning( "Can't load marked elements" )
+    }
+    
+    if(is.numeric(marked)) marked <- marked + 1
+    if(length(marked) == 0)
+      return (c())
+    
+    marked
+  },
+  
+  mark = function(elements, chartId = NULL, layerId = NULL, preventEvent = TRUE, sessionId = NULL){
+    if(is.null(sessionId) && exists(".id")) {
+      session <- super$getSession(.id)
+    } else {
+      session <- super$getSession(sessionId)
+    }
+    
+    if(is.null(session))
+      stop("Can't retreive the session")
+    
+    if(is.null(chartId))
+      if(length(private$charts) == 1) {
+        chartId <- private$charts[[1]]$id
+      } else {
+        stop(str_c("There is more than one chart on the page. 'chartId' must be ",
+                   "specified. Use 'listCharts()' to get IDs of all existing charts."))
+      }
+    
+    chart <- private$getChart(chartId)
+    if(is.null(chart))
+      stop(str_c("Chart ", chartId, " is not defined."))
+    
+    if(is.null(layerId)) {
+      if(chart$nLayers() == 0)
+        layerId <- "main"
+      if(chart$nLayers() == 1)
+        layerId <- names(chart$layers)[2]
+      if(chart$nLayers() > 1)
+        stop(str_c("There is more than one layer in this chart. 'layerId' must be specified. ",
+                   "Use 'listCharts()' to get IDs of all existing charts and their layers."))
+    }
+    
+    if(length(elements) != 0 & !is.vector(elements))
+      stop("'elements' must be a vector of indices.")
+    if(preventEvent) {
+      preventEvent = "true"
+    } else {
+      preventEvent = "false"
+    }
+    
+    if(length(elements) == 0) {
+      elements <- "__clear__"
+    } else {
+      elements <- elements - 1
+    }
+    
+    session$sendData("markElements", elements)
+    session$sendCommand(str_c("rlc.mark('", chartId, "', '", layerId, "', ", preventEvent, ");"))    
+  },
   
   initialize = function(layout = NULL, ...){
     super$initialize(...)
@@ -100,7 +320,7 @@ LCApp <- R6Class("LCApp", inherits = "App", public = list(
         super$closeSession(session)
         stop( "Can't load linked-charts.js or rlc.js" )
       }
-      session$sessionVariables(remove = c("s1", "s2"))
+      session$sessionVariables(vars = list(app = self), remove = c("s1", "s2"))
       
       session$sendCommand("d3.select('title').text('R/linked-charts');")
       
@@ -169,7 +389,63 @@ LCApp <- R6Class("LCApp", inherits = "App", public = list(
     message(str_interp("Chart '${chartId}' added."))
     
     invisible(chart)
-  }  
+  },
+  
+  setChart <- function(.type, data, ..., place, id, layerId, dataFun, addLayer, pacerStep = 50) {
+    if(is.null(pkg.env$app)) openPage()
+    
+    if(is.null(place))
+      place <- str_c("Chart", length(lc$charts) + 1)
+    
+    if(is.null(id))
+      id <- place
+    
+    chart <- private$getChart(id)
+    if(!is.null(chart) && !is.null(layerId) && layerId == "main") {
+      self$removeChart(chart$id)
+      chart <- private$getChart(id)
+    }
+    
+    if(is.null(chart)) {
+      chart <- private$addChart(id, place)
+      if(is.null(layerId) || layerId != "main")
+        chart$addLayer("main", "axesChart")
+    }
+    
+    if(is.null(layerId)){
+      if(!addLayer & chart$nLayers() > 1) {
+        warning(str_c("Chart '", id, "' has ", chart$nLayers(), " layers and the layer ID is not specified. ", 
+                      "'addLayer' will be set to TRUE."))
+        addLayer <- T
+      }
+      
+      if(addLayer | chart$nLayers() == 0) {
+        layerId <- str_c("Layer", (chart$nLayers() + 1))
+      } else {
+        layerId <- names(chart$layers)[2]
+      }
+    }
+    
+    if(!is.null(chart$getLayer(layerId)))
+      chart$removeLayer(layerId)
+    
+    layer <- chart$addLayer(layerId, .type)
+    layer$dataFun <- dataFun
+    
+    layer$pacerStep <- pacerStep
+    l <- list(...)
+    nonEv <- lapply(names(l), function(n) {function() l[[n]]})
+    names(nonEv) <- names(l)
+    setProperties(c(data, nonEv), id, layerId)
+    
+    for(session in super$sessions){
+      chart$JSinitialize(session)
+      chart$update(session)
+    }
+    
+    invisible(self)
+  }
+  
 ))
 
 
@@ -243,6 +519,35 @@ Chart <- R6Class("Chart", public = list(
       }
     }
   },
+  
+  update = function(sessionId, layerId = NULL, updateOnly = NULL) {
+    args <- str_c("'", self$id, "', '")
+      
+    if(!is.null(updateOnly)) {
+        args <- str_c(args, updateOnly, "', '")
+    } else {
+      args <- str_c(args, "', '")
+    }
+      
+    if(!is.null(layerId)) {
+      args <- str_c(args, layerId, "'")
+      private$sendProperties(sessionId, layerId)
+    } else {
+      private$sendProperties(sessionId)
+      args <- str_c(args, "'")
+    }
+    if(is.vector(sessionId)){
+      for(id in sessionId){
+        session <- private$app$getSession(id)
+        if(!is.null(session))
+          session$sendCommand(str_interp("rlc.updateCharts(${args});"))
+      }
+    } else {
+      sessionId$sendCommand(str_interp("rlc.updateCharts(${args});"))
+    }
+    invisible(self)
+  },
+    
   initialize = function(id, place) {
     self$id <- id
     self$place <- place
@@ -262,6 +567,70 @@ Chart <- R6Class("Chart", public = list(
         layer$init <- TRUE
       }
     })
+  },
+  
+  sendProperties <- function(sessionId, layerId = ls(private$layers)){
+    for(layerName in layerId){
+      layer <- self$getLayer(layerName)
+      if(is.null(layer))
+        stop(str_c("There is no layer ", layerName, " in the chart ", self$id))
+      
+      e <- new.env()
+      tryCatch({
+        d <- lapply(layer$properties, function(el) el())
+        d <- layer$dataFun(d)
+      },
+      error = function(e) 
+        stop( str_interp( "in data expression for chart '${chart$id}': ${e$message}." ), call.=FALSE ) ) 
+      
+      if(!is.null(d$ticksX) & !is.vector(d$ticksX))
+        d$ticksX <- t(d$ticksX)
+      if(!is.null(d$ticksY) & !is.vector(d$ticksY))
+        d$ticksY <- t(d$ticksY)
+      
+      if(!is.null(d$on_click)) {
+        layer$on_click <- d$on_click
+        d$on_click <- NULL
+      }
+      
+      name <- str_c(self$id, layer$id, sep = "_")
+      
+      for(id in sessionId){
+        session <- private$app$getSession(id)
+        if(!is.null(session)) {
+          if(!is.null(d$on_marked)) {
+            layer$on_marked <- d$on_marked
+            d$maekedUpdated <- NULL
+            session$sendCommand(str_interp("rlc.setCustomOnMarked('${self$id}', '${layerName}');"))
+          }
+          
+          if(!is.null(d$on_mouseover)) {
+            layer$on_mouseover <- d$on_mouseover
+            d$on_mouseover <- NULL
+            session$sendCommand(str_interp("rlc.setCustomMouseOver('${self$id}', '${layerName}', ${layer$pacerStep});"))
+          }
+          if(!is.null(d$on_mouseout)) {
+            layer$on_mouseout <- d$on_mouseout
+            d$on_mouseout <- NULL
+            session$sendCommand(str_interp("rlc.setCustomMouseOut('${self$id}', '${layerName}');"))
+          }    
+          if(!is.null(d$on_labelClickRow)) {
+            layer$on_labelClickRow <- d$on_labelClickRow
+            d$on_labelClickRow <- NULL
+            session$sendCommand(str_interp("rlc.setCustomClickLabel('${self$id}', 'Row');"))
+          }    
+          if(!is.null(d$on_labelClickCol)) {
+            layer$on_labelClickCol <- d$on_labelClickCol
+            d$on_labelClickCol <- NULL
+            session$sendCommand(str_interp("rlc.setCustomClickLabel('${self$id}', 'Col');"))
+          }    
+          
+          session$sendData(name, d)
+          session$sendCommand(str_interp("rlc.setProperty('${name}')"))
+          
+        }
+      }
+    }
   }
 ))                 
                    
@@ -352,7 +721,6 @@ setProperties <- function(data, chartId, layerId = NULL) {
     stop("There is no opened page. Please, use 'openPage()' function to create one.") 
   
   pkg.env$app$removeChart(data, chartId, layerId)
-  
 }
 
 #' Update a chart
@@ -411,7 +779,7 @@ setProperties <- function(data, chartId, layerId = NULL) {
 #' }
 #' 
 #' 
-#' @param id An ID of the chart to be updated (or vector of IDs). If NULL then all the
+#' @param chartId An ID of the chart to be updated (or vector of IDs). If NULL then all the
 #' existing charts will be updated.
 #' 
 #' @param layerId An ID of the layer to be updated (or vector of IDs). If NULL of the
@@ -452,156 +820,11 @@ setProperties <- function(data, chartId, layerId = NULL) {
 #' updateCharts("iris", updateOnly = "ElementStyle")}
 #' 
 #' @export
-updateCharts <- function(id = NULL, layerId = NULL, updateOnly = NULL) {
-  if(length(lc$charts) == 0) {
-    warning("There are no charts yet.")
-    return ();
-  }
+updateCharts <- function(chartId = NULL, layerId = NULL, updateOnly = NULL) {
+  if(is.null(pkg.env$app))
+    stop("There is no opened page. Please, use 'openPage()' function to create one.") 
   
-  if(is.null(id)) id <- ls(lc$charts)
-  if(!is.vector(id))
-    stop("'id' should be a vector of IDs")
-
-  
-  if(!is.null(layerId) & length(layerId) != length(id))
-    stop("Lengths of 'id' and 'layerId' differ")
-  if(!is.null(updateOnly) & length(updateOnly) != length(id))
-    stop("Lengths of 'id' and 'updateOnly' differ")
-  
-  for(i in 1:length(id)){
-    chart <- getChart(id[i])
-    if(is.null(chart))
-      stop(str_c("Chart with ID ", id[i], " is not defined."))
-    args <- str_c("'", id[i], "', '")
-    
-    if(!is.null(updateOnly)) {
-      args <- str_c(args, updateOnly[i], "', '")
-    } else {
-      args <- str_c(args, "', '")
-    }
-    
-    if(!is.null(layerId)) {
-      args <- str_c(args, layerId[i], "'")
-      sendProperties(chart, layerId[i])
-    } else {
-      sendProperties(chart)
-      args <- str_c(args, "'")
-    }
-    sendCommand(str_interp("rlc.updateCharts(${args});"))
-  }
-}
-
-sendProperties <- function(chart, layerId = ls(chart$layers)){
-  for(layerName in layerId){
-    layer <- chart$getLayer(layerName)
-    if(is.null(layer))
-      stop(str_c("There is no layer ", layerName, " in the chart ", chart$id))
-    
-    e <- new.env()
-    tryCatch({
-      d <- lapply(layer$properties, function(el) el())
-      d <- layer$dataFun(d)
-    },
-    error = function(e) 
-      stop( str_interp( "in data expression for chart '${chart$id}': ${e$message}." ), call.=FALSE ) ) 
-    
-    if(!is.null(d$ticksX) & !is.vector(d$ticksX))
-      d$ticksX <- t(d$ticksX)
-    if(!is.null(d$ticksY) & !is.vector(d$ticksY))
-      d$ticksY <- t(d$ticksY)
-    
-    if(!is.null(d$on_click)) {
-      layer$on_click <- d$on_click
-      d$on_click <- NULL
-    }
-    
-    if(!is.null(d$on_marked)) {
-      layer$on_marked <- d$on_marked
-      d$maekedUpdated <- NULL
-      sendCommand(str_interp("rlc.setCustomOnMarked('${chart$id}', '${layerName}');"))
-    }
-    
-    if(!is.null(d$on_mouseover)) {
-      layer$on_mouseover <- d$on_mouseover
-      d$on_mouseover <- NULL
-      sendCommand(str_interp("rlc.setCustomMouseOver('${chart$id}', '${layerName}', ${layer$pacerStep});"))
-    }
-    if(!is.null(d$on_mouseout)) {
-      layer$on_mouseout <- d$on_mouseout
-      d$on_mouseout <- NULL
-      sendCommand(str_interp("rlc.setCustomMouseOut('${chart$id}', '${layerName}');"))
-    }    
-    if(!is.null(d$on_labelClickRow)) {
-      layer$on_labelClickRow <- d$on_labelClickRow
-      d$on_labelClickRow <- NULL
-      sendCommand(str_interp("rlc.setCustomClickLabel('${chart$id}', 'Row');"))
-    }    
-    if(!is.null(d$on_labelClickCol)) {
-      layer$on_labelClickCol <- d$on_labelClickCol
-      d$on_labelClickCol <- NULL
-      sendCommand(str_interp("rlc.setCustomClickLabel('${chart$id}', 'Col');"))
-    }    
-    
-    name <- str_c(chart$id, layer$id, sep = "_")
-    
-    sendData(name, d)
-    sendCommand(str_interp("rlc.setProperty('${name}')"))
-  }
-}
-
-setChart <- function(.type, data, ..., place, id, layerId, dataFun, addLayer, pacerStep = 50) {
-  if(!lc$pageOpened) openPage()
-  
-  if(is.null(place))
-    place <- str_c("Chart", length(lc$charts) + 1)
-  prepareContainer(place)
-  
-  if(is.null(id))
-    id <- place
-  
-  chart <- getChart(id)
-  if(!is.null(chart) && !is.null(layerId) && layerId == "main") {
-    removeChart(chart$id)
-    chart <- getChart(id)
-  }
-  
-  if(is.null(chart)) {
-    chart <- addChart(id, place)
-    if(is.null(layerId) || layerId != "main")
-      chart$addLayer("main", "axesChart")
-  }
-
-  if(is.null(layerId)){
-    if(!addLayer & chart$nLayers() > 1) {
-      warning(str_c("Chart '", id, "' has ", chart$nLayers(), " layers and the layer ID is not specified. ", 
-                    "'addLayer' will be set to TRUE."))
-      addLayer <- T
-    }
-    
-    if(addLayer | chart$nLayers() == 0) {
-      layerId <- str_c("Layer", (chart$nLayers() + 1))
-    } else {
-      layerId <- names(chart$layers)[2]
-    }
-  }
-  
-  if(!is.null(chart$getLayer(layerId)))
-    chart$removeLayer(layerId)
-  
-  layer <- chart$addLayer(layerId, .type)
-  layer$dataFun <- dataFun
-  
-  layer$pacerStep <- pacerStep
-  
-  chart$JSinitialize()
-  
-  l <- list(...)
-  nonEv <- lapply(names(l), function(n) {function() l[[n]]})
-  names(nonEv) <- names(l)
-  setProperties(c(data, nonEv), id, layerId)
-  updateCharts(id)
-  
-  invisible(chart)
+  pkg.env$app$updateCharts(chartId, layerId, updateOnly)
 }
 
 #' Trigger an event
@@ -628,40 +851,20 @@ setChart <- function(.type, data, ..., place, id, layerId, dataFun, addLayer, pa
 #' 
 #' @export
 #' @importFrom utils type.convert
-chartEvent <- function(d, id, layerId = "main", event) {
+chartEvent <- function(d, chartId, layerId = "main", event) {
   
   if(length(d) == 1)
     if(d == "NULL")
       d <- NULL
   
-  #lame. This also must go to jrc with the nearest update
-  d <- type.convert(d, as.is = TRUE)
-  if(is.numeric(d)) d <- d + 1
-  # should we move that to jrc? And add some parameter, like 'flatten'?
-  if(is.list(d))
-    if(all(sapply(d, function(el) length(el) == 1)))
-      d <- unlist(d)
-  
-  chart <- getChart(id)
-  if(is.null(chart))
-    stop(str_interp("Chart with ID ${id} is not defined"))
-  
-  layer <- chart$getLayer(layerId)
-  if(is.null(layer))
-    stop(str_interp("Chart ${id} doesn't have layer ${layerId}"))
-
-  if(event == "click")
-    layer$on_click(d)
-  if(event == "mouseover")
-    layer$on_mouseover(d)
-  if(event == "mouseout")
-    layer$on_mouseout()
-  if(event == "marked")
-    layer$on_marked()
-  if(event == "labelClickRow")
-    layer$on_labelClickRow(d)
-  if(event == "labelClickCol")
-    layer$on_labelClickCol(d)
+  if(exists(".id")) {
+    app$chartEvent(d, chartId, layerId, event, .id)
+  } else {
+    if(is.null(pkg.env$app))
+      stop("There is no opened page. Please, use 'openPage()' function to create one.") 
+    pkg.env$app$chartEvent(d, chartId, layerId, event, pkg.env$app$getSessionIds())
+  }
+    
 }
 
 #' List all existing charts and layers
@@ -682,18 +885,10 @@ chartEvent <- function(d, id, layerId = "main", event) {
 #' listCharts()}
 #' @export
 listCharts <- function() {
-  for(chartId in names(lc$charts)) {
-    print(str_interp("Chart: ${chartId}"))
-    chart <- getChart(chartId)
-    if(chart$nLayers() > 1) {
-      print("- Layers:")
-      for(layerId in names(chart$layers)){
-        layer <- chart$getLayer(layerId)
-        if(layer$id != "main")
-          print(str_interp("-- ${layer$id} - ${layer$type}"))
-      }
-    }
-  }
+  if(is.null(pkg.env$app))
+    stop("There is no opened page. Please, use 'openPage()' function to create one.") 
+
+  pkg.env$app$listCharts()
 }
 
 #' Get currently marked elements
@@ -720,49 +915,11 @@ listCharts <- function() {
 #' getMarked("Chart1")}
 #' 
 #' @export
-getMarked <- function(chartId = NULL, layerId = NULL) {
-  if(is.null(chartId))
-    if(length(lc$charts)) {
-      chartId <- lc$charts[[1]]$id
-    } else {
-      stop(str_c("There are more than one chart on the page. 'chartId' must be ",
-                 "specified. Use 'listCharts()' to get IDs of all existing charts."))
-    }
+getMarked <- function(chartId = NULL, layerId = NULL, sessionId = NULL) {
+  if(is.null(pkg.env$app))
+    stop("There is no opened page. Please, use 'openPage()' function to create one.") 
   
-  chart <- getChart(chartId)
-  if(is.null(chart))
-    stop(str_c("Chart ", chartId, " is not defined."))
-  
-  if(is.null(layerId)) {
-    if(chart$nLayers() == 0)
-      layerId <- "main"
-    if(chart$nLayers() == 1)
-      layerId <- names(chart$layers)[2]
-    if(chart$nLayers() > 1)
-      stop(str_c("There is more than one layer in this chart. 'layerId' must be specified. ",
-                 "Use 'listCharts()' to get IDs of all existing charts and their layers."))
-  }
-  marked <- NULL
-  setEnvironment(environment()) 
-  sendCommand(str_interp("rlc.getMarked('${chartId}', '${layerId}')"))
-  for( i in 1:(5/0.05) ) {
-    service()
-    if(!is.null(marked)) {
-      setEnvironment(globalenv())
-      break
-    } 
-    Sys.sleep( .05 )
-  }
-  
-  if( is.null(marked) ) {
-    warning( "Can't load marked elements" )
-  }
-  
-  if(is.numeric(marked)) marked <- marked + 1
-  if(length(marked) == 0)
-    return (c())
-  
-  marked
+  pkg.env$getMarked(chartId, layerId, sessionId)
 }
 
 #' Mark elements of a chart
@@ -805,45 +962,11 @@ getMarked <- function(chartId = NULL, layerId = NULL) {
 #' ), "A2")}
 #'
 #' @export
-mark <- function(elements, chartId = NULL, layerId = NULL, preventEvent = TRUE) {
-  if(is.null(chartId))
-    if(length(lc$charts)) {
-      chartId <- lc$charts[[1]]$id
-    } else {
-      stop(str_c("There is more than one chart on the page. 'chartId' must be ",
-                 "specified. Use 'listCharts()' to get IDs of all existing charts."))
-    }
+mark <- function(elements, chartId = NULL, layerId = NULL, preventEvent = TRUE, sessionId = NULL) {
+  if(is.null(pkg.env$app))
+    stop("There is no opened page. Please, use 'openPage()' function to create one.") 
   
-  chart <- getChart(chartId)
-  if(is.null(chart))
-    stop(str_c("Chart ", chartId, " is not defined."))
-  
-  if(is.null(layerId)) {
-    if(chart$nLayers() == 0)
-      layerId <- "main"
-    if(chart$nLayers() == 1)
-      layerId <- names(chart$layers)[2]
-    if(chart$nLayers() > 1)
-      stop(str_c("There is more than one layer in this chart. 'layerId' must be specified. ",
-                 "Use 'listCharts()' to get IDs of all existing charts and their layers."))
-  }
-  
-  if(length(elements) != 0 & !is.vector(elements))
-    stop("'elements' must be a vector of indices.")
-  if(preventEvent) {
-    preventEvent = "true"
-  } else {
-    preventEvent = "false"
-  }
-  
-  if(length(elements) == 0) {
-    elements <- "__clear__"
-  } else {
-    elements <- elements - 1
-  }
-  
-  sendData("markElements", elements)
-  sendCommand(str_c("rlc.mark('", chartId, "', '", layerId, "', ", preventEvent, ");"))
+  pkg.env$app$mark(elements, chartId, layerId, preventEvent, sessionId)
 }
 
 

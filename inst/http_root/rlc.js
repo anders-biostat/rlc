@@ -175,7 +175,7 @@ rlc.getMarked = function(id, layerId) {
   if(marked.empty)
     marked = marked.data();
 
-  jrc.sendData("marked", marked);
+  jrc.sendData(".marked", marked);
 }
 
 rlc.mark = function(id, layerId, pe) {
