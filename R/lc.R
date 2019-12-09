@@ -119,7 +119,7 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
       if(all(sapply(d, function(el) length(el) == 1)))
         d <- unlist(d)
       
-    chart <- private$getChart(id)
+    chart <- private$getChart(chartId)
     if(is.null(chart))
       stop(str_interp("Chart with ID ${id} is not defined"))
       
@@ -256,11 +256,19 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
     session$sendCommand(str_c("rlc.mark('", chartId, "', '", layerId, "', ", preventEvent, ");"))    
   },
   
-  setChart = function(.type, data, ..., place, id, layerId, addLayer, pacerStep = 50) {
+  setChart = function(chartType, data, ..., place, id, layerId, addLayer, pacerStep = 50) {
     if(is.null(private$serverHandle)){
       super$startServer()
       super$openPage()
     }
+    
+    if(length(chartType) > 1){
+      warning("Attempt supply several types for one chart. Only the first one will be used.")
+      chartType <- chartType[1]
+    }
+    
+    if(!(chartType %in% names(private$jsTypes)))
+      stop("Unknown chart type")
     
     if(is.null(place))
       place <- str_c("Chart", length(private$charts) + 1)
@@ -296,10 +304,10 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
 
     if(!is.null(chart$getLayer(layerId)))
       chart$removeLayer(layerId)
-
-    layer <- chart$addLayer(layerId, .type)
-    if(!is.null(private$dataFun[[.type]]))
-      layer$dataFun <- private$dataFun[[.type]]
+    
+    layer <- chart$addLayer(layerId, private$jsTypes[chartType])
+    if(!is.null(private$dataFun[[chartType]]))
+      layer$dataFun <- private$dataFun[[chartType]]
 
     layer$pacerStep <- pacerStep
     l <- list(...)
@@ -308,7 +316,7 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
     self$setProperties(c(data, nonEv), id, layerId)
     
     for(session in private$sessions){
-      chart$JSinitialize(session)
+      chart$JSInitialize(session)
       chart$update(session)
     }
     
@@ -383,6 +391,10 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
                "symbols" = "symbol", "symbolValues" = "symbolValue", "strokes" = "stroke", "values" = "value",
                "heatmapRows" = "heatmapRow", "heatmapCols" = "heatmapCol", "showValues" = "showValue",
                "globalColorScale" = "globalColourScale", "steps" = "step"),
+  jsTypes = c(scatter = "scatter", beeswarm = "beeswarm", line = "pointLine", path = "poinLine",
+              ribbon = "pointRibbon", bars = "barchart", hist = "barchart", dens = "pointLine",
+              heatmap = "heatmap", colourSlider = "colourSlider", abLine = "xLine", hLine = "xLine",
+              vLine = "yLine", html = "html", input = "input"),
   charts = list(),
   layout = NULL,
 
@@ -457,12 +469,361 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
 #        l$mode <- "svg"
       
       l
-    }
+    },
+    beeswarm = function(l) {
+      if(is.null(l$x) || is.null(l$y))
+        stop("Required properties 'x' and 'y' are not defined.")
+      
+      if(is.factor(l$x))
+        l$layerDomainX <- levels(l$x)
+      if(is.factor(l$y))
+        l$layerDomainY <- levels(l$y)    
+      
+      if(is.null(l$label)){
+        if(!is.null(names(l$y)))
+          l$label <- names(l$y)
+        if(!is.null(names(l$x)))
+          l$label <- names(l$x)
+      }
+      
+#      if(lc$useViewer)
+#        l$mode <- "svg"    
+      
+      l   
+    },
 
+    path = function(l) {
+      if(is.null(l$x) && is.null(l$y))
+        stop("Required properties 'x' and 'y' are missing.")
+      
+      if(is.factor(l$x))
+        l$layerDomainX <- levels(l$x)
+      if(is.factor(l$y))
+        l$layerDomainY <- levels(l$y)
+      
+      if(!is.null(l$x)) l$x <- as.matrix(l$x)
+      if(!is.null(l$y)) l$y <- as.matrix(l$y)
+      
+      if(is.null(l$y))
+        l$y <- matrix(rep(1:nrow(l$x), ncol(l$x)), nrow = ncol(l$x))
+      if(is.null(l$x))
+        l$x <- matrix(rep(1:nrow(l$y), ncol(l$y)), nrow = ncol(l$y))
+      
+      if(!is.matrix(l$x) || !is.matrix(l$y))
+        stop("One of the properties 'x' or 'y' can not be converted into matrix")
+      
+      if(nrow(l$x) != nrow(l$y))
+        stop("Lengths of 'x' and 'y' differ.")
+      
+      if(ncol(l$x) != ncol(l$y)){
+        if(ncol(l$x) == 1)
+          l$x <- matrix(rep(l$x, ncol(l$y)), ncol = ncol(l$y))
+        if(ncol(l$y) == 1)
+          l$y <- matrix(rep(l$y, ncol(l$x)), ncol = ncol(l$x))
+        if(ncol(l$x) != ncol(l$y))
+          stop("'x' and 'y' define different number of lines.")
+      }
+      
+      if(!is.null(l$x)) {
+        l$nelements <- ncol(l$x)
+        l$nsteps <- nrow(l$x)      
+      }
+      
+      l
+    },
+
+    line = function(l) {
+      l <- private$dataFun$path(l)
+      
+      for(i in 1:ncol(l$x)) {
+        l$y[, i] <- l$y[order(l$x[, i]), i]
+        l$x[, i] <- l$x[order(l$x[, i]), i]
+      }
+      l
+    },
+    
+    ribbon = function(l) {
+      if(is.factor(l$x))
+        l$layerDomainX <- levels(l$x)
+      if(is.factor(l$ymax))
+        l$layerDomainY <- levels(l$ymax)
+      if(is.factor(l$ymin))
+        l$layerDomainY <- levels(l$ymin)
+      
+      if(!is.null(l$x) && !is.vector(l$x)) l$x <- as.matrix(l$x)
+      if(!is.null(l$ymax) && !is.vector(l$ymax)) l$ymax <- as.matrix(l$ymax)
+      if(!is.null(l$ymin) && !is.vector(l$ymin)) l$ymin <- as.matrix(l$ymin)
+      
+      if(!is.null(l$ymax) | !is.null(l$ymin) | !is.null(l$x)){
+        if(is.matrix(l$x)) {
+          if((nrow(l$ymax) != nrow(l$ymin)) | (nrow(l$x) != nrow(l$ymin)))
+            stop("'x', 'ymax' and 'ymin' define different number of lines.")
+          if((ncol(l$ymax) != ncol(l$ymin)) | (ncol(l$x) != ncol(l$ymin)))
+            stop("Lengths of 'x', 'ymax' and 'ymin' differ.")
+          
+        } else {
+          if(length(l$ymax) != length(l$ymin) | length(l$x) != length(l$ymin))
+            stop("Lengths of 'x', 'ymax' and 'ymin' differ.")
+        }
+      }
+      
+      if(!is.null(l$x)) {
+        if(is.matrix(l$x)) {
+          l$nelements <- ncol(l$x)
+          l$nsteps <- nrow(l$x)      
+        } else {
+          l$nelements <- 1
+          l$nsteps <- length(l$x)
+        }
+      }
+      
+      l
+    },
+
+    bars = function(l) {
+      if(!is.null(l$barIds) && length(l$barIds) != length(l$value))
+        stop("Number of bar IDs is not equal to the number of provided values.")
+      if(!is.null(l$stackIds) && length(l$stackIds) != length(l$value))
+        stop("Number of stack IDs is not equal to the number of provided values.")
+      if(!is.null(l$groupIds) && length(l$groupIds) != length(l$value))
+        stop("Number of group IDs is not equal to the number of provided values.")
+      
+      if(all(is.null(l$groupIds), !is.null(l$barIds), is.null(l$stackIds))) {
+        l$groupIds <- l$barIds
+        l$barIds <- NULL
+      }
+      if(is.null(l$groupIds) &is.null(l$barIds))
+        if(is.null(names(l$value))) {
+          l$groupIds <- 1:length(l$value)  
+        } else {
+          l$groupIds <- names(l$value)
+        }
+      
+      if(is.null(l$barIds) & is.null(l$stackIds))
+        l$addColourScaleToLegend <- FALSE
+      
+      if(is.null(l$groupIds)) l$groupIds <- rep("group", length(l$value))
+      if(is.null(l$barIds)) l$barIds <- rep(1, length(l$value))
+      if(is.null(l$stackIds)) l$stackIds <- rep(1, length(l$value))
+      
+      ngroups <- length(unique(l$groupIds))
+      nbars <- length(unique(l$barIds))
+      nstacks <- length(unique(l$stackIds))
+      
+      if(is.factor(l$groupIds))
+        l$layerDomainX <- levels(l$groupIds)
+      
+      inds <- NULL
+      
+      if(is.numeric(l$groupIds) & !is.integer(l$groupIds)){
+        inds <- unique(l$groupIds)
+        l$groupIds <- match(l$groupIds, inds)
+      }
+      
+      vals <- list()
+      
+      for(i in 1:length(l$value)) {
+        
+        if(is.null(vals[[as.character(l$groupIds[i])]])) vals[[as.character(l$groupIds[i])]] <- list()
+        if(is.null(vals[[as.character(l$groupIds[i])]][[as.character(l$barIds[i])]])) 
+          vals[[as.character(l$groupIds[i])]][[as.character(l$barIds[i])]] <- list()
+        
+        vals[[as.character(l$groupIds[i])]][[as.character(l$barIds[i])]][[as.character(l$stackIds[i])]] <- l$value[i]
+      }
+      
+      if(!is.null(inds)) {
+        vals$`__inds__` <- inds
+        l$groupIds <- inds
+      }
+      
+      
+      l$value <- vals
+      l$groupIds <- unique(l$groupIds)
+      l$barIds <- unique(l$barIds)
+      l$stackIds <- unique(l$stackIds)
+      
+      l
+    },
+
+    hist = function(l) {
+      if(is.null(l$nbins)) {
+        nbins <- 10
+      } else {
+        nbins <- l$nbins
+      }
+      if(!is.numeric(nbins) || nbins < 1) 
+        stop("'nbins' must be a positive number")
+      
+      l$nbins <- NULL
+      
+      l$contScaleX <- TRUE
+      l$addColourScaleToLegend <- FALSE
+      l$groupWidth <- 1
+      
+      if(!is.null(l$value)) {
+        minV <- min(l$value, na.rm = TRUE)
+        maxV <- max(l$value, na.rm = TRUE)
+        breaks <- seq(minV, maxV, length.out = nbins + 1)
+        step <- breaks[2] - breaks[1]
+        groupIds <- breaks - step/2
+        groupIds <- groupIds[-1]
+        binned <- .bincode(l$value, breaks, include.lowest = TRUE)
+        value <- sapply(1:nbins, function(i) {sum(binned == i)})
+        
+        l$groupIds <- groupIds
+        l$value <- value
+      }
+      private$dataFun$bars(l)
+    },
+
+    dens = function(l) {
+      if(!is.null(l$value)) {
+        dens <- density.default(l$value)
+        l$x <- dens$x
+        l$y <- dens$y
+        l$value <- NULL
+      }
+      private$dataFun$path(l)
+    },
+    
+    heatmap = function(l) {
+      if(!is.null(l$value)) {
+        l$nrows <- nrow(l$value)
+        l$ncols <- ncol(l$value)
+        
+        l$value <- as.matrix(l$value)
+        
+        if(is.null(l$rowLabel) & !is.null(rownames(l$value)))
+          l$rowLabel <- rownames(l$value)
+        if(is.null(l$colLabel) & !is.null(colnames(l$value)))
+          l$colLabel <- colnames(l$value)
+      }
+      
+      if(lc$useViewer)
+        l$mode <- "svg"
+      
+      l
+    },
+    
+    colourSlider = function(l) {
+      if(!is.null(l$chart)) {
+        l$linkedChart <- str_c("charts.", l$chart)
+        if(is.null(l$layer) && getChart(l$chart)$nLayers() == 1) 
+          l$layer <- names(getChart(l$chart)$layers)[2]
+        if(!is.null(l$layer))
+          l$linkedChart <- str_c(l$linkedChart, ".layers.", l$layer)
+        
+      }
+      l$chart <- NULL
+      l$layer <- NULL
+      l
+    },
+
+    abLine = function(l) {
+      if(is.null(l$a) || is.null(l$b))
+        stop("Required properties 'a' and 'b' are not defined.");
+      if(length(l$a) != length(l$b))
+        stop("Lengths of 'a' and 'b' differ.")
+      
+      l$a <- as.vector(l$a)
+      l$b <- as.vector(l$b)
+      
+      l$nelements <- length(l$a)
+      l$lineFun <- str_c("function(x, d) { a = ", toJSON(l$a, digits = NA), ";",
+                         "b = ", toJSON(l$b, digits = NA), ";", 
+                         "return a[d] * x + b[d]; }")
+      l$a <- NULL
+      l$b <- NULL
+      
+      l
+    },
+
+    hLine = function(l) {
+      if(is.null(l$h))
+        stop("Required property 'h' is not defined.");
+      
+      l$h <- as.vector(l$h)
+      
+      l$nelements <- length(l$h)
+      l$lineFun <- str_c("function(x, d) { h = ", toJSON(l$h, digits = NA), ";",
+                         "return h[d]; }")
+      l$h <- NULL
+      
+      l
+    },
+
+    vLine = function(l) {
+      if(is.null(l$v))
+        stop("Required property 'v' is not defined.");
+      
+      l$v <- as.vector(l$v)
+      
+      l$nelements <- length(l$v)
+      l$lineFun <- str_c("function(x, d) { v = ", toJSON(l$v, digits = NA), ";",
+                         "return v[d]; }")
+      l$v <- NULL
+      
+      l
+    },
+
+    html = function(l) {
+      if(!is.character(l$content) || length(l$content) != 1)
+        l$content <- hwrite(l$content)
+      
+      #l$content <- gsub("[\r\n]", "", l$content)
+      #l$content <- str_replace_all(l$content, "(\\W)", "\\\\\\1")
+      
+      l
+    },
+
+    input = function(l){
+      if(!(l$type %in% c("checkbox", "radio", "text", "button", "range")))
+        stop("Unsupported type of input. Please, use one of \"checkbox\", \"radio\", \"text\", \"button\", \"range\"")
+      
+      if(!is.null(l$label)) {
+        l$nelements <- length(l$label)
+      } else {
+        l$nelements <- 1
+      }
+      
+      if(l$type == "checkbox")
+        if(!is.null(l$values))
+          if(length(l$value) != 1 & length(l$value) != l$nelements)
+            stop("Length of 'values' vector must be either 1 or equal to the number of checkboxes.")
+      
+      if(l$type == "radio")
+        if(!is.null(l$value))
+          if(length(l$value) != 1 | !is.numeric(l$value)) {
+            stop("'value' must be a number of the checked radio button")
+          } else {
+            l$value = l$value - 1
+          }
+      
+      
+      if(l$type == "text")
+        if(!is.null(l$value) & length(l$value) != l$nelements)
+          stop("Length of 'values' must be equal to the number of text fields.")
+      
+      if(l$type == "range") {
+        if(!is.null(l$value) & length(l$value) != 1 & length(l$value) != l$nelements)
+          stop("Length of 'values' vector must be either 1 or equal to the number of ranges.")
+        if(!is.null(l$step) & length(l$step) != 1 & length(l$step) != l$nelements)
+          stop("Length of 'step' vector must be either 1 or equal to the number of ranges.")
+        if(!is.null(l$min) & length(l$min) != 1 & length(l$min) != l$nelements)
+          stop("Length of 'min' vector must be either 1 or equal to the number of ranges.")
+        if(!is.null(l$max) & length(l$max) != 1 & length(l$max) != l$nelements)
+          stop("Length of 'max' vector must be either 1 or equal to the number of ranges.")
+      }
+      
+      if(!is.null(l$on_change)) {
+        l$on_click <- l$on_change
+        l$on_change <- NULL
+      }
+      l
+    }
   )
   
 ))
-
 
 Layer <- R6Class("Layer", public = list(
   type = NULL,
@@ -539,6 +900,7 @@ Chart <- R6Class("Chart", public = list(
   update = function(sessionId, layerId = NULL, updateOnly = NULL) {
     if("Session" %in% class(sessionId))
       sessionId <- sessionId$id
+    
     args <- str_c("'", self$id, "', '")
       
     if(!is.null(updateOnly)) {
@@ -565,7 +927,7 @@ Chart <- R6Class("Chart", public = list(
     }
     invisible(self)
   },
-  JSinitialize = function(session) {
+  JSInitialize = function(session) {
     session$sendCommand(str_interp("rlc.prepareContainer('${self$place}');"))
     
     lapply(private$layers, function(layer) {
@@ -1171,68 +1533,10 @@ lc_scatter <- function(data = list(), place = NULL, ..., id = NULL, layerId = NU
 #' 
 #' @export
 lc_beeswarm <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE, pacerStep = 50) {
-  setChart("beeswarm", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer, dataFun = function(l) {
-    if(is.null(l$x) || is.null(l$y))
-      stop("Required properties 'x' and 'y' are not defined.")
+  if(is.null(pkg.env$app))
+    openPage()
 
-    if(is.factor(l$x))
-      l$layerDomainX <- levels(l$x)
-    if(is.factor(l$y))
-      l$layerDomainY <- levels(l$y)    
-  
-    if(is.null(l$label)){
-      if(!is.null(names(l$y)))
-        l$label <- names(l$y)
-      if(!is.null(names(l$x)))
-        l$label <- names(l$x)
-    }
-    
-    if(lc$useViewer)
-      l$mode <- "svg"    
-    
-    l   
-  }, pacerStep = pacerStep)
-}
-
-#TO DO: Add grouping
-lineDataFun <- function(l) {
-  if(is.null(l$x) && is.null(l$y))
-    stop("Required properties 'x' and 'y' are missing.")
-  
-  if(is.factor(l$x))
-    l$layerDomainX <- levels(l$x)
-  if(is.factor(l$y))
-    l$layerDomainY <- levels(l$y)
-  
-  if(!is.null(l$x)) l$x <- as.matrix(l$x)
-  if(!is.null(l$y)) l$y <- as.matrix(l$y)
-
-  if(is.null(l$y))
-    l$y <- matrix(rep(1:nrow(l$x), ncol(l$x)), nrow = ncol(l$x))
-  if(is.null(l$x))
-    l$x <- matrix(rep(1:nrow(l$y), ncol(l$y)), nrow = ncol(l$y))
-
-  if(!is.matrix(l$x) || !is.matrix(l$y))
-    stop("One of the properties 'x' or 'y' can not be converted into matrix")
-
-  if(nrow(l$x) != nrow(l$y))
-    stop("Lengths of 'x' and 'y' differ.")
-  
-  if(ncol(l$x) != ncol(l$y)){
-    if(ncol(l$x) == 1)
-      l$x <- matrix(rep(l$x, ncol(l$y)), ncol = ncol(l$y))
-    if(ncol(l$y) == 1)
-      l$y <- matrix(rep(l$y, ncol(l$x)), ncol = ncol(l$x))
-    if(ncol(l$x) != ncol(l$y))
-      stop("'x' and 'y' define different number of lines.")
-  }
-    
-  if(!is.null(l$x)) {
-    l$nelements <- ncol(l$x)
-    l$nsteps <- nrow(l$x)      
-  }
-  
-  l
+  pck.env$app$setChart("beeswarm", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer, pacerStep = pacerStep)
 }
 
 #' Lines and ribbons
@@ -1363,130 +1667,28 @@ lineDataFun <- function(l) {
 #' 
 #' @export
 lc_line <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE) {
-  setChart("pointLine", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer,
-           dataFun = function(l) {
-             l <- lineDataFun(l)
-             
-             for(i in 1:ncol(l$x)) {
-               l$y[, i] <- l$y[order(l$x[, i]), i]
-               l$x[, i] <- l$x[order(l$x[, i]), i]
-             }
-             
-             l
-           })
+  if(is.null(pkg.env$app))
+    openPage()
+  
+  pkg.env$app$setChart("line", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer)
 }
 
 #' @describeIn lc_line connects points in the order they are given.
 #' @export
 lc_path <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE) {
-  setChart("pointLine", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer, dataFun = lineDataFun)
+  if(is.null(pkg.env$app))
+    openPage()
+
+  pkg.env$app$setChart("path", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer)
 }
 
 #' @describeIn lc_line displays a filled area, defined by \code{ymax} and \code{ymin} values.
 #' @export
 lc_ribbon <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE) {
-  setChart("pointRibbon", data, ...,  place = place, id = id, layerId = layerId, addLayer = addLayer, dataFun = function(l) {
-    if(is.factor(l$x))
-      l$layerDomainX <- levels(l$x)
-    if(is.factor(l$ymax))
-      l$layerDomainY <- levels(l$ymax)
-    if(is.factor(l$ymin))
-      l$layerDomainY <- levels(l$ymin)
-    
-    if(!is.null(l$x) && !is.vector(l$x)) l$x <- as.matrix(l$x)
-    if(!is.null(l$ymax) && !is.vector(l$ymax)) l$ymax <- as.matrix(l$ymax)
-    if(!is.null(l$ymin) && !is.vector(l$ymin)) l$ymin <- as.matrix(l$ymin)
-    
-    if(!is.null(l$ymax) | !is.null(l$ymin) | !is.null(l$x)){
-      if(is.matrix(l$x)) {
-        if((nrow(l$ymax) != nrow(l$ymin)) | (nrow(l$x) != nrow(l$ymin)))
-          stop("'x', 'ymax' and 'ymin' define different number of lines.")
-        if((ncol(l$ymax) != ncol(l$ymin)) | (ncol(l$x) != ncol(l$ymin)))
-          stop("Lengths of 'x', 'ymax' and 'ymin' differ.")
-        
-      } else {
-        if(length(l$ymax) != length(l$ymin) | length(l$x) != length(l$ymin))
-          stop("Lengths of 'x', 'ymax' and 'ymin' differ.")
-      }
-    }
-    
-    if(!is.null(l$x)) {
-      if(is.matrix(l$x)) {
-        l$nelements <- ncol(l$x)
-        l$nsteps <- nrow(l$x)      
-      } else {
-        l$nelements <- 1
-        l$nsteps <- length(l$x)
-      }
-    }
+  if(is.null(pkg.env$app))
+    openPage()
   
-    l
-  })
-}
-
-barDataFun <- function(l) {
-  if(!is.null(l$barIds) && length(l$barIds) != length(l$value))
-    stop("Number of bar IDs is not equal to the number of provided values.")
-  if(!is.null(l$stackIds) && length(l$stackIds) != length(l$value))
-    stop("Number of stack IDs is not equal to the number of provided values.")
-  if(!is.null(l$groupIds) && length(l$groupIds) != length(l$value))
-    stop("Number of group IDs is not equal to the number of provided values.")
-  
-  if(all(is.null(l$groupIds), !is.null(l$barIds), is.null(l$stackIds))) {
-    l$groupIds <- l$barIds
-    l$barIds <- NULL
-  }
-  if(is.null(l$groupIds) &is.null(l$barIds))
-    if(is.null(names(l$value))) {
-      l$groupIds <- 1:length(l$value)  
-    } else {
-      l$groupIds <- names(l$value)
-    }
-  
-  if(is.null(l$barIds) & is.null(l$stackIds))
-    l$addColourScaleToLegend <- FALSE
-  
-  if(is.null(l$groupIds)) l$groupIds <- rep("group", length(l$value))
-  if(is.null(l$barIds)) l$barIds <- rep(1, length(l$value))
-  if(is.null(l$stackIds)) l$stackIds <- rep(1, length(l$value))
-  
-  ngroups <- length(unique(l$groupIds))
-  nbars <- length(unique(l$barIds))
-  nstacks <- length(unique(l$stackIds))
-  
-  if(is.factor(l$groupIds))
-    l$layerDomainX <- levels(l$groupIds)
-  
-  inds <- NULL
-  
-  if(is.numeric(l$groupIds) & !is.integer(l$groupIds)){
-    inds <- unique(l$groupIds)
-    l$groupIds <- match(l$groupIds, inds)
-  }
-  
-  vals <- list()
-  
-  for(i in 1:length(l$value)) {
-    
-    if(is.null(vals[[as.character(l$groupIds[i])]])) vals[[as.character(l$groupIds[i])]] <- list()
-    if(is.null(vals[[as.character(l$groupIds[i])]][[as.character(l$barIds[i])]])) 
-      vals[[as.character(l$groupIds[i])]][[as.character(l$barIds[i])]] <- list()
-    
-    vals[[as.character(l$groupIds[i])]][[as.character(l$barIds[i])]][[as.character(l$stackIds[i])]] <- l$value[i]
-  }
-  
-  if(!is.null(inds)) {
-    vals$`__inds__` <- inds
-    l$groupIds <- inds
-  }
-    
-  
-  l$value <- vals
-  l$groupIds <- unique(l$groupIds)
-  l$barIds <- unique(l$barIds)
-  l$stackIds <- unique(l$stackIds)
-  
-  l
+  pkg.env$app$setChart("ribbon", data, ...,  place = place, id = id, layerId = layerId, addLayer = addLayer)
 }
 
 #' Create a barplot
@@ -1603,7 +1805,10 @@ barDataFun <- function(l) {
 #' 
 #' @export
 lc_bars <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE) {
-  setChart("barchart", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer, dataFun = barDataFun)
+  if(is.null(pkg.env$app))
+    openPage()
+  
+  pkg.env$app$setChart("bars", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer)
 }
 
 #' Histograms and density plots
@@ -1645,51 +1850,20 @@ lc_bars <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL,
 #' @export 
 lc_hist <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE) {
   # has a nbins property. Not implemented in JS
-  setChart("barchart", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer, dataFun = function(l) {
-    if(is.null(l$nbins)) {
-      nbins <- 10
-    } else {
-      nbins <- l$nbins
-    }
-    if(!is.numeric(nbins) || nbins < 1) 
-      stop("'nbins' must be a positive number")
-    
-    l$nbins <- NULL
-    
-    l$contScaleX <- TRUE
-    l$addColourScaleToLegend <- FALSE
-    l$groupWidth <- 1
-    
-    if(!is.null(l$value)) {
-      minV <- min(l$value, na.rm = TRUE)
-      maxV <- max(l$value, na.rm = TRUE)
-      breaks <- seq(minV, maxV, length.out = nbins + 1)
-      step <- breaks[2] - breaks[1]
-      groupIds <- breaks - step/2
-      groupIds <- groupIds[-1]
-      binned <- .bincode(l$value, breaks, include.lowest = TRUE)
-      value <- sapply(1:nbins, function(i) {sum(binned == i)})
-      
-      l$groupIds <- groupIds
-      l$value <- value
-    }
-    barDataFun(l)
-  })
+  if(is.null(pkg.env$app))
+    openPage()
+  
+  pkg.env$app$setChart("hist", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer)
 }
 
 #' @describeIn lc_hist makes a density plot. Is an extension of \code{\link{lc_line}}.
 #' @export
 #' @importFrom stats density.default
 lc_dens <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE) {
-  setChart("pointLine", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer, dataFun = function(l) {
-    if(!is.null(l$value)) {
-      dens <- density.default(l$value)
-      l$x <- dens$x
-      l$y <- dens$y
-      l$value <- NULL
-    }
-    lineDataFun(l)
-  })
+  if(is.null(pkg.env$app))
+    openPage()
+  
+  pkg.env$app$setChart("dens", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer)
 }
 
 #' Create a heatmap
@@ -1789,24 +1963,10 @@ lc_dens <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL,
 #'                palette = brewer.pal(11, "RdYlBu")))}
 #' @export
 lc_heatmap <- function(data = list(), place = NULL, ..., id = NULL, pacerStep = 50) {
-  setChart("heatmap", data, ..., place = place, id = id, layerId = "main", dataFun = function(l) {
-    if(!is.null(l$value)) {
-      l$nrows <- nrow(l$value)
-      l$ncols <- ncol(l$value)
-      
-      l$value <- as.matrix(l$value)
-      
-      if(is.null(l$rowLabel) & !is.null(rownames(l$value)))
-        l$rowLabel <- rownames(l$value)
-      if(is.null(l$colLabel) & !is.null(colnames(l$value)))
-        l$colLabel <- colnames(l$value)
-    }
-    
-    if(lc$useViewer)
-      l$mode <- "svg"
-    
-    l
-  }, pacerStep = pacerStep)
+  if(is.null(pkg.env$app))
+    openPage()
+  
+  pkg.env$app$setChart("heatmap", data, ..., place = place, id = id, layerId = "main", pacerStep = pacerStep)
 }
 
 #' Add a colour slider
@@ -1863,79 +2023,38 @@ lc_heatmap <- function(data = list(), place = NULL, ..., id = NULL, pacerStep = 
 #' 
 #' @export
 lc_colourSlider <- function(data = list(), place = NULL, ..., id = NULL) {
-  setChart("colourSlider", data, ..., place = place, id = id, layerId = "main", dataFun = function(l) {
-    if(!is.null(l$chart)) {
-      l$linkedChart <- str_c("charts.", l$chart)
-      if(is.null(l$layer) && getChart(l$chart)$nLayers() == 1) 
-        l$layer <- names(getChart(l$chart)$layers)[2]
-      if(!is.null(l$layer))
-        l$linkedChart <- str_c(l$linkedChart, ".layers.", l$layer)
-      
-    }
-    l$chart <- NULL
-    l$layer <- NULL
-    l
-  })
+  if(is.null(pkg.env$app))
+    openPage()
+  
+  pkg.env$app$setChart("colourSlider", data, ..., place = place, id = id, layerId = "main")
 }
 
 #' @describeIn lc_line creates straight lines by intercept and slope values
 #' @export
 #' @importFrom jsonlite toJSON
 lc_abLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE) {
-  setChart("xLine", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer, dataFun = function(l) {
-    if(is.null(l$a) || is.null(l$b))
-      stop("Required properties 'a' and 'b' are not defined.");
-    if(length(l$a) != length(l$b))
-      stop("Lengths of 'a' and 'b' differ.")
-    
-    l$a <- as.vector(l$a)
-    l$b <- as.vector(l$b)
-    
-    l$nelements <- length(l$a)
-    l$lineFun <- str_c("function(x, d) { a = ", toJSON(l$a, digits = NA), ";",
-                       "b = ", toJSON(l$b, digits = NA), ";", 
-                       "return a[d] * x + b[d]; }")
-    l$a <- NULL
-    l$b <- NULL
-    
-    l
-  })
+  if(is.null(pkg.env$app))
+    openPage()
+  
+  pkg.env$app$setChart("abLine", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer)
 }
 
 #' @describeIn lc_line creates horizontal lines by y-intercept values
 #' @export
 lc_hLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE) {
-  setChart("xLine", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer, dataFun = function(l) {
-    if(is.null(l$h))
-      stop("Required property 'h' is not defined.");
-
-    l$h <- as.vector(l$h)
-
-    l$nelements <- length(l$h)
-    l$lineFun <- str_c("function(x, d) { h = ", toJSON(l$h, digits = NA), ";",
-                         "return h[d]; }")
-    l$h <- NULL
-
-    l
-  })
+  if(is.null(pkg.env$app))
+    openPage()
+  
+  pkg.env$app$setChart("hLine", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer)
 }
 
 #' @describeIn lc_line creates vertical lines by x-intercept values
 #' @export
 lc_vLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE) {
-  setChart("yLine", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer, dataFun = function(l) {
-    if(is.null(l$v))
-      stop("Required property 'v' is not defined.");
-    
-    l$v <- as.vector(l$v)
-      
-    l$nelements <- length(l$v)
-    l$lineFun <- str_c("function(x, d) { v = ", toJSON(l$v, digits = NA), ";",
-                       "return v[d]; }")
-    l$v <- NULL
-        
-    l
-  })
+  if(is.null(pkg.env$app))
+    openPage()
+  
+  pkg.env$app$setChart("vLine", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer)
 }
 
 #' Add HTML code to the page
@@ -1979,15 +2098,10 @@ lc_vLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL
 #' @export
 #' @importFrom hwriter hwrite
 lc_html <- function(data = list(), place = NULL, ..., id = NULL) {
-  setChart("html", data, ..., place = place, id = id, layerId = "main", dataFun = function(l) {
-    if(!is.character(l$content) || length(l$content) != 1)
-      l$content <- hwrite(l$content)
-    
-    #l$content <- gsub("[\r\n]", "", l$content)
-    #l$content <- str_replace_all(l$content, "(\\W)", "\\\\\\1")
-    
-    l
-  })
+  if(is.null(pkg.env$app))
+    openPage()
+  
+  pkg.env$app$setChart("html", data, ..., place = place, id = id, layerId = "main")
 }
 
 #' Add input forms to the page
@@ -2049,49 +2163,8 @@ lc_html <- function(data = list(), place = NULL, ..., id = NULL) {
 #'
 #' @export
 lc_input <- function(data = list(), place = NULL, ..., id = NULL) {
-  setChart("input", data, ..., place = place, id = id, layerId = "main", dataFun = function(l){
-    if(!(l$type %in% c("checkbox", "radio", "text", "button", "range")))
-       stop("Unsupported type of input. Please, use one of \"checkbox\", \"radio\", \"text\", \"button\", \"range\"")
-    
-    if(!is.null(l$label)) {
-      l$nelements <- length(l$label)
-    } else {
-      l$nelements <- 1
-    }
-    
-    if(l$type == "checkbox")
-      if(!is.null(l$values))
-        if(length(l$value) != 1 & length(l$value) != l$nelements)
-          stop("Length of 'values' vector must be either 1 or equal to the number of checkboxes.")
-    
-    if(l$type == "radio")
-      if(!is.null(l$value))
-        if(length(l$value) != 1 | !is.numeric(l$value)) {
-          stop("'value' must be a number of the checked radio button")
-        } else {
-          l$value = l$value - 1
-        }
-          
-    
-    if(l$type == "text")
-      if(!is.null(l$value) & length(l$value) != l$nelements)
-        stop("Length of 'values' must be equal to the number of text fields.")
-    
-    if(l$type == "range") {
-      if(!is.null(l$value) & length(l$value) != 1 & length(l$value) != l$nelements)
-        stop("Length of 'values' vector must be either 1 or equal to the number of ranges.")
-      if(!is.null(l$step) & length(l$step) != 1 & length(l$step) != l$nelements)
-        stop("Length of 'step' vector must be either 1 or equal to the number of ranges.")
-      if(!is.null(l$min) & length(l$min) != 1 & length(l$min) != l$nelements)
-        stop("Length of 'min' vector must be either 1 or equal to the number of ranges.")
-      if(!is.null(l$max) & length(l$max) != 1 & length(l$max) != l$nelements)
-        stop("Length of 'max' vector must be either 1 or equal to the number of ranges.")
-    }
-    
-    if(!is.null(l$on_change)) {
-      l$on_click <- l$on_change
-      l$on_change <- NULL
-    }
-    l
-  })
+  if(is.null(pkg.env$app))
+    openPage()
+  
+  pkg.env$app$setChart("input", data, ..., place = place, id = id, layerId = "main")
 }
