@@ -4,10 +4,10 @@
 \alias{updateCharts}
 \title{Update a chart}
 \usage{
-updateCharts(id = NULL, layerId = NULL, updateOnly = NULL)
+updateCharts(chartId = NULL, layerId = NULL, updateOnly = NULL)
 }
 \arguments{
-\item{id}{An ID of the chart to be updated (or vector of IDs). If NULL then all the
+\item{chartId}{An ID of the chart to be updated (or vector of IDs). If NULL then all the
 existing charts will be updated.}
 
 \item{layerId}{An ID of the layer to be updated (or vector of IDs). If NULL of the

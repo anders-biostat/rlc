@@ -9,23 +9,59 @@
 \alias{lc_vLine}
 \title{Lines and ribbons}
 \usage{
-lc_line(data = list(), place = NULL, ..., id = NULL,
-  layerId = NULL, addLayer = FALSE)
+lc_line(
+  data = list(),
+  place = NULL,
+  ...,
+  id = NULL,
+  layerId = NULL,
+  addLayer = FALSE
+)
 
-lc_path(data = list(), place = NULL, ..., id = NULL,
-  layerId = NULL, addLayer = FALSE)
+lc_path(
+  data = list(),
+  place = NULL,
+  ...,
+  id = NULL,
+  layerId = NULL,
+  addLayer = FALSE
+)
 
-lc_ribbon(data = list(), place = NULL, ..., id = NULL,
-  layerId = NULL, addLayer = FALSE)
+lc_ribbon(
+  data = list(),
+  place = NULL,
+  ...,
+  id = NULL,
+  layerId = NULL,
+  addLayer = FALSE
+)
 
-lc_abLine(data = list(), place = NULL, ..., id = NULL,
-  layerId = NULL, addLayer = FALSE)
+lc_abLine(
+  data = list(),
+  place = NULL,
+  ...,
+  id = NULL,
+  layerId = NULL,
+  addLayer = FALSE
+)
 
-lc_hLine(data = list(), place = NULL, ..., id = NULL,
-  layerId = NULL, addLayer = FALSE)
+lc_hLine(
+  data = list(),
+  place = NULL,
+  ...,
+  id = NULL,
+  layerId = NULL,
+  addLayer = FALSE
+)
 
-lc_vLine(data = list(), place = NULL, ..., id = NULL,
-  layerId = NULL, addLayer = FALSE)
+lc_vLine(
+  data = list(),
+  place = NULL,
+  ...,
+  id = NULL,
+  layerId = NULL,
+  addLayer = FALSE
+)
 }
 \arguments{
 \item{data}{Name value pairs of properties, passed through the \code{\link{dat}} function. These

@@ -4,7 +4,7 @@
 \alias{getMarked}
 \title{Get currently marked elements}
 \usage{
-getMarked(chartId = NULL, layerId = NULL)
+getMarked(chartId = NULL, layerId = NULL, sessionId = NULL)
 }
 \arguments{
 \item{chartId}{An ID of the chart.}

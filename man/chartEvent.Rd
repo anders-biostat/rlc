@@ -4,7 +4,7 @@
 \alias{chartEvent}
 \title{Trigger an event}
 \usage{
-chartEvent(d, id, layerId = "main", event)
+chartEvent(d, chartId, layerId = "main", event)
 }
 \arguments{
 \item{d}{ID of an element that triggered the event. May be index of a point or line, vector or
@@ -13,11 +13,11 @@ for more details about values). Should be \code{NULL} for \code{mouseout} or \co
 N.B. This function is called from the web page and therefore all element indices start from zero as it is
 used in JavaScript.}
 
-\item{id}{ID of the chart.}
-
 \item{layerId}{ID of the layer. You can get IDs of all charts and their layers with \code{\link{listCharts}}.}
 
 \item{event}{Type of event. Must be one of \code{"click", "mouseover", "mouseout", "marked", "labelClickRow", "labelClickCol"}.}
+
+\item{id}{ID of the chart.}
 }
 \description{
 This function is called whenever user clicks, selects or hover over elements of a chart. In turn,

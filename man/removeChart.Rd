@@ -4,7 +4,7 @@
 \alias{removeChart}
 \title{Remove chart from the page}
 \usage{
-removeChart(id)
+removeChart(chartId)
 }
 \arguments{
 \item{id}{A vector of IDs of the charts to be removed.}

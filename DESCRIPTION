@@ -14,5 +14,5 @@ License: GPL-3
 Imports: httpuv, jsonlite, stringr, hwriter, jrc(>= 0.2.0), plyr, methods, stats
 Suggests: tidyverse, RColorBrewer
 NeedsCompilation: no
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.1
 Roxygen: list(markdown = TRUE)

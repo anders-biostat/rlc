@@ -4,8 +4,15 @@
 \alias{openPage}
 \title{Open a new empty page}
 \usage{
-openPage(useViewer = TRUE, rootDirectory = NULL, startPage = NULL,
-  layout = NULL, newPage = TRUE, ...)
+openPage(
+  useViewer = TRUE,
+  rootDirectory = NULL,
+  startPage = NULL,
+  layout = NULL,
+  port = NULL,
+  browser = NULL,
+  ...
+)
 }
 \arguments{
 \item{useViewer}{If \code{TRUE}, the page will be opened in the RStudio Viewer. If \code{FALSE}
@@ -24,9 +31,6 @@ size are supported. To add a table set this parameter to \code{tableNxM}, where 
 number of rows and \code{M} is the number of columns. Each cell will get an ID that consists of
 a letter (indicating the row) and a number (indicating the column) (e.g. \code{B3} is an ID of
 the second row and third column).}
-
-\item{newPage}{Determines whether or not to open a new page. If \code{FALSE}, one can add
-interactive charts to another apps, created the with \code{jrc} package.}
 
 \item{...}{Further arguments passed to \code{\link[jrc]{openPage}}.}
 }

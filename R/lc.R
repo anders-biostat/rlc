@@ -1,14 +1,16 @@
 #' @import jrc
 #' @import stringr
 #' @import R6
+#' @importFrom stats runif
 pkg.env <- new.env()
 
-LCApp <- R6Class("LCApp", inherits = "App", public = list(
+#' @export
+LCApp <- R6Class("LCApp", inherit = App, public = list(
   removeChart = function(chartId) {
     if(!is.vector(chartId) | !is.character(chartId))
       stop("Chart ID must be a vector of characters")
 
-    sessionId <- names(super$sessions)
+    sessionId <- names(private$sessions)
 
     for(id in chartId){
       private$charts[[id]] <- NULL
@@ -71,43 +73,6 @@ LCApp <- R6Class("LCApp", inherits = "App", public = list(
     invisible(self)
   },
   
-  if(length(lc$charts) == 0) {
-    warning("There are no charts yet.")
-    return ();
-  }
-  
-  if(is.null(id)) id <- ls(lc$charts)
-  if(!is.vector(id))
-    stop("'id' should be a vector of IDs")
-  
-  
-  if(!is.null(layerId) & length(layerId) != length(id))
-    stop("Lengths of 'id' and 'layerId' differ")
-  if(!is.null(updateOnly) & length(updateOnly) != length(id))
-    stop("Lengths of 'id' and 'updateOnly' differ")
-  
-  for(i in 1:length(id)){
-    chart <- getChart(id[i])
-    if(is.null(chart))
-      stop(str_c("Chart with ID ", id[i], " is not defined."))
-    args <- str_c("'", id[i], "', '")
-    
-    if(!is.null(updateOnly)) {
-      args <- str_c(args, updateOnly[i], "', '")
-    } else {
-      args <- str_c(args, "', '")
-    }
-    
-    if(!is.null(layerId)) {
-      args <- str_c(args, layerId[i], "'")
-      sendProperties(chart, layerId[i])
-    } else {
-      sendProperties(chart)
-      args <- str_c(args, "'")
-    }
-    sendCommand(str_interp("rlc.updateCharts(${args});"))
-  },
-  
   updateCharts = function(chartId = NULL, layerId = NULL, updateOnly = NULL) {
     if(length(private$charts) == 0) {
       stop("There are no charts yet.")
@@ -132,7 +97,7 @@ LCApp <- R6Class("LCApp", inherits = "App", public = list(
     if(exists(".id")){
       sessionId <- .id
     } else {
-      sessionId <- names(super$sessions)
+      sessionId <- names(private$sessions)
     }
 
     for(i in 1:length(chartId)) {
@@ -291,12 +256,67 @@ LCApp <- R6Class("LCApp", inherits = "App", public = list(
     session$sendCommand(str_c("rlc.mark('", chartId, "', '", layerId, "', ", preventEvent, ");"))    
   },
   
-  initialize = function(layout = NULL, ...){
-    super$initialize(...)
-    if(!is.null(layout))
-      self$setLayout(layout)
+  setChart = function(.type, data, ..., place, id, layerId, addLayer, pacerStep = 50) {
+    if(is.null(private$serverHandle)){
+      super$startServer()
+      super$openPage()
+    }
     
-    super$onStart <- function(session) {
+    if(is.null(place))
+      place <- str_c("Chart", length(private$charts) + 1)
+    
+    if(is.null(id))
+      id <- place
+    
+    chart <- private$getChart(id)
+    if(!is.null(chart) && !is.null(layerId) && layerId == "main") {
+      self$removeChart(chart$id)
+      chart <- private$getChart(id)
+    }
+    
+    if(is.null(chart)) {
+      chart <- private$addChart(id, place)
+      if(is.null(layerId) || layerId != "main")
+        chart$addLayer("main", "axesChart")
+    }
+
+    if(is.null(layerId)){
+      if(!addLayer & chart$nLayers() > 1) {
+        warning(str_c("Chart '", id, "' has ", chart$nLayers(), " layers and the layer ID is not specified. ", 
+                      "'addLayer' will be set to TRUE."))
+        addLayer <- T
+      }
+      
+      if(addLayer | chart$nLayers() == 0) {
+        layerId <- str_c("Layer", (chart$nLayers() + 1))
+      } else {
+        layerId <- names(chart$layers)[2]
+      }
+    }
+
+    if(!is.null(chart$getLayer(layerId)))
+      chart$removeLayer(layerId)
+
+    layer <- chart$addLayer(layerId, .type)
+    if(!is.null(private$dataFun[[.type]]))
+      layer$dataFun <- private$dataFun[[.type]]
+
+    layer$pacerStep <- pacerStep
+    l <- list(...)
+    nonEv <- lapply(names(l), function(n) {function() l[[n]]})
+    names(nonEv) <- names(l)
+    self$setProperties(c(data, nonEv), id, layerId)
+    
+    for(session in private$sessions){
+      chart$JSinitialize(session)
+      chart$update(session)
+    }
+    
+    invisible(self)
+  },  
+  
+  initialize = function(layout = NULL, ...){
+    onStart <- function(session) {
 
       srcDir <- "http_root_rlc"
       
@@ -330,7 +350,10 @@ LCApp <- R6Class("LCApp", inherits = "App", public = list(
         chart$update(session)
       }
     }
-    
+
+    super$initialize(..., onStart = onStart)
+    if(!is.null(layout))
+      self$setLayout(layout)    
     invisible(self)
   }
 ), private = list(
@@ -372,7 +395,7 @@ LCApp <- R6Class("LCApp", inherits = "App", public = list(
   },
 
   getChart = function(id) {
-    if(is.character(id))
+    if(!is.character(id))
       stop("Chart ID must be a character")
     if(length(id) > 1) {
       warning("Attempt to supply several chart IDs at once. Only the first one will be used.")
@@ -382,8 +405,8 @@ LCApp <- R6Class("LCApp", inherits = "App", public = list(
     private$charts[[id]]
   },
   
-  addChart <- function(chartId, place) {
-    chart <- Chart$new(chartId, place)
+  addChart = function(chartId, place) {
+    chart <- Chart$new(chartId, place, self)
     private$charts[[chartId]] <- chart
     
     message(str_interp("Chart '${chartId}' added."))
@@ -391,60 +414,52 @@ LCApp <- R6Class("LCApp", inherits = "App", public = list(
     invisible(chart)
   },
   
-  setChart <- function(.type, data, ..., place, id, layerId, dataFun, addLayer, pacerStep = 50) {
-    if(is.null(pkg.env$app)) openPage()
-    
-    if(is.null(place))
-      place <- str_c("Chart", length(lc$charts) + 1)
-    
-    if(is.null(id))
-      id <- place
-    
-    chart <- private$getChart(id)
-    if(!is.null(chart) && !is.null(layerId) && layerId == "main") {
-      self$removeChart(chart$id)
-      chart <- private$getChart(id)
-    }
-    
-    if(is.null(chart)) {
-      chart <- private$addChart(id, place)
-      if(is.null(layerId) || layerId != "main")
-        chart$addLayer("main", "axesChart")
-    }
-    
-    if(is.null(layerId)){
-      if(!addLayer & chart$nLayers() > 1) {
-        warning(str_c("Chart '", id, "' has ", chart$nLayers(), " layers and the layer ID is not specified. ", 
-                      "'addLayer' will be set to TRUE."))
-        addLayer <- T
+  dataFuns = list(
+    scatter = function(l) {
+      if(is.null(l$x) && is.null(l$y))
+        stop("Required properties 'x' and 'y' are not defined.")
+      
+      if(is.factor(l$x))
+        l$layerDomainX <- levels(l$x)
+      if(is.factor(l$y))
+        l$layerDomainY <- levels(l$y)
+      
+      if(is.null(l$x))
+        l$x <- 1:length(l$y)
+      if(is.null(l$y))
+        l$y <- 1:length(l$x)
+      
+      if(is.null(l$label)){
+        if(!is.null(names(l$y)))
+          l$label <- names(l$y)
+        if(!is.null(names(l$x)))
+          l$label <- names(l$x)
       }
       
-      if(addLayer | chart$nLayers() == 0) {
-        layerId <- str_c("Layer", (chart$nLayers() + 1))
-      } else {
-        layerId <- names(chart$layers)[2]
+      if(!is.null(l$jitterX)) {
+        if(!is.numeric(l$jitterX))
+          stop("'jitterX' must be a number")
+        l$jitterX = abs(l$jitterX)
+        
+        l$shiftX <- runif(length(l$x), -l$jitterX, l$jitterX)
+        l$jitterX <- NULL
       }
+      if(!is.null(l$jitterY)) {
+        if(!is.numeric(l$jitterY))
+          stop("'jitterX' must be a number")
+        l$jitterY = abs(l$jitterY)
+        
+        l$shiftY <- runif(length(l$y), -l$jitterY, l$jitterY)
+        l$jitterY <- NULL
+      }
+      
+#      if(lc$useViewer)
+#        l$mode <- "svg"
+      
+      l
     }
-    
-    if(!is.null(chart$getLayer(layerId)))
-      chart$removeLayer(layerId)
-    
-    layer <- chart$addLayer(layerId, .type)
-    layer$dataFun <- dataFun
-    
-    layer$pacerStep <- pacerStep
-    l <- list(...)
-    nonEv <- lapply(names(l), function(n) {function() l[[n]]})
-    names(nonEv) <- names(l)
-    setProperties(c(data, nonEv), id, layerId)
-    
-    for(session in super$sessions){
-      chart$JSinitialize(session)
-      chart$update(session)
-    }
-    
-    invisible(self)
-  }
+
+  )
   
 ))
 
@@ -452,29 +467,30 @@ LCApp <- R6Class("LCApp", inherits = "App", public = list(
 Layer <- R6Class("Layer", public = list(
   type = NULL,
   id = NULL,
+  pacerStep = 50,
+  init = c(),
+  
   setProperty = function(name, expr = NULL) {
     if(is.null(expr))
-      return(private$properties[[name]])
+      return(self$properties[[name]])
     
-    private$properties[[name]] <- expr
+    self$properties[[name]] <- expr
   },
   initialize = function(type, id) {
     self$type <- type
     self$id <- id
-    
+
     invisible(self)
-  }
-), private = list(
+  },
+
   properties = list(),
-  dataFun = fucntion(l) {l},
+  dataFun = function(l) {l},
   on_click = function(d) {},
   on_mouseover = NULL,
   on_mouseout = NULL,
   on_marked = NULL,
   on_labelClickRow  = NULL,
-  on_labelClickCol = NULL,
-  init = FALSE,
-  
+  on_labelClickCol = NULL
 ))
 
 
@@ -509,7 +525,7 @@ Chart <- R6Class("Chart", public = list(
     if(layerId == "main"){
       warning(str_c("You are attempting to remove the main layer of the chart ", self$id, 
                     ". The entire chart will be removed."))
-      privte$app$removeChart(self$id)
+      private$app$removeChart(self$id)
     } else {
       if(!(layerId %in% names(layers))) {
         stop(str_c("There is no layer with ID ", layerId))
@@ -521,6 +537,8 @@ Chart <- R6Class("Chart", public = list(
   },
   
   update = function(sessionId, layerId = NULL, updateOnly = NULL) {
+    if("Session" %in% class(sessionId))
+      sessionId <- sessionId$id
     args <- str_c("'", self$id, "', '")
       
     if(!is.null(updateOnly)) {
@@ -547,29 +565,31 @@ Chart <- R6Class("Chart", public = list(
     }
     invisible(self)
   },
+  JSinitialize = function(session) {
+    session$sendCommand(str_interp("rlc.prepareContainer('${self$place}');"))
     
-  initialize = function(id, place) {
+    lapply(private$layers, function(layer) {
+      if(!(session$id %in% layer$init)) {
+        if(layer$id != "main")
+          message(str_interp("Layer '${layer$id}' is added to chart '${self$id}'."))
+        session$sendCommand(str_interp("rlc.addChart('${self$id}', '${layer$type}', '${self$place}', '${layer$id}');"))
+        layer$init <- c(session$id, layer$init)
+      }
+    })
+  },  
+    
+  initialize = function(id, place, app) {
     self$id <- id
     self$place <- place
+    private$app <- app
     invisible(self)
   }
 ), private = list(
   layers = list(),
   app = NULL,
-  JSinitialize = function(session) {
-    session$sendCommand(str_interp("rlc.prepareContainer('${self$place}');"))
-    
-    lapply(private$layers, function(layer) {
-      if(!layer$init) {
-        if(layer$id != "main")
-          message(str_interp("Layer '${layer$id}' is added to chart '${self$id}'."))
-        session$sendCommand(str_interp("rlc.addChart('${self$id}', '${layer$type}', '${self$place}', '${layer$id}');"))
-        layer$init <- TRUE
-      }
-    })
-  },
   
-  sendProperties <- function(sessionId, layerId = ls(private$layers)){
+  sendProperties = function(sessionId, layerId = ls(private$layers)){
+    
     for(layerName in layerId){
       layer <- self$getLayer(layerName)
       if(is.null(layer))
@@ -582,7 +602,7 @@ Chart <- R6Class("Chart", public = list(
       },
       error = function(e) 
         stop( str_interp( "in data expression for chart '${chart$id}': ${e$message}." ), call.=FALSE ) ) 
-      
+
       if(!is.null(d$ticksX) & !is.vector(d$ticksX))
         d$ticksX <- t(d$ticksX)
       if(!is.null(d$ticksY) & !is.vector(d$ticksY))
@@ -592,9 +612,9 @@ Chart <- R6Class("Chart", public = list(
         layer$on_click <- d$on_click
         d$on_click <- NULL
       }
-      
+
       name <- str_c(self$id, layer$id, sep = "_")
-      
+
       for(id in sessionId){
         session <- private$app$getSession(id)
         if(!is.null(session)) {
@@ -720,7 +740,7 @@ setProperties <- function(data, chartId, layerId = NULL) {
   if(is.null(pkg.env$app))
     stop("There is no opened page. Please, use 'openPage()' function to create one.") 
   
-  pkg.env$app$removeChart(data, chartId, layerId)
+  pkg.env$app$setProperties(data, chartId, layerId)
 }
 
 #' Update a chart
@@ -969,6 +989,10 @@ mark <- function(elements, chartId = NULL, layerId = NULL, preventEvent = TRUE, 
   pkg.env$app$mark(elements, chartId, layerId, preventEvent, sessionId)
 }
 
+#' @export
+getPage <- function(){
+  pkg.env$app
+}
 
 #' Link data to the chart
 #' 
@@ -1003,54 +1027,12 @@ dat <- function( ... ) {
 #' 
 #' @export
 closePage <- function() {
-  lc$charts <- list()
-  lc$pageOpened <- F
-  jrc::closePage()
-}
-
-#' @importFrom stats runif
-scatterDataFun <- function(l) {
-  if(is.null(l$x) && is.null(l$y))
-    stop("Required properties 'x' and 'y' are not defined.")
-  
-  if(is.factor(l$x))
-    l$layerDomainX <- levels(l$x)
-  if(is.factor(l$y))
-    l$layerDomainY <- levels(l$y)
-    
-  if(is.null(l$x))
-    l$x <- 1:length(l$y)
-  if(is.null(l$y))
-    l$y <- 1:length(l$x)
-  
-  if(is.null(l$label)){
-    if(!is.null(names(l$y)))
-      l$label <- names(l$y)
-    if(!is.null(names(l$x)))
-      l$label <- names(l$x)
+  if(!is.null(pkg.env$app)) {
+    pkg.env$app$stopServer()
+    pkg.env$app <- NULL
+  } else {
+    message("There is no opened page.")
   }
-  
-  if(!is.null(l$jitterX)) {
-    if(!is.numeric(l$jitterX))
-      stop("'jitterX' must be a number")
-    l$jitterX = abs(l$jitterX)
-    
-    l$shiftX <- runif(length(l$x), -l$jitterX, l$jitterX)
-    l$jitterX <- NULL
-  }
-  if(!is.null(l$jitterY)) {
-    if(!is.numeric(l$jitterY))
-      stop("'jitterX' must be a number")
-    l$jitterY = abs(l$jitterY)
-    
-    l$shiftY <- runif(length(l$y), -l$jitterY, l$jitterY)
-    l$jitterY <- NULL
-  }
-  
-  if(lc$useViewer)
-    l$mode <- "svg"
-
-  l
 }
 
 #' Visualize a set of points
@@ -1177,7 +1159,10 @@ scatterDataFun <- function(l) {
 #'             colourLegendTitle = "Sepal Width")}
 #' @export
 lc_scatter <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE, pacerStep = 50) {
-  setChart("scatter", data, ...,  place = place, id = id, layerId = layerId, dataFun = scatterDataFun, addLayer = addLayer,
+  if(is.null(pkg.env$app))
+    openPage()
+  
+  pkg.env$app$setChart("scatter", data, ...,  place = place, id = id, layerId = layerId, addLayer = addLayer,
            pacerStep = pacerStep)
 }
 

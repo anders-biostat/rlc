@@ -4,8 +4,7 @@
 \alias{lc_heatmap}
 \title{Create a heatmap}
 \usage{
-lc_heatmap(data = list(), place = NULL, ..., id = NULL,
-  pacerStep = 50)
+lc_heatmap(data = list(), place = NULL, ..., id = NULL, pacerStep = 50)
 }
 \arguments{
 \item{data}{Name value pairs of properties, passed through the \code{\link{dat}} function. These

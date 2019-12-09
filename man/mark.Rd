@@ -4,7 +4,13 @@
 \alias{mark}
 \title{Mark elements of a chart}
 \usage{
-mark(elements, chartId = NULL, layerId = NULL, preventEvent = TRUE)
+mark(
+  elements,
+  chartId = NULL,
+  layerId = NULL,
+  preventEvent = TRUE,
+  sessionId = NULL
+)
 }
 \arguments{
 \item{elements}{numeric vector of indices of the elements to select.}
