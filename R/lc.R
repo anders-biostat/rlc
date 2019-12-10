@@ -711,9 +711,10 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
     invisible(self)
   },  
   
-  initialize = function(layout = NULL, ...){
-    onStart <- function(session) {
-
+  initialize = function(layout = NULL, beforeLoad = function(session) {}, afterLoad = function(session) {}, ...){
+    onStart_lc <- function(session) {
+      
+      
       srcDir <- "http_root_rlc"
       
       session$sessionVariables(list(s1 = 0, s2 = 0))
@@ -740,14 +741,18 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
       
       session$sendCommand("d3.select('title').text('R/linked-charts');")
       
+      beforeLoad(session)
+      
       private$addLayout(session)
       for(chart in private$charts){
         chart$JSInitialize(session)
         chart$update(session)
       }
+      
+      afterLoad(session)
     }
 
-    super$initialize(..., onStart = onStart)
+    super$initialize(..., onStart = onStart_lc)
     if(!is.null(layout))
       self$setLayout(layout)    
     invisible(self)
@@ -948,35 +953,32 @@ Chart <- R6Class("Chart", public = list(
       layer <- self$getLayer(layerName)
       if(is.null(layer))
         stop(str_c("There is no layer ", layerName, " in the chart ", self$id))
-      
-      if(exists(".id")) {
-        env <- app$getSession(.id)$sessionVariables()
-      } else {
-        env <- private$app$.__enclos_env__$private$envir
-      }
-      
-      tryCatch({
-        d <- lapply(layer$properties, function(expr) eval(expr, env))
-        d <- layer$dataFun(d)
-      },
-      error = function(e) 
-        stop( str_interp( "in data expression for chart '${self$id}': ${e$message}." ), call.=FALSE ) ) 
-
-      if(!is.null(d$ticksX) & !is.vector(d$ticksX))
-        d$ticksX <- t(d$ticksX)
-      if(!is.null(d$ticksY) & !is.vector(d$ticksY))
-        d$ticksY <- t(d$ticksY)
-      
-      if(!is.null(d$on_click)) {
-        layer$on_click <- d$on_click
-        d$on_click <- NULL
-      }
 
       name <- str_c(self$id, layer$id, sep = "_")
 
       for(id in sessionId){
         session <- private$app$getSession(id)
         if(!is.null(session)) {
+
+          env <- session$sessionVariables()
+
+          tryCatch({
+            d <- lapply(layer$properties, function(expr) eval(expr, env))
+            d <- layer$dataFun(d)
+          },
+          error = function(e) 
+            stop( str_interp( "in data expression for chart '${self$id}': ${e$message}." ), call.=FALSE ) ) 
+          
+          if(!is.null(d$ticksX) & !is.vector(d$ticksX))
+            d$ticksX <- t(d$ticksX)
+          if(!is.null(d$ticksY) & !is.vector(d$ticksY))
+            d$ticksY <- t(d$ticksY)
+          
+          if(!is.null(d$on_click)) {
+            layer$on_click <- d$on_click
+            d$on_click <- NULL
+          }
+          
           if(!is.null(d$on_marked)) {
             layer$on_marked <- d$on_marked
             d$maekedUpdated <- NULL
@@ -1042,10 +1044,15 @@ Chart <- R6Class("Chart", public = list(
 #' @export
 #' @importFrom httpuv service
 openPage <- function(useViewer = TRUE, rootDirectory = NULL, startPage = NULL, layout = NULL, port = NULL, 
-                     browser = NULL, ...) {
+                     browser = NULL, allowedFunctions = NULL, allowedVariables = NULL, ...) {
+  if(!is.null(pkg.env$app)) 
+    closePage()
+  
+  allowedFunctions <- c("chartEvent", allowedFunctions)
+  allowedVariables <- c("marked", "s1", "s2", allowedVariables)
   
   app <- LCApp$new(rootDirectory = rootDirectory, startPage = startPage, layout = layout, 
-                   allowedFunctions = "chartEvent", allowedVariables = c("marked", "s1", "s2"), ...)
+                   allowedFunctions = allowedFunctions, allowedVariables = allowedVariables, ...)
   app$startServer(port)
   app$openPage(useViewer, browser)
   
