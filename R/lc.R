@@ -400,15 +400,11 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
     if(!is.vector(chartId) | !is.character(chartId))
       stop("Chart ID must be a vector of characters")
 
-    sessionId <- names(private$sessions)
-
     for(id in chartId){
       private$charts[[id]] <- NULL
-      for(sid in sessionId){
-        session <- super$getSession(sid)
+      for(session in private$sessions)
         if(!is.null(session))
-          session$sendCommand(str_interp("rlc.removeChart('${chartId}');"))      
-      }
+          session$sendCommand(str_interp("rlc.removeChart('${chartId}');"))
     }
     
     invisible(self)
@@ -462,7 +458,7 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
     invisible(self)
   },
   
-  updateCharts = function(chartId = NULL, layerId = NULL, updateOnly = NULL) {
+  updateCharts = function(chartId = NULL, layerId = NULL, updateOnly = NULL, sessionId = NULL) {
     if(length(private$charts) == 0) {
       stop("There are no charts yet.")
     }
@@ -482,12 +478,9 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
       stop("Lengths of 'chartId' and 'layerId' differ")
     if(!is.null(updateOnly) & length(updateOnly) != length(chartId))
       stop("Lengths of 'chartId' and 'updateOnly' differ")        
-    
-    if(exists(".id")){
-      sessionId <- .id
-    } else {
+      
+    if(is.null(sessionId))
       sessionId <- names(private$sessions)
-    }
 
     for(i in 1:length(chartId)) {
       chart <- private$getChart(chartId[i])
@@ -499,7 +492,8 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
     }
   },
   
-  chartEvent = function(d, chartId, layerId = "main", event, sesionId) {
+  chartEvent = function(d, chartId, layerId = "main", event, sessionId = NULL) {
+
     #lame. This also must go to jrc with the nearest update
     d <- type.convert(d, as.is = TRUE)
     if(is.numeric(d)) d <- d + 1
@@ -507,28 +501,25 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
     if(is.list(d))
       if(all(sapply(d, function(el) length(el) == 1)))
         d <- unlist(d)
-      
+  
     chart <- private$getChart(chartId)
     if(is.null(chart))
       stop(str_interp("Chart with ID ${id} is not defined"))
-      
+ 
     layer <- chart$getLayer(layerId)
     if(is.null(layer))
       stop(str_interp("Chart ${id} doesn't have layer ${layerId}"))
-      
-    if(event == "click")
-      layer$on_click(d)
-    if(event == "mouseover")
-      layer$on_mouseover(d)
-    if(event == "mouseout")
-      layer$on_mouseout()
-    if(event == "marked")
-      layer$on_marked()
-    if(event == "labelClickRow")
-      layer$on_labelClickRow(d)
-    if(event == "labelClickCol")
-      layer$on_labelClickCol(d)
     
+    session <- super$getSession(sessionId)
+    if(is.null(session))
+      stop("Can't retreive the session")
+    
+    env <- session$sessionVariables()
+    
+    f <- layer[[paste0("on_", event)]]
+    environment(f) <- env
+    do.call(f, list(d))
+
     invisible(self)  
   },
   
@@ -550,12 +541,7 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
   },
   
   getMarked = function(chartId = NULL, layerId = NULL, sessionId = NULL) {
-    if(is.null(sessionId) && exists(".id")) {
-      session <- super$getSession(.id)
-    } else {
-        session <- getSession(sessionId)
-    }
-    
+    session <- super$getSession(sessionId)
     if(is.null(session))
       stop("Can't retreive the session")
 
@@ -596,12 +582,7 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
   },
   
   mark = function(elements, chartId = NULL, layerId = NULL, preventEvent = TRUE, sessionId = NULL){
-    if(is.null(sessionId) && exists(".id")) {
-      session <- super$getSession(.id)
-    } else {
-      session <- super$getSession(sessionId)
-    }
-    
+    session <- super$getSession(sessionId)
     if(is.null(session))
       stop("Can't retreive the session")
     
@@ -713,9 +694,9 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
   
   initialize = function(layout = NULL, beforeLoad = function(session) {}, afterLoad = function(session) {}, ...){
     onStart_lc <- function(session) {
-      
-      
+
       srcDir <- "http_root_rlc"
+      reqPage <- system.file( "/http_root/linked-charts.css", package = "rlc" )
       
       session$sessionVariables(list(s1 = 0, s2 = 0))
       session$sendCommand(str_c("link = document.createElement('link');", 
@@ -737,7 +718,7 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
         super$closeSession(session)
         stop( "Can't load linked-charts.js or rlc.js" )
       }
-      session$sessionVariables(vars = list(app = self), remove = c("s1", "s2"))
+      session$sessionVariables(vars = list(.app = self), remove = c("s1", "s2"))
       
       session$sendCommand("d3.select('title').text('R/linked-charts');")
       
@@ -754,7 +735,9 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
 
     super$initialize(..., onStart = onStart_lc)
     if(!is.null(layout))
-      self$setLayout(layout)    
+      self$setLayout(layout)
+    
+    private$envir <- parent.frame(n = 2)
     invisible(self)
   }
 ), private = list(
@@ -1055,10 +1038,33 @@ openPage <- function(useViewer = TRUE, rootDirectory = NULL, startPage = NULL, l
                    allowedFunctions = allowedFunctions, allowedVariables = allowedVariables, ...)
   app$startServer(port)
   app$openPage(useViewer, browser)
+  app$setEnvironment(parent.frame())
   
   pkg.env$app <- app
   
   invisible(app)
+}
+
+getAppAndSession <- function(sessionId = NULL, app = NULL, all = TRUE) {
+
+  if(is.null(app))
+    tryCatch(app <- get(".app", parent.env(parent.frame(n = 2)), inherits = FALSE), 
+           error = function(e) {
+             if(is.null(pkg.env$app))
+               stop("There is no opened page. Please, use 'openPage()' function to create one.") 
+             app <<- pkg.env$app
+           })
+  
+  if(is.null(sessionId))
+    tryCatch(sessionId <- get(".id", parent.env(parent.frame(n = 2)), inherits = FALSE), 
+      error = function(e) {
+        if(!all & length(app$getSessionIds()) != 1)
+          stop("There are several active sessions. Please, specify the session ID")
+        sessionId <<- app$getSessionIds()
+      })
+
+  
+  list(app = app, sessionId = sessionId)
 }
 
 #' Remove chart from the page
@@ -1073,10 +1079,9 @@ openPage <- function(useViewer = TRUE, rootDirectory = NULL, startPage = NULL, l
 #' 
 #' @export
 removeChart <- function(chartId) {
-  if(is.null(pkg.env$app))
-    stop("There is no opened page. Please, use 'openPage()' function to create one.") 
+  workWith <- getAppAndSession()
   
-  pkg.env$app$removeChart(chartId)
+  workWith$app$removeChart(chartId)
 }
 
 #' Set properties of the chart
@@ -1103,10 +1108,9 @@ removeChart <- function(chartId) {
 #' @export
 #' @importFrom plyr rename
 setProperties <- function(data, chartId, layerId = NULL) {
-  if(is.null(pkg.env$app))
-    stop("There is no opened page. Please, use 'openPage()' function to create one.") 
-  
-  pkg.env$app$setProperties(data, chartId, layerId)
+  workWith <- getAppAndSession(app = app)
+  print(workWith$sessionId)
+  workWith$app$setProperties(data, chartId, layerId)
 }
 
 #' Update a chart
@@ -1207,10 +1211,9 @@ setProperties <- function(data, chartId, layerId = NULL) {
 #' 
 #' @export
 updateCharts <- function(chartId = NULL, layerId = NULL, updateOnly = NULL) {
-  if(is.null(pkg.env$app))
-    stop("There is no opened page. Please, use 'openPage()' function to create one.") 
+  workWith <- getAppAndSession()
   
-  pkg.env$app$updateCharts(chartId, layerId, updateOnly)
+  workWith$app$updateCharts(chartId, layerId, updateOnly, workWith$sessionId)
 }
 
 #' Trigger an event
@@ -1237,20 +1240,17 @@ updateCharts <- function(chartId = NULL, layerId = NULL, updateOnly = NULL) {
 #' 
 #' @export
 #' @importFrom utils type.convert
-chartEvent <- function(d, chartId, layerId = "main", event) {
-  
+chartEvent <- function(d, chartId, layerId = "main", event, sessionId = .id, app = .app) {
+  workWith <- list()
+  tryCatch(workWith$app <- app, error = function(e) {})
+  tryCatch(workWith$sessionId <- sessionId, error = function(e) {})
+  workWith <- getAppAndSession(app = workWith$app, sessionId = workWith$sessionId, all = FALSE)
+
   if(length(d) == 1)
     if(d == "NULL")
       d <- NULL
   
-  if(exists(".id")) {
-    app$chartEvent(d, chartId, layerId, event, .id)
-  } else {
-    if(is.null(pkg.env$app))
-      stop("There is no opened page. Please, use 'openPage()' function to create one.") 
-    pkg.env$app$chartEvent(d, chartId, layerId, event, pkg.env$app$getSessionIds())
-  }
-    
+  workWith$app$chartEvent(d, chartId, layerId, event, workWith$sessionId)
 }
 
 #' List all existing charts and layers
@@ -1271,10 +1271,9 @@ chartEvent <- function(d, chartId, layerId = "main", event) {
 #' listCharts()}
 #' @export
 listCharts <- function() {
-  if(is.null(pkg.env$app))
-    stop("There is no opened page. Please, use 'openPage()' function to create one.") 
-
-  pkg.env$app$listCharts()
+  workWith <- getAppAndSession()
+  
+  workWith$app$listCharts()
 }
 
 #' Get currently marked elements
@@ -1302,10 +1301,9 @@ listCharts <- function() {
 #' 
 #' @export
 getMarked <- function(chartId = NULL, layerId = NULL, sessionId = NULL) {
-  if(is.null(pkg.env$app))
-    stop("There is no opened page. Please, use 'openPage()' function to create one.") 
+  workWith <- getAppAndSession(sessionId = sessionId, all = FALSE)
   
-  pkg.env$getMarked(chartId, layerId, sessionId)
+  workWith$getMarked(chartId, layerId, workWith$sessionId)
 }
 
 #' Mark elements of a chart
@@ -1349,10 +1347,9 @@ getMarked <- function(chartId = NULL, layerId = NULL, sessionId = NULL) {
 #'
 #' @export
 mark <- function(elements, chartId = NULL, layerId = NULL, preventEvent = TRUE, sessionId = NULL) {
-  if(is.null(pkg.env$app))
-    stop("There is no opened page. Please, use 'openPage()' function to create one.") 
+  workWith <- getAppAndSession(sessionId, app)
   
-  pkg.env$app$mark(elements, chartId, layerId, preventEvent, sessionId)
+  workWith$app$mark(elements, chartId, layerId, preventEvent, workWith$sessionId)
 }
 
 #' @export

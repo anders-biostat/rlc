@@ -12,7 +12,10 @@ Description: An easy-to-use tool to employ interactivity in every-day explorator
 	which can be linked to each other or to other interactive elements with just few lines of code.
 License: GPL-3
 Imports: httpuv, jsonlite, stringr, hwriter, jrc(>= 0.2.0), plyr, methods, stats
-Suggests: tidyverse, RColorBrewer
+Suggests: 
+    tidyverse,
+    RColorBrewer,
+    testthat (>= 2.1.0)
 NeedsCompilation: no
 RoxygenNote: 7.0.1
 Roxygen: list(markdown = TRUE)
