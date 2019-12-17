@@ -11,6 +11,8 @@ openPage(
   layout = NULL,
   port = NULL,
   browser = NULL,
+  allowedFunctions = NULL,
+  allowedVariables = NULL,
   ...
 )
 }

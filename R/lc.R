@@ -410,6 +410,13 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
     invisible(self)
   },
   
+  removeLayer = function(chartId, layerId) {
+    chart <- private$getChart(chartId)
+    chart$removeLayer(layerId)
+    
+    invisible(self)
+  },
+  
   setLayout = function(layout) {
     if(grepl("^table", layoutName)){
       size <- as.numeric(str_extract_all(layoutName, "\\d", simplify = TRUE))
@@ -868,11 +875,13 @@ Chart <- R6Class("Chart", public = list(
                     ". The entire chart will be removed."))
       private$app$removeChart(self$id)
     } else {
-      if(!(layerId %in% names(layers))) {
+      if(!(layerId %in% names(private$layers))) {
         stop(str_c("There is no layer with ID ", layerId))
       } else {
-        sendCommand(str_interp("rlc.removeLayer('${id}', '${layerId}')"))
-        layers[[layerId]] <<- NULL
+        sessionIds <- private$app$getSessionIds()
+        for(id in sessionIds)
+          private$app$getSession(id)$sendCommand(str_interp("rlc.removeLayer('${self$id}', '${layerId}')"))
+        private$layers[[layerId]] <- NULL
       }
     }
   },
@@ -1063,7 +1072,6 @@ getAppAndSession <- function(sessionId = NULL, app = NULL, all = TRUE) {
         sessionId <<- app$getSessionIds()
       })
 
-  
   list(app = app, sessionId = sessionId)
 }
 
@@ -1071,7 +1079,7 @@ getAppAndSession <- function(sessionId = NULL, app = NULL, all = TRUE) {
 #' 
 #' Removes an existing chart.
 #' 
-#' @param id A vector of IDs of the charts to be removed.
+#' @param chartId A vector of IDs of the charts to be removed.
 #' 
 #' @examples 
 #' \donttest{lc_scatter(dat(x = 1:10, y = 1:10 * 2), id = "scatter")
@@ -1082,6 +1090,25 @@ removeChart <- function(chartId) {
   workWith <- getAppAndSession()
   
   workWith$app$removeChart(chartId)
+}
+
+#' Remove a layer from a chart
+#' 
+#' Removes a layer from an existing chart.
+#' 
+#' @param chartId ID of the chart from which to remove a layer.
+#' @param layerId ID of the layer to remove.
+#' 
+#' @examples 
+#' \donttest{lc_scatter(dat(x = 1:10, y = 1:10 * 2), id = "scatter")
+#' lc_abLine(a = 2, b = 0, id = "scatter", addLayer = TRUE)
+#' removeLayer("scatter", "Layer1")}
+#' 
+#' @export
+removeLayer <- function(chartId, layerId) {
+  workWith <- getAppAndSession()
+  
+  workWith$app$removeLayer(chartId, layerId)
 }
 
 #' Set properties of the chart
@@ -1518,8 +1545,10 @@ closePage <- function() {
 #'             colourLegendTitle = "Sepal Width")}
 #' @export
 lc_scatter <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE, pacerStep = 50) {
-  if(is.null(pkg.env$app))
+  if(is.null(pkg.env$app)){
     openPage()
+    pkg.env$app$setEnvironment(parent.frame())
+  }
   
   pkg.env$app$setChart("scatter", data, ...,  place = place, id = id, layerId = layerId, addLayer = addLayer,
            pacerStep = pacerStep)
@@ -1530,9 +1559,11 @@ lc_scatter <- function(data = list(), place = NULL, ..., id = NULL, layerId = NU
 #' 
 #' @export
 lc_beeswarm <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE, pacerStep = 50) {
-  if(is.null(pkg.env$app))
+  if(is.null(pkg.env$app)){
     openPage()
-
+    pkg.env$app$setEnvironment(parent.frame())
+  }
+  
   pck.env$app$setChart("beeswarm", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer, pacerStep = pacerStep)
 }
 
@@ -1664,8 +1695,10 @@ lc_beeswarm <- function(data = list(), place = NULL, ..., id = NULL, layerId = N
 #' 
 #' @export
 lc_line <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE) {
-  if(is.null(pkg.env$app))
+  if(is.null(pkg.env$app)){
     openPage()
+    pkg.env$app$setEnvironment(parent.frame())
+  }
   
   pkg.env$app$setChart("line", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer)
 }
@@ -1673,17 +1706,21 @@ lc_line <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL,
 #' @describeIn lc_line connects points in the order they are given.
 #' @export
 lc_path <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE) {
-  if(is.null(pkg.env$app))
+  if(is.null(pkg.env$app)){
     openPage()
-
+    pkg.env$app$setEnvironment(parent.frame())
+  }
+  
   pkg.env$app$setChart("path", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer)
 }
 
 #' @describeIn lc_line displays a filled area, defined by \code{ymax} and \code{ymin} values.
 #' @export
 lc_ribbon <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE) {
-  if(is.null(pkg.env$app))
+  if(is.null(pkg.env$app)){
     openPage()
+    pkg.env$app$setEnvironment(parent.frame())
+  }
   
   pkg.env$app$setChart("ribbon", data, ...,  place = place, id = id, layerId = layerId, addLayer = addLayer)
 }
@@ -1802,8 +1839,10 @@ lc_ribbon <- function(data = list(), place = NULL, ..., id = NULL, layerId = NUL
 #' 
 #' @export
 lc_bars <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE) {
-  if(is.null(pkg.env$app))
+  if(is.null(pkg.env$app)){
     openPage()
+    pkg.env$app$setEnvironment(parent.frame())
+  }
   
   pkg.env$app$setChart("bars", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer)
 }
@@ -1847,8 +1886,10 @@ lc_bars <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL,
 #' @export 
 lc_hist <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE) {
   # has a nbins property. Not implemented in JS
-  if(is.null(pkg.env$app))
+  if(is.null(pkg.env$app)){
     openPage()
+    pkg.env$app$setEnvironment(parent.frame())
+  }
   
   pkg.env$app$setChart("hist", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer)
 }
@@ -1857,8 +1898,10 @@ lc_hist <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL,
 #' @export
 #' @importFrom stats density.default
 lc_dens <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE) {
-  if(is.null(pkg.env$app))
+  if(is.null(pkg.env$app)){
     openPage()
+    pkg.env$app$setEnvironment(parent.frame())
+  }
   
   pkg.env$app$setChart("dens", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer)
 }
@@ -1960,8 +2003,10 @@ lc_dens <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL,
 #'                palette = brewer.pal(11, "RdYlBu")))}
 #' @export
 lc_heatmap <- function(data = list(), place = NULL, ..., id = NULL, pacerStep = 50) {
-  if(is.null(pkg.env$app))
+  if(is.null(pkg.env$app)){
     openPage()
+    pkg.env$app$setEnvironment(parent.frame())
+  }
   
   pkg.env$app$setChart("heatmap", data, ..., place = place, id = id, layerId = "main", pacerStep = pacerStep)
 }
@@ -2020,8 +2065,10 @@ lc_heatmap <- function(data = list(), place = NULL, ..., id = NULL, pacerStep = 
 #' 
 #' @export
 lc_colourSlider <- function(data = list(), place = NULL, ..., id = NULL) {
-  if(is.null(pkg.env$app))
+  if(is.null(pkg.env$app)){
     openPage()
+    pkg.env$app$setEnvironment(parent.frame())
+  }
   
   pkg.env$app$setChart("colourSlider", data, ..., place = place, id = id, layerId = "main")
 }
@@ -2030,8 +2077,10 @@ lc_colourSlider <- function(data = list(), place = NULL, ..., id = NULL) {
 #' @export
 #' @importFrom jsonlite toJSON
 lc_abLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE) {
-  if(is.null(pkg.env$app))
+  if(is.null(pkg.env$app)){
     openPage()
+    pkg.env$app$setEnvironment(parent.frame())
+  }
   
   pkg.env$app$setChart("abLine", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer)
 }
@@ -2039,8 +2088,10 @@ lc_abLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NUL
 #' @describeIn lc_line creates horizontal lines by y-intercept values
 #' @export
 lc_hLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE) {
-  if(is.null(pkg.env$app))
+  if(is.null(pkg.env$app)){
     openPage()
+    pkg.env$app$setEnvironment(parent.frame())
+  }
   
   pkg.env$app$setChart("hLine", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer)
 }
@@ -2048,8 +2099,10 @@ lc_hLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL
 #' @describeIn lc_line creates vertical lines by x-intercept values
 #' @export
 lc_vLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE) {
-  if(is.null(pkg.env$app))
+  if(is.null(pkg.env$app)){
     openPage()
+    pkg.env$app$setEnvironment(parent.frame())
+  }
   
   pkg.env$app$setChart("vLine", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer)
 }
@@ -2095,8 +2148,10 @@ lc_vLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL
 #' @export
 #' @importFrom hwriter hwrite
 lc_html <- function(data = list(), place = NULL, ..., id = NULL) {
-  if(is.null(pkg.env$app))
+  if(is.null(pkg.env$app)){
     openPage()
+    pkg.env$app$setEnvironment(parent.frame())
+  }
   
   pkg.env$app$setChart("html", data, ..., place = place, id = id, layerId = "main")
 }
@@ -2160,8 +2215,10 @@ lc_html <- function(data = list(), place = NULL, ..., id = NULL) {
 #'
 #' @export
 lc_input <- function(data = list(), place = NULL, ..., id = NULL) {
-  if(is.null(pkg.env$app))
+  if(is.null(pkg.env$app)){
     openPage()
+    pkg.env$app$setEnvironment(parent.frame())
+  }
   
   pkg.env$app$setChart("input", data, ..., place = place, id = id, layerId = "main")
 }

@@ -4,7 +4,7 @@
 \alias{chartEvent}
 \title{Trigger an event}
 \usage{
-chartEvent(d, chartId, layerId = "main", event)
+chartEvent(d, chartId, layerId = "main", event, sessionId = .id, app = .app)
 }
 \arguments{
 \item{d}{ID of an element that triggered the event. May be index of a point or line, vector or

@@ -19,6 +19,35 @@ test_that("Charts can be added and removed", {
   closePage()
 })
 
+test_that("Layers can be added and removed", {
+  lc_scatter(x = 1:10, y = 1:10)
+  lc_line(x = 1:10, y = 1:10, id = "Chart1", addLayer = TRUE)
+  lc_hist(value = sample(1:10, 50, replace = TRUE), nbins = 15, id = "Chart1", addLayer = TRUE)
+
+  app <- getPage()
+  app$allowVariables("n")
+  
+  session <- app$getSession()
+  session$sendCommand("jrc.sendData('n', d3.select('#Chart1').selectAll('.chart_g').size())", wait = 3)
+  expect_equal(n, 3)
+  
+  session$sendCommand("jrc.sendData('n', d3.select('#Layer1').selectAll('.data_element').size())", wait = 3)
+  expect_equal(n, 10)
+
+  session$sendCommand("jrc.sendData('n', d3.select('#Layer2').selectAll('.data_element').size())", wait = 3)
+  expect_equal(n, 1)
+
+  session$sendCommand("jrc.sendData('n', d3.select('#Layer3').selectAll('.data_element').size())", wait = 3)
+  expect_equal(n, 15)
+  
+  removeLayer("Chart1", "Layer2")
+  
+  session$sendCommand("jrc.sendData('n', d3.select('#Chart1').selectAll('.chart_g').size())", wait = 3)
+  expect_equal(n, 2)
+  
+  closePage()
+})
+
 test_that("Only one session is updated on click", {
   openPage(allowedVariables = c("red1", "red2"))
   clicked <- 1

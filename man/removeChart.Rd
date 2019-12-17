@@ -7,7 +7,7 @@
 removeChart(chartId)
 }
 \arguments{
-\item{id}{A vector of IDs of the charts to be removed.}
+\item{chartId}{A vector of IDs of the charts to be removed.}
 }
 \description{
 Removes an existing chart.
