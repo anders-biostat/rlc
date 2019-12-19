@@ -270,9 +270,6 @@ pkg.env$dataFun <- list(
         l$colLabel <- colnames(l$value)
     }
     
-    if(lc$useViewer)
-      l$mode <- "svg"
-    
     l
   },
   
@@ -633,7 +630,7 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
     session$sendCommand(str_c("rlc.mark('", chartId, "', '", layerId, "', ", preventEvent, ");"))    
   },
   
-  setChart = function(chartType, data, ..., place, id, layerId, addLayer, pacerStep = 50) {
+  setChart = function(chartType, data, ..., place = NULL, chartId = NULL, layerId = NULL, addLayer = FALSE, pacerStep = 50) {
     if(is.null(private$serverHandle)){
       super$startServer()
       super$openPage()
@@ -647,27 +644,30 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
     if(!(chartType %in% names(private$jsTypes)))
       stop("Unknown chart type")
     
-    if(is.null(place))
+    if(is.null(place) && is.null(chartId))
       place <- str_c("Chart", length(private$charts) + 1)
     
-    if(is.null(id))
-      id <- place
+    if(is.null(chartId))
+      chartId <- place
+    if(is.null(place))
+      place <- chartId
     
-    chart <- private$getChart(id)
-    if(!is.null(chart) && !is.null(layerId) && layerId == "main") {
+    chart <- private$getChart(chartId)
+    if(!is.null(chart) && ((!is.null(layerId) && layerId == "main") || 
+                           chart$nLayers() == 0)) {
       self$removeChart(chart$id)
-      chart <- private$getChart(id)
+      chart <- private$getChart(chartId)
     }
     
     if(is.null(chart)) {
-      chart <- private$addChart(id, place)
+      chart <- private$addChart(chartId, place)
       if(is.null(layerId) || layerId != "main")
         chart$addLayer("main", "axesChart")
     }
 
     if(is.null(layerId)){
       if(!addLayer & chart$nLayers() > 1) {
-        warning(str_c("Chart '", id, "' has ", chart$nLayers(), " layers and the layer ID is not specified. ", 
+        warning(str_c("Chart '", chartId, "' has ", chart$nLayers(), " layers and the layer ID is not specified. ", 
                       "'addLayer' will be set to TRUE."))
         addLayer <- T
       }
@@ -675,7 +675,7 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
       if(addLayer | chart$nLayers() == 0) {
         layerId <- str_c("Layer", (chart$nLayers() + 1))
       } else {
-        layerId <- names(chart$layers)[2]
+        layerId <- chart$getLayerIds()[2]
       }
     }
 
@@ -689,7 +689,7 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
 
     layer$pacerStep <- pacerStep
 
-    self$setProperties(c(data, list(...)), id, layerId)
+    self$setProperties(c(data, list(...)), chartId, layerId)
     
     for(session in private$sessions){
       chart$JSInitialize(session)
@@ -864,6 +864,10 @@ Chart <- R6Class("Chart", public = list(
       }
     private$layers[[layerId]]
   },
+  
+  getLayerIds = function() {
+    names(private$layers)
+  }, 
   
   nLayers = function() {
     length(private$layers) - 1
@@ -1435,7 +1439,7 @@ closePage <- function() {
 #' exists. If not defined, the chart will be placed directly in the body of the opened page.
 #' @param ... Name value pairs of properties that can be evaluated only once and then will remain 
 #' constant. These properties can still be changed later using the \code{\link{setProperties}} function
-#' @param id An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
+#' @param chartId An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
 #' exists, a new layer will be added to it. If you want to replace one chart with another, use \code{\link{removeChart}}
 #' first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} is the number of currently existing charts.
 #' @param layerId An ID for the new layer. All layers within one chart must have different IDs. If a layer with the same
@@ -1544,13 +1548,13 @@ closePage <- function() {
 #'             axisTitleX = "Species",
 #'             colourLegendTitle = "Sepal Width")}
 #' @export
-lc_scatter <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE, pacerStep = 50) {
+lc_scatter <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, addLayer = FALSE, pacerStep = 50) {
   if(is.null(pkg.env$app)){
     openPage()
     pkg.env$app$setEnvironment(parent.frame())
   }
   
-  pkg.env$app$setChart("scatter", data, ...,  place = place, id = id, layerId = layerId, addLayer = addLayer,
+  pkg.env$app$setChart("scatter", data, ...,  place = place, chartId = chartId, layerId = layerId, addLayer = addLayer,
            pacerStep = pacerStep)
 }
 
@@ -1558,13 +1562,13 @@ lc_scatter <- function(data = list(), place = NULL, ..., id = NULL, layerId = NU
 #' the axes to avoid overlapping.
 #' 
 #' @export
-lc_beeswarm <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE, pacerStep = 50) {
+lc_beeswarm <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, addLayer = FALSE, pacerStep = 50) {
   if(is.null(pkg.env$app)){
     openPage()
     pkg.env$app$setEnvironment(parent.frame())
   }
   
-  pck.env$app$setChart("beeswarm", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer, pacerStep = pacerStep)
+  pck.env$app$setChart("beeswarm", data, ..., place = place, chartId = chartId, layerId = layerId, addLayer = addLayer, pacerStep = pacerStep)
 }
 
 #' Lines and ribbons
@@ -1580,7 +1584,7 @@ lc_beeswarm <- function(data = list(), place = NULL, ..., id = NULL, layerId = N
 #' exists. If not defined, the chart will be placed directly in the body of the opened page.
 #' @param ... Name value pairs of properties that can be evaluated only once and then will remain 
 #' constant. These properties can still be changed later using the \code{\link{setProperties}} function
-#' @param id An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
+#' @param chartId An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
 #' exists, a new layer will be added to it. If you want to replace one chart with another, use \code{\link{removeChart}}
 #' first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} is the number of currently existing charts.
 #' @param layerId An ID for the new layer. All layers within one chart must have different IDs. If a layer with the same
@@ -1694,35 +1698,35 @@ lc_beeswarm <- function(data = list(), place = NULL, ..., id = NULL, layerId = N
 #' lc_vLine(dat(v = seq(1, 9, 1)), id = "grid", addLayer = TRUE)}
 #' 
 #' @export
-lc_line <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE) {
+lc_line <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, addLayer = FALSE) {
   if(is.null(pkg.env$app)){
     openPage()
     pkg.env$app$setEnvironment(parent.frame())
   }
   
-  pkg.env$app$setChart("line", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer)
+  pkg.env$app$setChart("line", data, ..., place = place, chartId = chartId, layerId = layerId, addLayer = addLayer)
 }
 
 #' @describeIn lc_line connects points in the order they are given.
 #' @export
-lc_path <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE) {
+lc_path <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, addLayer = FALSE) {
   if(is.null(pkg.env$app)){
     openPage()
     pkg.env$app$setEnvironment(parent.frame())
   }
   
-  pkg.env$app$setChart("path", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer)
+  pkg.env$app$setChart("path", data, ..., place = place, chartId = chartId, layerId = layerId, addLayer = addLayer)
 }
 
 #' @describeIn lc_line displays a filled area, defined by \code{ymax} and \code{ymin} values.
 #' @export
-lc_ribbon <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE) {
+lc_ribbon <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, addLayer = FALSE) {
   if(is.null(pkg.env$app)){
     openPage()
     pkg.env$app$setEnvironment(parent.frame())
   }
   
-  pkg.env$app$setChart("ribbon", data, ...,  place = place, id = id, layerId = layerId, addLayer = addLayer)
+  pkg.env$app$setChart("ribbon", data, ...,  place = place, chartId = chartId, layerId = layerId, addLayer = addLayer)
 }
 
 #' Create a barplot
@@ -1736,7 +1740,7 @@ lc_ribbon <- function(data = list(), place = NULL, ..., id = NULL, layerId = NUL
 #' exists. If not defined, the chart will be placed directly in the body of the opened page.
 #' @param ... Name value pairs of properties that can be evaluated only once and then will remain 
 #' constant. These properties can still be changed later using the \code{\link{setProperties}} function
-#' @param id An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
+#' @param chartId An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
 #' exists, a new layer will be added to it. If you want to replace one chart with another, use \code{\link{removeChart}}
 #' first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} is the number of currently existing charts.
 #' @param layerId An ID for the new layer. All layers within one chart must have different IDs. If a layer with the same
@@ -1838,13 +1842,13 @@ lc_ribbon <- function(data = list(), place = NULL, ..., id = NULL, layerId = NUL
 #'             groupIds = newData$agegp))}
 #' 
 #' @export
-lc_bars <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE) {
+lc_bars <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, addLayer = FALSE) {
   if(is.null(pkg.env$app)){
     openPage()
     pkg.env$app$setEnvironment(parent.frame())
   }
   
-  pkg.env$app$setChart("bars", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer)
+  pkg.env$app$setChart("bars", data, ..., place = place, chartId = chartId, layerId = layerId, addLayer = addLayer)
 }
 
 #' Histograms and density plots
@@ -1858,7 +1862,7 @@ lc_bars <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL,
 #' exists. If not defined, the chart will be placed directly in the body of the opened page.
 #' @param ... Name value pairs of properties that can be evaluated only once and then will remain 
 #' constant. These properties can still be changed later using the \code{\link{setProperties}} function
-#' @param id An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
+#' @param chartId An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
 #' exists, a new layer will be added to it. If you want to replace one chart with another, use \code{\link{removeChart}}
 #' first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} is the number of currently existing charts.
 #' @param layerId An ID for the new layer. All layers within one chart must have different IDs. If a layer with the same
@@ -1884,26 +1888,26 @@ lc_bars <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL,
 #' lc_dens(dat(value = rnorm(1000), height = 300)) }
 #' 
 #' @export 
-lc_hist <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE) {
+lc_hist <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, addLayer = FALSE) {
   # has a nbins property. Not implemented in JS
   if(is.null(pkg.env$app)){
     openPage()
     pkg.env$app$setEnvironment(parent.frame())
   }
   
-  pkg.env$app$setChart("hist", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer)
+  pkg.env$app$setChart("hist", data, ..., place = place, chartId = chartId, layerId = layerId, addLayer = addLayer)
 }
 
 #' @describeIn lc_hist makes a density plot. Is an extension of \code{\link{lc_line}}.
 #' @export
 #' @importFrom stats density.default
-lc_dens <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE) {
+lc_dens <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, addLayer = FALSE) {
   if(is.null(pkg.env$app)){
     openPage()
     pkg.env$app$setEnvironment(parent.frame())
   }
   
-  pkg.env$app$setChart("dens", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer)
+  pkg.env$app$setChart("dens", data, ..., place = place, chartId = chartId, layerId = layerId, addLayer = addLayer)
 }
 
 #' Create a heatmap
@@ -1917,7 +1921,7 @@ lc_dens <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL,
 #' exists. If not defined, the chart will be placed directly in the body of the opened page.
 #' @param ... Name value pairs of properties that can be evaluated only once and then will remain 
 #' constant. These properties can still be changed later using the \code{\link{setProperties}} function
-#' @param id An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
+#' @param chartId An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
 #' exists, a new layer will be added to it. If you want to replace one chart with another, use \code{\link{removeChart}}
 #' first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} is the number of currently existing charts.
 #' @param pacerStep Time in ms between two consecutive calls of an \code{onmouseover} event. Prevents overqueuing in case
@@ -2002,13 +2006,13 @@ lc_dens <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL,
 #'                colourDomain = c(-1, 1),
 #'                palette = brewer.pal(11, "RdYlBu")))}
 #' @export
-lc_heatmap <- function(data = list(), place = NULL, ..., id = NULL, pacerStep = 50) {
+lc_heatmap <- function(data = list(), place = NULL, ..., chartId = NULL, pacerStep = 50) {
   if(is.null(pkg.env$app)){
     openPage()
     pkg.env$app$setEnvironment(parent.frame())
   }
   
-  pkg.env$app$setChart("heatmap", data, ..., place = place, id = id, layerId = "main", pacerStep = pacerStep)
+  pkg.env$app$setChart("heatmap", data, ..., place = place, chartId = chartId, layerId = "main", pacerStep = pacerStep)
 }
 
 #' Add a colour slider
@@ -2024,7 +2028,7 @@ lc_heatmap <- function(data = list(), place = NULL, ..., id = NULL, pacerStep = 
 #' exists. If not defined, the chart will be placed directly in the body of the opened page.
 #' @param ... Name value pairs of properties that can be evaluated only once and then will remain 
 #' constant. These properties can still be changed later using the \code{\link{setProperties}} function
-#' @param id An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
+#' @param chartId An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
 #' exists, a new layer will be added to it. If you want to replace one chart with another, use \code{\link{removeChart}}
 #' first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} is the number of currently existing charts.
 #' 
@@ -2059,52 +2063,52 @@ lc_heatmap <- function(data = list(), place = NULL, ..., id = NULL, pacerStep = 
 #'            colourLegendTitle = "Petal Width",
 #'            symbolLegendTitle = "Species",
 #'            showLegend = FALSE,
-#'            id = "scatter")
+#'            chartId = "scatter")
 #' 
 #' lc_colourSlider(chart = "scatter")}
 #' 
 #' @export
-lc_colourSlider <- function(data = list(), place = NULL, ..., id = NULL) {
+lc_colourSlider <- function(data = list(), place = NULL, ..., chartId = NULL) {
   if(is.null(pkg.env$app)){
     openPage()
     pkg.env$app$setEnvironment(parent.frame())
   }
   
-  pkg.env$app$setChart("colourSlider", data, ..., place = place, id = id, layerId = "main")
+  pkg.env$app$setChart("colourSlider", data, ..., place = place, chartId = chartId, layerId = "main")
 }
 
 #' @describeIn lc_line creates straight lines by intercept and slope values
 #' @export
 #' @importFrom jsonlite toJSON
-lc_abLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE) {
+lc_abLine <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, addLayer = FALSE) {
   if(is.null(pkg.env$app)){
     openPage()
     pkg.env$app$setEnvironment(parent.frame())
   }
   
-  pkg.env$app$setChart("abLine", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer)
+  pkg.env$app$setChart("abLine", data, ..., place = place, chartId = chartId, layerId = layerId, addLayer = addLayer)
 }
 
 #' @describeIn lc_line creates horizontal lines by y-intercept values
 #' @export
-lc_hLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE) {
+lc_hLine <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, addLayer = FALSE) {
   if(is.null(pkg.env$app)){
     openPage()
     pkg.env$app$setEnvironment(parent.frame())
   }
   
-  pkg.env$app$setChart("hLine", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer)
+  pkg.env$app$setChart("hLine", data, ..., place = place, chartId = chartId, layerId = layerId, addLayer = addLayer)
 }
 
 #' @describeIn lc_line creates vertical lines by x-intercept values
 #' @export
-lc_vLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE) {
+lc_vLine <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, addLayer = FALSE) {
   if(is.null(pkg.env$app)){
     openPage()
     pkg.env$app$setEnvironment(parent.frame())
   }
   
-  pkg.env$app$setChart("vLine", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer)
+  pkg.env$app$setChart("vLine", data, ..., place = place, chartId = chartId, layerId = layerId, addLayer = addLayer)
 }
 
 #' Add HTML code to the page
@@ -2118,7 +2122,7 @@ lc_vLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL
 #' exists. If not defined, the chart will be placed directly in the body of the opened page.
 #' @param ... Name value pairs of properties that can be evaluated only once and then will remain 
 #' constant. These properties can still be changed later using the \code{\link{setProperties}} function
-#' @param id An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
+#' @param chartId An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
 #' exists, a new layer will be added to it. If you want to replace one chart with another, use \code{\link{removeChart}}
 #' first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} is the number of currently existing charts.
 #'
@@ -2147,13 +2151,13 @@ lc_vLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL
 #' 
 #' @export
 #' @importFrom hwriter hwrite
-lc_html <- function(data = list(), place = NULL, ..., id = NULL) {
+lc_html <- function(data = list(), place = NULL, ..., chartId = NULL) {
   if(is.null(pkg.env$app)){
     openPage()
     pkg.env$app$setEnvironment(parent.frame())
   }
   
-  pkg.env$app$setChart("html", data, ..., place = place, id = id, layerId = "main")
+  pkg.env$app$setChart("html", data, ..., place = place, chartId = chartId, layerId = "main")
 }
 
 #' Add input forms to the page
@@ -2167,7 +2171,7 @@ lc_html <- function(data = list(), place = NULL, ..., id = NULL) {
 #' exists. If not defined, the chart will be placed directly in the body of the opened page.
 #' @param ... Name value pairs of properties that can be evaluated only once and then will remain 
 #' constant. These properties can still be changed later using the \code{\link{setProperties}} function
-#' @param id An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
+#' @param chartId An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
 #' exists, a new layer will be added to it. If you want to replace one chart with another, use \code{\link{removeChart}}
 #' first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} is the number of currently existing charts.
 #' 
@@ -2214,11 +2218,11 @@ lc_html <- function(data = list(), place = NULL, ..., id = NULL) {
 #' lc_input(type = "button", labels = paste0("el", 1:5), on_click = function(value) print(value))}
 #'
 #' @export
-lc_input <- function(data = list(), place = NULL, ..., id = NULL) {
+lc_input <- function(data = list(), place = NULL, ..., chartId = NULL) {
   if(is.null(pkg.env$app)){
     openPage()
     pkg.env$app$setEnvironment(parent.frame())
   }
   
-  pkg.env$app$setChart("input", data, ..., place = place, id = id, layerId = "main")
+  pkg.env$app$setChart("input", data, ..., place = place, chartId = chartId, layerId = "main")
 }

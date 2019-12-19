@@ -19,10 +19,41 @@ test_that("Charts can be added and removed", {
   closePage()
 })
 
+test_that("Charts can be replaced without restarting the page", {
+  n <- -1
+  lc_scatter(x = 1:10, y = 1:10)
+  
+  lc_abLine(a = rep(1, 7), b = -3:3, chartId = "Chart1")
+  
+  s <- getPage()$getSession()
+  getPage()$allowVariables("n")
+
+  s$sendCommand("jrc.sendData('n', d3.selectAll('div.linked-charts').size())", wait = 3)
+  expect_equal(n, 1)
+  
+  n <- -1
+  s$sendCommand("jrc.sendData('n', d3.select('#Chart1').selectAll('.chart_g').size())", wait = 3)
+  expect_equal(n, 1)
+  
+  s$sendCommand("jrc.sendData('n', d3.select('#Chart1').selectAll('.data_element').size())", wait = 3)
+  expect_equal(n, 7)
+  
+  lc_heatmap(value = matrix(1:100, nrow = 10), chartId = "Chart1")
+  
+  s$sendCommand("jrc.sendData('n', d3.select('#Chart1').selectAll('.chart_g').size())", wait = 3)
+  expect_equal(n, 1)
+  
+  lc_scatter(x = 1:10, y = 1:10, chartId = "Chart1")
+  s$sendCommand("jrc.sendData('n', d3.selectAll('.data_element').size())", wait = 3)
+  expect_equal(n, 10)
+  
+  closePage()
+})
+
 test_that("Layers can be added and removed", {
   lc_scatter(x = 1:10, y = 1:10)
-  lc_line(x = 1:10, y = 1:10, id = "Chart1", addLayer = TRUE)
-  lc_hist(value = sample(1:10, 50, replace = TRUE), nbins = 15, id = "Chart1", addLayer = TRUE)
+  lc_line(x = 1:10, y = 1:10, chartId = "Chart1", addLayer = TRUE)
+  lc_hist(value = sample(1:10, 50, replace = TRUE), nbins = 15, chartId = "Chart1", addLayer = TRUE)
 
   app <- getPage()
   app$allowVariables("n")
@@ -44,6 +75,29 @@ test_that("Layers can be added and removed", {
   
   session$sendCommand("jrc.sendData('n', d3.select('#Chart1').selectAll('.chart_g').size())", wait = 3)
   expect_equal(n, 2)
+  
+  closePage()
+})
+
+test_that("Each layer uses its own callback function", {
+  n1 <- -1
+  n2 <- -1
+  lc_scatter(x = 1:10, y = 1:10, on_click = function(d) {n1 <<- d})
+  lc_scatter(x = 1:10, y = 1:10 * 2, on_click = function(d) {n2 <<- d}, chartId = "Chart1", addLayer = TRUE)
+  
+  s <- getPage()$getSession()
+  
+  s$sendCommand('f = d3.select("#pLayer1_4").on("click")')
+  s$callFunction('f', list(4), wait = 3)
+  
+  expect_equal(n1, 5)
+  expect_equal(n2, -1)
+
+  s$sendCommand('f = d3.select("#pLayer2_4").on("click")')
+  s$callFunction('f', list(8), wait = 3)
+  
+  expect_equal(n1, 5)
+  expect_equal(n2, 9)
   
   closePage()
 })
