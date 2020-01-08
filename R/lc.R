@@ -394,6 +394,67 @@ pkg.env$dataFun <- list(
   }
 )
 
+#' @name LCApp
+#' @title LCApp class
+#' 
+#' @description Object of this class represents the entire linked-charts app. It stores all charts, client sessions and
+#' local variables. You can create and manage interactive apps solely by creating new instances of this class and utilizing
+#' its methods. There are no limitations on the number of apps simultaneously running in one R session.
+#' However, it is also possible to create and manage app via the provided by the package wrapper functions. In this case an
+#' instance of this class is created and stored in the package namespace, and therefore only one app can be active simultaneously.
+#' You can always retrieve the active app with the \code{\link{getPage}} function. The \code{LCApp} class inherits from 
+#' the \code{\link[jrc]{App}} class.
+#' 
+#' @section Methods:
+#' \describe{
+#'    \item{\code{removeChart(chartId)}}{
+#'       Removes chart with the given ID from the app. See also \code{\link{removeChart}}.
+#'    }
+#'    \item{\code{removeLayer(chartId, layerId)}}{
+#'       Removes a layer from a chart by their IDs. See also \code{\link{removeLayer}}.
+#'    }
+#'    \item{\code{setProperties(data, chartId, layerId = NULL)}}{
+#'       Changes or sets properties for a given chart and layer. For more information, please, check \code{\link{setProperties}}.
+#'    }
+#'    \item{\code{updateCharts(chartId = NULL, layerId = NULL, updateOnly = NULL, sessionId = NULL)}}{
+#'       Updates charts or specific layers for one or multiple users. For more information about arguments,
+#'       please, check \code{\link{updateCharts}}.
+#'    }
+#'    \item{\code{chartEvent(d, chartId, layerId = "main", event, sessionId = NULL)}}{
+#'       Triggers a reaction to mouse event on the web page. Generally, this method is not supposed to be 
+#'       called explicitely. It is called internally each time, user clicks or hovers over an interactive chart element.
+#'       However, experienced users can use this method to simulate mouse events on the R side. For more information
+#'       on the arguments, please, check \code{\link{chartEvent}}.
+#'    }
+#'    \itme{\code{listCharts()}}{
+#'       Prints a list of all existing charts and their layers. See also \code{\link{listCharts}}.
+#'    }
+#'    \item{\code{getMarked(chartId = NULL, layerId = NULL, sessionId = NULL)}}{
+#'       Returns a vector of indices of all currently marked elements of a certain chart and layer and from a given client.
+#'       For more information, please, check \code{\link{getMarked}}.
+#'    }
+#'    \item{\code{mark(elements, chartId = NULL, layerId = NULL, preventEvent = TRUE, sessionId = NULL)}}{
+#'       Maks elements of a given chart and layer on one of the currently opened web pages. Please, check
+#'       \code{\link{mark}}.
+#'    }
+#'    \item{\code{setChart(chartType, data, ..., place = NULL, chartId = NULL, layerId = NULL, addLayer = FALSE, pacerStep = 50)}}{
+#'       Adds a new chart (or replaces an existing one) to the app. This is the main function of the package, that
+#'       allows to describe any chart completely. There exist multiple wrappers for this method - one for each type of 
+#'       chart. Here is a full list:
+#'          \itemize{
+#'             \item{\code{\link{lc_scatter}}}
+#'             \item{\code{\link{lc_beeswarm}}}
+#'             \item{\code{\link{lc_line}}}
+#'             \item{\code{\link{lc_path}}}
+#'             \item{\code{\link{lc_ribbon}}}
+#'             \item{\code{\link{lc_bars}}}
+#'             \item{\code{\link{lc_hist}}}
+#'          }
+#'    }
+#' }
+#'
+NULL
+
 #' @export
 LCApp <- R6Class("LCApp", inherit = App, public = list(
   removeChart = function(chartId) {
@@ -1041,7 +1102,6 @@ Chart <- R6Class("Chart", public = list(
 #' openPage(useViewer = FALSE, layout = "table2x3")}
 #' 
 #' @export
-#' @importFrom httpuv service
 openPage <- function(useViewer = TRUE, rootDirectory = NULL, startPage = NULL, layout = NULL, port = NULL, 
                      browser = NULL, allowedFunctions = NULL, allowedVariables = NULL, ...) {
   if(!is.null(pkg.env$app)) 

@@ -4,7 +4,7 @@
 \alias{lc_heatmap}
 \title{Create a heatmap}
 \usage{
-lc_heatmap(data = list(), place = NULL, ..., id = NULL, pacerStep = 50)
+lc_heatmap(data = list(), place = NULL, ..., chartId = NULL, pacerStep = 50)
 }
 \arguments{
 \item{data}{Name value pairs of properties, passed through the \code{\link{dat}} function. These
@@ -16,7 +16,7 @@ exists. If not defined, the chart will be placed directly in the body of the ope
 \item{...}{Name value pairs of properties that can be evaluated only once and then will remain
 constant. These properties can still be changed later using the \code{\link{setProperties}} function}
 
-\item{id}{An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
+\item{chartId}{An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
 exists, a new layer will be added to it. If you want to replace one chart with another, use \code{\link{removeChart}}
 first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} is the number of currently existing charts.}
 
