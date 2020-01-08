@@ -19,6 +19,8 @@ pkg.env$dataFun <- list(
     if(is.null(l$y))
       l$y <- 1:length(l$x)
     
+    l$nelements <- length(l$x)
+    
     if(is.null(l$label)){
       if(!is.null(names(l$y)))
         l$label <- names(l$y)
@@ -42,6 +44,7 @@ pkg.env$dataFun <- list(
       l$shiftY <- runif(length(l$y), -l$jitterY, l$jitterY)
       l$jitterY <- NULL
     }
+    
     l
   },
   beeswarm = function(l) {
