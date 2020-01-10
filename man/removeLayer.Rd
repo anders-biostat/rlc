@@ -12,7 +12,9 @@ removeLayer(chartId, layerId)
 \item{layerId}{ID of the layer to remove.}
 }
 \description{
-Removes a layer from an existing chart.
+Removes a layer from an existing chart. Changes will be applied to all currently opened and future pages.
+This function is a wrapper around method \code{removeLayer} of
+class \code{\link{LCApp}}.
 }
 \examples{
 \donttest{lc_scatter(dat(x = 1:10, y = 1:10 * 2), id = "scatter")

@@ -438,8 +438,8 @@ pkg.env$dataFun <- list(
 #'       \code{\link{mark}}.
 #'    }
 #'    \item{\code{setChart(chartType, data, ..., place = NULL, chartId = NULL, layerId = NULL, addLayer = FALSE, pacerStep = 50)}}{
-#'       Adds a new chart (or replaces an existing one) to the app. This is the main function of the package, that
-#'       allows to describe any chart completely. There exist multiple wrappers for this method - one for each type of 
+#'       Adds a new chart (or replaces an existing one) to the app. This is the main method of the package, that
+#'       allows to define any chart and all its properties. There exist multiple wrappers for this method - one for each type of 
 #'       chart. Here is a full list:
 #'          \itemize{
 #'             \item{\code{\link{lc_scatter}}}
@@ -449,7 +449,25 @@ pkg.env$dataFun <- list(
 #'             \item{\code{\link{lc_ribbon}}}
 #'             \item{\code{\link{lc_bars}}}
 #'             \item{\code{\link{lc_hist}}}
+#'             \item{\code{\link{lc_dens}}}
+#'             \item{\code{\link{lc_heatmap}}}
+#'             \item{\code{\link{lc_colourSlider}}}
+#'             \item{\code{\link{lc_abLine}}}
+#'             \item{\code{\link{lc_vLine}}}
+#'             \item{\code{\link{lc_html}}}
+#'             \itme{\code{\link{lc_input}}}
 #'          }
+#'      You can check the wrapper funcitons for information about arguments and available properties. Compared to them, this 
+#'      method gets additional argument \code{chartType}, which is always the same as the second part of the name of a 
+#'      corresponding wrapper function (\code{lc_`chartType`}). In all other aspects, wrapper functions and the \code{setChart} 
+#'      method are the same.
+#'    }
+#'    \item{\code{new(layout = NULL, beforeLoad = function(session) {}, afterLoad = function(session) {}, ...)}}{
+#'       Creates new instance of class \code{LCApp}. Most of its arguments are inherited from method \code{new} of
+#'       the \code{\link[jrc]{App}} class. The ones specific to \code{LCApp} are \code{layout} which sets a default
+#'       layout for each new webpage (currently only tables of any size are available, see \code{\link{setLayout}} for
+#'       more information), \code{beforeLoad} and \code{afterLoad} replace \code{onStart} from the \code{\link[jrc]{App}}
+#'       class. For more information, please, check \code{\link{openPage}}.
 #'    }
 #' }
 #'
@@ -1077,9 +1095,20 @@ Chart <- R6Class("Chart", public = list(
                    
 #' Open a new empty page
 #' 
-#' \code{openPage} creates a server, establishes a web socket connection between it and the current
+#' \code{openPage} starts a server, establishes a web socket connection between it and the current
 #' R session and loads linked-charts JS library with all the dependencies. If there is already an 
 #' opened page, it will be automatically closed.
+#' 
+#' Argument \code{onStart} of \code{jrc} \code{\link[jrc]{openPage}} function is replaced in \code{rlc}
+#' with \code{beforeLoad} and \code{afterLoad}. The reason for that is when the page opens, \code{rlc}
+#' has to put there all the existing charts. Different situations may require some code be loaded before or after
+#' that happens. \code{beforeLoad} and \code{afterLoad} provide a way to define two callback functions, each 
+#' of which gets a \code{\link[jrc]{Session}} object as an argument and is called once for each new page.
+#' \code{beforeLoad} runs before anything else has happend, while \code{afterLoad} is called after all the
+#' existing chars have been added to the page.
+#' 
+#' This function initializes a new instance of class \code{\link{LCApp}} and wraps around methods 
+#' \code{startServer} and \code{openPage} of its parent class \code{\link[jrc]{App}}.
 #' 
 #' @param useViewer If \code{TRUE}, the page will be opened in the RStudio Viewer. If \code{FALSE}
 #' a default web browser will be used.
@@ -1094,7 +1123,22 @@ Chart <- R6Class("Chart", public = list(
 #' number of rows and \code{M} is the number of columns. Each cell will get an ID that consists of 
 #' a letter (indicating the row) and a number (indicating the column) (e.g. \code{B3} is an ID of 
 #' the second row and third column).
-#' @param ... Further arguments passed to \code{\link[jrc]{openPage}}.
+#' @param port Defines which TCP port the server will listen to. If not defined, random available port
+#' will be used (see \code{\link[httpuv]{randomPort}}).
+#' @param browser A browser in which to open a new web page.
+#' If not defined, default browser will be used. For more information check \code{\link[utils]{browseURL}}.
+#' If this argument is specified, \code{useViewer} will be ignored.
+#' @param allowedFunctions List of functions that can be called from a web page without any additional actions 
+#' on the R side. All other functions will require authorization in the current R session before they are called. 
+#' This argument should be a vector of R function names. Check \code{\link{authorize}} and \code{\link{allowFunctions}}
+#' for more information. 
+#' @param allowedVariables List of variables that can be modified from a web page without any additional actions 
+#' on the R side. All other variable reassignments must be confirmed in the current R session. 
+#' This argument should be a vector of variable names. Check \code{\link{authorize}} and \code{\link{allowVariables}}
+#' for more information.
+#' @param ... Further arguments passed to \code{\link[jrc]{openPage}}. Check for more information in the Details section.
+#' 
+#' @return A new instance of class \code{\link{LCApp}}.
 #' 
 #' @examples
 #' \donttest{openPage()
@@ -1144,7 +1188,9 @@ getAppAndSession <- function(sessionId = NULL, app = NULL, all = TRUE) {
 
 #' Remove chart from the page
 #' 
-#' Removes an existing chart.
+#' Removes an existing chart. Changes will be applied to all currently opened and future pages.
+#' This function is a wrapper around method \code{removeChart} of
+#' class \code{\link{LCApp}}. 
 #' 
 #' @param chartId A vector of IDs of the charts to be removed.
 #' 
@@ -1161,7 +1207,9 @@ removeChart <- function(chartId) {
 
 #' Remove a layer from a chart
 #' 
-#' Removes a layer from an existing chart.
+#' Removes a layer from an existing chart. Changes will be applied to all currently opened and future pages.
+#' This function is a wrapper around method \code{removeLayer} of
+#' class \code{\link{LCApp}}.
 #' 
 #' @param chartId ID of the chart from which to remove a layer.
 #' @param layerId ID of the layer to remove.
@@ -1181,7 +1229,8 @@ removeLayer <- function(chartId, layerId) {
 #' Set properties of the chart
 #' 
 #' Changes already defined properties or sets the new ones for an
-#' existing chart.
+#' existing chart. Changes will be applied to all currently opened and future pages.
+#' This function is a wrapper around method \code{setProperties} of class \code{\link{LCApp}}.
 #' 
 #' @param data Set of properties to be redefined for this layer or chart. Created by \code{\link{dat}}
 #' function.
@@ -1217,6 +1266,12 @@ setProperties <- function(data, chartId, layerId = NULL) {
 #' actions. Each time the \code{updateCharts} function is called, all the properties passed
 #' via \code{\link{dat}} function are reevaluated and the chart is changed in accordance with the
 #' new state.
+#' 
+#' If this function is called by the user from the currently running R session, changes will be applied
+#' to all currently opened pages. If it is used as a part of any Linked-charts callback, only the page
+#' that triggered the call will be affected.
+#' 
+#' This function is a wrapper around method \code{updateCharts} of class \code{\link{LCApp}}.
 #' 
 #' @section Update types: 
 #' To improve performance you can update only a certain part of the chart (e.g. colours,
@@ -1318,6 +1373,8 @@ updateCharts <- function(chartId = NULL, layerId = NULL, updateOnly = NULL) {
 #' behavior in some complicated cases. This function can also emulate events triggered by non-existing
 #' elements.
 #' 
+#' This function is a wrapper around method \code{chartEvent} of class \code{\link{LCApp}}.
+#' 
 #' @param d ID of an element that triggered the event. May be index of a point or line, vector or
 #' row and column indices for a heatmap, value of an input block (please, check \code{\link{lc_input}}
 #' for more details about values). Should be \code{NULL} for \code{mouseout} or \code{marked} events.
@@ -1326,7 +1383,13 @@ updateCharts <- function(chartId = NULL, layerId = NULL, updateOnly = NULL) {
 #' @param id ID of the chart.
 #' @param layerId ID of the layer. You can get IDs of all charts and their layers with \code{\link{listCharts}}.
 #' @param event Type of event. Must be one of \code{"click", "mouseover", "mouseout", "marked", "labelClickRow", "labelClickCol"}.
-#' 
+#' @param sessionId ID of the session (opened client page) that triggered the event. The default value uses a local session
+#' variable. This must be a single sessionId. You can get a list of IDs of all currently active with the
+#' method \code{getSessionIds} inherited from class \code{\link{App}}. Possible errors in evaluation of 
+#' this argument are ignored.
+#' @param app Object of class \code{\link{LCApp}} for which the event was triggered. Note that this argument is here for
+#' internal use and is default value is a variable, stored in each session. If you are not use wrapper functions, 
+#' it is preferred to call method \code{chartEvent} of a corresponding instance of class \code{\link{LCApp}}.
 #' @examples 
 #' \donttest{x <- rnorm(50)
 #' lc_scatter(x = x, y = 2*x + rnorm(50, 0.1), on_click = function(d) print(d))
@@ -1350,6 +1413,7 @@ chartEvent <- function(d, chartId, layerId = "main", event, sessionId = .id, app
 #' List all existing charts and layers
 #' 
 #' \code{listCharts} prints a list of IDs of all existing charts and layers.
+#' This function is wrapper around method \code{listCharts} of class \code{\link{LCApp}}.
 #' 
 #' @examples 
 #' \donttest{noise <- rnorm(30)
@@ -1380,6 +1444,10 @@ listCharts <- function() {
 #' @param chartId An ID of the chart.
 #' @param layerId An ID of the layer. This argument is required, if the chart has more
 #' than one layer.
+#' @param sessionId An ID of the session from which to get the marked elements. Can be \code{NULL}
+#' if there is only one active session. Otherwise must be a valid session ID. Check \code{\link[jrc]{Session}}
+#' for more information on client sessions. If a call to this function was triggered from an opened web page, ID of 
+#' the corresponding session will be used automatically.
 #' 
 #' @return a vector of indices or, in case of heatmaps, an \emph{n x 2} matrix were first and
 #' second columns contain, respectively, row and column indices of the marked cells.
@@ -1413,6 +1481,10 @@ getMarked <- function(chartId = NULL, layerId = NULL, sessionId = NULL) {
 #' the chart has only one layer).
 #' @param preventEvent if \code{TRUE}, \code{on_marked} function will not be
 #' called.
+#' @param sessionId An ID of the session from which to get the marked elements. Can be \code{NULL}
+#' if there is only one active session. Otherwise must be a valid session ID. Check \code{\link[jrc]{Session}}
+#' for more information on client sessions. If a call to this function was triggered from an opened web page, ID of 
+#' the corresponding session will be used automatically.
 #'
 #' @examples 
 #' \donttest{data("iris")
@@ -1446,6 +1518,17 @@ mark <- function(elements, chartId = NULL, layerId = NULL, preventEvent = TRUE, 
   workWith$app$mark(elements, chartId, layerId, preventEvent, workWith$sessionId)
 }
 
+#' Get the currently running app
+#' 
+#' \code{rlc} offers two ways to control an interactive app. One is by using methods of class
+#' \code{\link{LCApp}}. This allows one to have any number of apps within one
+#' R session, but requires some understanding of object oriented programming. Another way is to use
+#' provided wrapper functions that are exported by the package. These functions internally work with 
+#' the \code{\link{LCApp}} object, which is stored in the package namespace upon initialization with 
+#' \code{\link{openPage}} function. \code{getPage} returns this object if any.
+#' 
+#' @return Object of class \code{\link{LCApp}} or \code{NULL} if there is no active app.
+#' 
 #' @export
 getPage <- function(){
   pkg.env$app
@@ -1470,9 +1553,10 @@ dat <- function( ... ) {
   as.list(match.call()[-1])
 }
 
-#' Close page
+#' Stop server
 #' 
-#' Close an opened web page and clear the list of charts.
+#' Stops the server and closes all currently opened pages (if any). This function is a 
+#' wrapper of \code{stopServer} method inherited by the \code{\link{LCApp}} class from \code{\link[jrc]{App}}.
 #' 
 #' @examples 
 #' \donttest{openPage(useViewer = FALSE)

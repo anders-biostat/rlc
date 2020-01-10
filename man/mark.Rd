@@ -23,6 +23,11 @@ the chart has only one layer).}
 
 \item{preventEvent}{if \code{TRUE}, \code{on_marked} function will not be
 called.}
+
+\item{sessionId}{An ID of the session from which to get the marked elements. Can be \code{NULL}
+if there is only one active session. Otherwise must be a valid session ID. Check \code{\link[jrc]{Session}}
+for more information on client sessions. If a call to this function was triggered from an opened web page, ID of
+the corresponding session will be used automatically.}
 }
 \description{
 \code{mark} selects a set of elements in a given chart. It is equivalent to

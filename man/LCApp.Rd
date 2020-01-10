@@ -46,8 +46,8 @@ Maks elements of a given chart and layer on one of the currently opened web page
 \code{\link{mark}}.
 }
 \item{\code{setChart(chartType, data, ..., place = NULL, chartId = NULL, layerId = NULL, addLayer = FALSE, pacerStep = 50)}}{
-Adds a new chart (or replaces an existing one) to the app. This is the main function of the package, that
-allows to describe any chart completely. There exist multiple wrappers for this method - one for each type of
+Adds a new chart (or replaces an existing one) to the app. This is the main method of the package, that
+allows to define any chart and all its properties. There exist multiple wrappers for this method - one for each type of
 chart. Here is a full list:
 \itemize{
 \item{\code{\link{lc_scatter}}}
@@ -57,7 +57,25 @@ chart. Here is a full list:
 \item{\code{\link{lc_ribbon}}}
 \item{\code{\link{lc_bars}}}
 \item{\code{\link{lc_hist}}}
+\item{\code{\link{lc_dens}}}
+\item{\code{\link{lc_heatmap}}}
+\item{\code{\link{lc_colourSlider}}}
+\item{\code{\link{lc_abLine}}}
+\item{\code{\link{lc_vLine}}}
+\item{\code{\link{lc_html}}}
+\itme{\code{\link{lc_input}}}
 }
+You can check the wrapper funcitons for information about arguments and available properties. Compared to them, this
+method gets additional argument \code{chartType}, which is always the same as the second part of the name of a
+corresponding wrapper function (\code{lc_`chartType`}). In all other aspects, wrapper functions and the \code{setChart}
+method are the same.
+}
+\item{\code{new(layout = NULL, beforeLoad = function(session) {}, afterLoad = function(session) {}, ...)}}{
+Creates new instance of class \code{LCApp}. Most of its arguments are inherited from method \code{new} of
+the \code{\link[jrc]{App}} class. The ones specific to \code{LCApp} are \code{layout} which sets a default
+layout for each new webpage (currently only tables of any size are available, see \code{\link{setLayout}} for
+more information), \code{beforeLoad} and \code{afterLoad} replace \code{onStart} from the \code{\link[jrc]{App}}
+class. For more information, please, check \code{\link{openPage}}.
 }
 }
 }

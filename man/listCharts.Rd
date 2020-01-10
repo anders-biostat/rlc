@@ -8,6 +8,7 @@ listCharts()
 }
 \description{
 \code{listCharts} prints a list of IDs of all existing charts and layers.
+This function is wrapper around method \code{listCharts} of class \code{\link{LCApp}}.
 }
 \examples{
 \donttest{noise <- rnorm(30)

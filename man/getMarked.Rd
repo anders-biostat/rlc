@@ -11,6 +11,11 @@ getMarked(chartId = NULL, layerId = NULL, sessionId = NULL)
 
 \item{layerId}{An ID of the layer. This argument is required, if the chart has more
 than one layer.}
+
+\item{sessionId}{An ID of the session from which to get the marked elements. Can be \code{NULL}
+if there is only one active session. Otherwise must be a valid session ID. Check \code{\link[jrc]{Session}}
+for more information on client sessions. If a call to this function was triggered from an opened web page, ID of
+the corresponding session will be used automatically.}
 }
 \value{
 a vector of indices or, in case of heatmaps, an \emph{n x 2} matrix were first and

@@ -32,6 +32,12 @@ used to define a chart are not constant, but can change as a result of user's
 actions. Each time the \code{updateCharts} function is called, all the properties passed
 via \code{\link{dat}} function are reevaluated and the chart is changed in accordance with the
 new state.
+
+If this function is called by the user from the currently running R session, changes will be applied
+to all currently opened pages. If it is used as a part of any Linked-charts callback, only the page
+that triggered the call will be affected.
+
+This function is a wrapper around method \code{updateCharts} of class \code{\link{LCApp}}.
 }
 \section{Update types}{
 

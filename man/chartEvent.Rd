@@ -17,6 +17,15 @@ used in JavaScript.}
 
 \item{event}{Type of event. Must be one of \code{"click", "mouseover", "mouseout", "marked", "labelClickRow", "labelClickCol"}.}
 
+\item{sessionId}{ID of the session (opened client page) that triggered the event. The default value uses a local session
+variable. This must be a single sessionId. You can get a list of IDs of all currently active with the
+method \code{getSessionIds} inherited from class \code{\link{App}}. Possible errors in evaluation of
+this argument are ignored.}
+
+\item{app}{Object of class \code{\link{LCApp}} for which the event was triggered. Note that this argument is here for
+internal use and is default value is a variable, stored in each session. If you are not use wrapper functions,
+it is preferred to call method \code{chartEvent} of a corresponding instance of class \code{\link{LCApp}}.}
+
 \item{id}{ID of the chart.}
 }
 \description{
@@ -25,6 +34,9 @@ it calls a corresponding callback function, if any was specified by the user. Th
 is meant to be used internally. However, an experienced user can still use it to customize app
 behavior in some complicated cases. This function can also emulate events triggered by non-existing
 elements.
+}
+\details{
+This function is a wrapper around method \code{chartEvent} of class \code{\link{LCApp}}.
 }
 \examples{
 \donttest{x <- rnorm(50)

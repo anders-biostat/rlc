@@ -17,7 +17,8 @@ layer or doesn't have layers, default value (which is NULL) can be used.}
 }
 \description{
 Changes already defined properties or sets the new ones for an
-existing chart.
+existing chart. Changes will be applied to all currently opened and future pages.
+This function is a wrapper around method \code{setProperties} of class \code{\link{LCApp}}.
 }
 \examples{
 \donttest{data("iris")

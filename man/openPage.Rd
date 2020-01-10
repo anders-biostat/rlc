@@ -34,12 +34,44 @@ number of rows and \code{M} is the number of columns. Each cell will get an ID t
 a letter (indicating the row) and a number (indicating the column) (e.g. \code{B3} is an ID of
 the second row and third column).}
 
-\item{...}{Further arguments passed to \code{\link[jrc]{openPage}}.}
+\item{port}{Defines which TCP port the server will listen to. If not defined, random available port
+will be used (see \code{\link[httpuv]{randomPort}}).}
+
+\item{browser}{A browser in which to open a new web page.
+If not defined, default browser will be used. For more information check \code{\link[utils]{browseURL}}.
+If this argument is specified, \code{useViewer} will be ignored.}
+
+\item{allowedFunctions}{List of functions that can be called from a web page without any additional actions
+on the R side. All other functions will require authorization in the current R session before they are called.
+This argument should be a vector of R function names. Check \code{\link{authorize}} and \code{\link{allowFunctions}}
+for more information.}
+
+\item{allowedVariables}{List of variables that can be modified from a web page without any additional actions
+on the R side. All other variable reassignments must be confirmed in the current R session.
+This argument should be a vector of variable names. Check \code{\link{authorize}} and \code{\link{allowVariables}}
+for more information.}
+
+\item{...}{Further arguments passed to \code{\link[jrc]{openPage}}. Check for more information in the Details section.}
+}
+\value{
+A new instance of class \code{\link{LCApp}}.
 }
 \description{
-\code{openPage} creates a server, establishes a web socket connection between it and the current
+\code{openPage} starts a server, establishes a web socket connection between it and the current
 R session and loads linked-charts JS library with all the dependencies. If there is already an
 opened page, it will be automatically closed.
+}
+\details{
+Argument \code{onStart} of \code{jrc} \code{\link[jrc]{openPage}} function is replaced in \code{rlc}
+with \code{beforeLoad} and \code{afterLoad}. The reason for that is when the page opens, \code{rlc}
+has to put there all the existing charts. Different situations may require some code be loaded before or after
+that happens. \code{beforeLoad} and \code{afterLoad} provide a way to define two callback functions, each
+of which gets a \code{\link[jrc]{Session}} object as an argument and is called once for each new page.
+\code{beforeLoad} runs before anything else has happend, while \code{afterLoad} is called after all the
+existing chars have been added to the page.
+
+This function initializes a new instance of class \code{\link{LCApp}} and wraps around methods
+\code{startServer} and \code{openPage} of its parent class \code{\link[jrc]{App}}.
 }
 \examples{
 \donttest{openPage()
