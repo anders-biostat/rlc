@@ -22,7 +22,7 @@ happens in JavaScript.}
 \code{"labelClickRow"}, \code{"labelClickCol"}.}
 
 \item{sessionId}{ID of the session (opened client page) that triggered the event. The default value uses a local session
-variable. This must be a single sessionId. You can get a list of IDs of all currently active with the
+variable. This must be a single session ID. You can get a list of IDs of all currently active with the
 method \code{getSessionIds} inherited from class \code{\link{App}} by \code{\link{LCApp}}. Possible errors in evaluation of
 this argument are ignored.}
 

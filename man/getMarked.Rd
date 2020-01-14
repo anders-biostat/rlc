@@ -24,7 +24,7 @@ second columns contain row and column indices of the marked cells, respectively.
 \description{
 \code{getMarked} returns indices of the chart's elements that are currently
 marked. To mark elements select them with your mouse while holding the \emph{Shift} key.
-Double click on the chart with the \emph{Shift} key pressed will unmark all the
+Double click on the chart with the \emph{Shift} key pressed will deselect all the
 elements. This function is a wrapper of method \code{getMarked} of class \code{\link{LCApp}}.
 }
 \examples{

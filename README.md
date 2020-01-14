@@ -21,7 +21,7 @@ of the others.
 install.package("rlc")
 ```
 
-You can also intall the latest devolopmental version from GitHub:
+You can also install the latest developmental version from GitHub:
 
 ```
 install.packages("devtools")

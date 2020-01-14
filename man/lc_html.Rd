@@ -18,7 +18,7 @@ constant. These properties can still be changed later using the \code{\link{setP
 
 \item{chartId}{ID for the chart. All charts must have unique IDs. If a chart with the same ID already
 exists, it will be replaced. If ID is not defined, it will be the same as
-value of the \code{place} argument. And if bothe are not defined, the ID will be set to \code{ChartN},
+value of the \code{place} argument. And if both are not defined, the ID will be set to \code{ChartN},
 where \code{N - 1} is the number of existing charts.}
 }
 \description{
@@ -41,7 +41,7 @@ If width is defined and it's smaller than content's width, scrolling will be pos
 \item \code{heigth} - height of the chart in pixels. By default, height will be set to fit the content.
 If height is defined and it's smaller than content's height, scrolling will be possible.
 \item \code{paddings} - padding sizes in pixels. Must be a list with all the following fields:
-\code{"top", "bottom", "left", "right"}.
+\code{"top", "bottom", "left", "right"}.}
 }
 
 \examples{

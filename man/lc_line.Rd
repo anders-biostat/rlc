@@ -75,7 +75,7 @@ constant. These properties can still be changed later using the \code{\link{setP
 
 \item{chartId}{ID for the chart. All charts must have unique IDs. If a chart with the same ID already
 exists, it will be replaced unless \code{addLayer = TRUE}. If ID is not defined, it will be the same as
-value of the \code{place} argument. And if bothe are not defined, the ID will be set to \code{ChartN},
+value of the \code{place} argument. And if both are not defined, the ID will be set to \code{ChartN},
 where \code{N - 1} is the number of existing charts.}
 
 \item{layerId}{An ID for the new layer. All layers within one chart must have different IDs. If a layer with the same

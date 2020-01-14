@@ -30,7 +30,7 @@ please, check \code{\link{updateCharts}}.
 }
 \item{\code{chartEvent(d, chartId, layerId = "main", event, sessionId = NULL)}}{
 Triggers a reaction to mouse event on a web page. Generally, this method is not supposed to be
-called explicitely. It is called internally each time, client clicks or hovers over an interactive chart element.
+called explicitly. It is called internally each time, client clicks or hovers over an interactive chart element.
 However, experienced users can use this method to simulate mouse events on the R side. For more information
 on the arguments, please, check \code{\link{chartEvent}}.
 }
@@ -65,7 +65,7 @@ chart. Here is a full list:
 \item{\code{\link{lc_html}}}
 \item{\code{\link{lc_input}}}
 }
-You can check the wrapper funcitons for information about arguments and available properties. Compared to them, this
+You can check the wrapper functions for information about arguments and available properties. Compared to them, this
 method gets additional argument \code{chartType}, which is always the same as the second part of the name of a
 corresponding wrapper function (\code{lc_`chartType`}). In all other aspects, wrapper functions and the \code{setChart}
 method are the same.

@@ -18,7 +18,7 @@ constant. These properties can still be changed later using the \code{\link{setP
 
 \item{chartId}{ID for the chart. All charts must have unique IDs. If a chart with the same ID already
 exists, it will be replaced. If ID is not defined, it will be the same as
-value of the \code{place} argument. And if bothe are not defined, the ID will be set to \code{ChartN},
+value of the \code{place} argument. And if both are not defined, the ID will be set to \code{ChartN},
 where \code{N - 1} is the number of existing charts.}
 }
 \description{
@@ -34,9 +34,9 @@ You can read more about different properties
 \itemize{
 \item \code{type} - type of input. Must be one of \code{"text"}, \code{"range"}, \code{"checkbox"},
 \code{"radio"} or \code{"button"}.
-\item \code{value} - current state of the input block. For radio buttons it is an idex of the checked
+\item \code{value} - current state of the input block. For radio buttons it is an index of the checked
 button. For checkboxes - a vector of \code{TRUE} (for each checked box) and \code{FALSE} (for each unchecked ones),
-for ranges and textboxes - a vector of values for each text field or slider.
+for ranges and text boxes - a vector of values for each text field or slider.
 \item \code{step} (only for \code{type = "range"}) - stepping interval for values that can be selected with the slider.
 Must be a numeric vector with one value for each slider in the input block.
 \item \code{min, max} (only for \code{type = "range"}) - minimal and maximal values that can be selected with the slider.
@@ -46,7 +46,7 @@ Must be a numeric vector with one value for each slider in the input block.
 Interactivity settings
 \itemize{
 \item \code{on_click, on_change} - function, to be called, when user clicks on a button, enters text in a text field
-or moves a slider. The two properties are complete synonymes and can replace one another.
+or moves a slider. The two properties are complete synonyms and can replace one another.
 }
 
 Global chart settings

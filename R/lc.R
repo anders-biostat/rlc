@@ -502,7 +502,7 @@ pkg.env$dataFun <- list(
 #'    }
 #'    \item{\code{chartEvent(d, chartId, layerId = "main", event, sessionId = NULL)}}{
 #'       Triggers a reaction to mouse event on a web page. Generally, this method is not supposed to be 
-#'       called explicitely. It is called internally each time, client clicks or hovers over an interactive chart element.
+#'       called explicitly. It is called internally each time, client clicks or hovers over an interactive chart element.
 #'       However, experienced users can use this method to simulate mouse events on the R side. For more information
 #'       on the arguments, please, check \code{\link{chartEvent}}.
 #'    }
@@ -537,7 +537,7 @@ pkg.env$dataFun <- list(
 #'             \item{\code{\link{lc_html}}}
 #'             \item{\code{\link{lc_input}}}
 #'          }
-#'      You can check the wrapper funcitons for information about arguments and available properties. Compared to them, this 
+#'      You can check the wrapper functions for information about arguments and available properties. Compared to them, this 
 #'      method gets additional argument \code{chartType}, which is always the same as the second part of the name of a 
 #'      corresponding wrapper function (\code{lc_`chartType`}). In all other aspects, wrapper functions and the \code{setChart} 
 #'      method are the same.
@@ -1188,7 +1188,7 @@ Chart <- R6Class("Chart", public = list(
 #' has to put there all the existing charts. Different situations may require some code be loaded before or after
 #' that happens. \code{beforeLoad} and \code{afterLoad} provide a way to define two callback functions, each 
 #' receiving a \code{\link[jrc]{Session}} object as an argument and is called once for each new page.
-#' \code{beforeLoad} runs before anything else has happend, while \code{afterLoad} is called after all the
+#' \code{beforeLoad} runs before anything else has happened, while \code{afterLoad} is called after all the
 #' existing charts have been added to the page.
 #' 
 #' This function initializes a new instance of class \code{\link{LCApp}} and wraps around methods 
@@ -1196,7 +1196,7 @@ Chart <- R6Class("Chart", public = list(
 #' 
 #' @param useViewer If \code{TRUE}, a page will be opened in the RStudio Viewer. If \code{FALSE},
 #' a default web browser will be used.
-#' @param rootDirectory A path to the root directory fpr the server. Any file, requested by the server
+#' @param rootDirectory A path to the root directory for the server. Any file, requested by the server
 #' will be searched for in this directory. If \code{rootDirectory} is not 
 #' defined, the \code{http_root} in the package directory will be used as a root directory.
 #' @param startPage A path to an HTML file that should be used as a starting page of the app.
@@ -1219,7 +1219,7 @@ Chart <- R6Class("Chart", public = list(
 #' @param allowedVariables List of variables that can be modified from a web page without any additional actions 
 #' on the R side. All other variable reassignments must be confirmed in the current R session. 
 #' This argument should be a vector of variable names.
-#' @param ... Further arguments passed to \code{\link[jrc]{openPage}}. Check detatils for more information.
+#' @param ... Further arguments passed to \code{\link[jrc]{openPage}}. Check details for more information.
 #' 
 #' @return A new instance of class \code{\link{LCApp}}.
 #' 
@@ -1347,7 +1347,7 @@ setProperties <- function(data, chartId, layerId = NULL) {
 #' Linked charts of the \emph{rlc} package are based on the idea that the variables that are
 #' used to define a chart are not constant, but can change as a result of user's
 #' actions. Each time the \code{updateCharts} function is called, all the properties that were set inside
-#' the \code{\link{dat}} function are reevaluated and the chart is resrawn in accordance with the
+#' the \code{\link{dat}} function are reevaluated and the chart is redrawn in accordance with the
 #' new state.
 #' 
 #' If this function is called from the R session, changes will be applied
@@ -1468,7 +1468,7 @@ updateCharts <- function(chartId = NULL, layerId = NULL, updateOnly = NULL) {
 #' @param event Type of event. Must be one of \code{"click"}, \code{"mouseover"}, \code{"mouseout"}, \code{"marked"}, 
 #' \code{"labelClickRow"}, \code{"labelClickCol"}.
 #' @param sessionId ID of the session (opened client page) that triggered the event. The default value uses a local session
-#' variable. This must be a single sessionId. You can get a list of IDs of all currently active with the
+#' variable. This must be a single session ID. You can get a list of IDs of all currently active with the
 #' method \code{getSessionIds} inherited from class \code{\link{App}} by \code{\link{LCApp}}. Possible errors in evaluation of 
 #' this argument are ignored.
 #' @param app Object of class \code{\link{LCApp}} for which the event was triggered. Note that this argument is here for
@@ -1522,7 +1522,7 @@ listCharts <- function() {
 #' 
 #' \code{getMarked} returns indices of the chart's elements that are currently
 #' marked. To mark elements select them with your mouse while holding the \emph{Shift} key.
-#' Double click on the chart with the \emph{Shift} key pressed will unmark all the 
+#' Double click on the chart with the \emph{Shift} key pressed will deselect all the 
 #' elements. This function is a wrapper of method \code{getMarked} of class \code{\link{LCApp}}.
 #' 
 #' @param chartId An ID of the chart. This argument is optional, if there is only one chart.
@@ -1681,7 +1681,7 @@ closePage <- function() {
 #' constant. These properties can still be changed later using the \code{\link{setProperties}} function.
 #' @param chartId ID for the chart. All charts must have unique IDs. If a chart with the same ID already
 #' exists, it will be replaced unless \code{addLayer = TRUE}. If ID is not defined, it will be the same as
-#' value of the \code{place} argument. And if bothe are not defined, the ID will be set to \code{ChartN}, 
+#' value of the \code{place} argument. And if both are not defined, the ID will be set to \code{ChartN}, 
 #' where \code{N - 1} is the number of existing charts.
 #' @param layerId An ID for the new layer. All layers within one chart must have different IDs. If a layer with the same
 #' ID already exists, it will be replaced. If not defined, will be set to \code{LayerN}, where \code{N - 1} 
@@ -1834,7 +1834,7 @@ lc_beeswarm <- function(data = list(), place = NULL, ..., chartId = NULL, layerI
 #' constant. These properties can still be changed later using the \code{\link{setProperties}} function.
 #' @param chartId ID for the chart. All charts must have unique IDs. If a chart with the same ID already
 #' exists, it will be replaced unless \code{addLayer = TRUE}. If ID is not defined, it will be the same as
-#' value of the \code{place} argument. And if bothe are not defined, the ID will be set to \code{ChartN}, 
+#' value of the \code{place} argument. And if both are not defined, the ID will be set to \code{ChartN}, 
 #' where \code{N - 1} is the number of existing charts.
 #' @param layerId An ID for the new layer. All layers within one chart must have different IDs. If a layer with the same
 #' ID already exists, it will be replaced. If not defined, will be set to \code{LayerN}, where \code{N - 1} 
@@ -1998,7 +1998,7 @@ lc_ribbon <- function(data = list(), place = NULL, ..., chartId = NULL, layerId 
 #' constant. These properties can still be changed later using the \code{\link{setProperties}} function.
 #' @param chartId ID for the chart. All charts must have unique IDs. If a chart with the same ID already
 #' exists, it will be replaced unless \code{addLayer = TRUE}. If ID is not defined, it will be the same as
-#' value of the \code{place} argument. And if bothe are not defined, the ID will be set to \code{ChartN}, 
+#' value of the \code{place} argument. And if both are not defined, the ID will be set to \code{ChartN}, 
 #' where \code{N - 1} is the number of existing charts.
 #' @param layerId An ID for the new layer. All layers within one chart must have different IDs. If a layer with the same
 #' ID already exists, it will be replaced. If not defined, will be set to \code{LayerN}, where \code{N - 1} 
@@ -2129,7 +2129,7 @@ lc_bars <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = 
 #' constant. These properties can still be changed later using the \code{\link{setProperties}} function.
 #' @param chartId ID for the chart. All charts must have unique IDs. If a chart with the same ID already
 #' exists, it will be replaced unless \code{addLayer = TRUE}. If ID is not defined, it will be the same as
-#' value of the \code{place} argument. And if bothe are not defined, the ID will be set to \code{ChartN}, 
+#' value of the \code{place} argument. And if both are not defined, the ID will be set to \code{ChartN}, 
 #' where \code{N - 1} is the number of existing charts.
 #' @param layerId An ID for the new layer. All layers within one chart must have different IDs. If a layer with the same
 #' ID already exists, it will be replaced. If not defined, will be set to \code{LayerN}, where \code{N - 1} 
@@ -2192,7 +2192,7 @@ lc_dens <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = 
 #' constant. These properties can still be changed later using the \code{\link{setProperties}} function.
 #' @param chartId ID for the chart. All charts must have unique IDs. If a chart with the same ID already
 #' exists, it will be replaced. If ID is not defined, it will be the same as
-#' value of the \code{place} argument. And if bothe are not defined, the ID will be set to \code{ChartN}, 
+#' value of the \code{place} argument. And if both are not defined, the ID will be set to \code{ChartN}, 
 #' where \code{N - 1} is the number of existing charts.
 #' @param pacerStep Time in ms between two consecutive calls of an \code{onmouseover} event. Prevents overqueuing in case
 #' of cumbersome computations. May be important when the chart works in canvas mode.
@@ -2301,7 +2301,7 @@ lc_heatmap <- function(data = list(), place = NULL, ..., chartId = NULL, pacerSt
 #' constant. These properties can still be changed later using the \code{\link{setProperties}} function.
 #' @param chartId ID for the chart. All charts must have unique IDs. If a chart with the same ID already
 #' exists, it will be replaced. If ID is not defined, it will be the same as
-#' value of the \code{place} argument. And if bothe are not defined, the ID will be set to \code{ChartN}, 
+#' value of the \code{place} argument. And if both are not defined, the ID will be set to \code{ChartN}, 
 #' where \code{N - 1} is the number of existing charts..
 #' 
 #' @section Available properties: 
@@ -2396,7 +2396,7 @@ lc_vLine <- function(data = list(), place = NULL, ..., chartId = NULL, layerId =
 #' constant. These properties can still be changed later using the \code{\link{setProperties}} function.
 #' @param chartId ID for the chart. All charts must have unique IDs. If a chart with the same ID already
 #' exists, it will be replaced. If ID is not defined, it will be the same as
-#' value of the \code{place} argument. And if bothe are not defined, the ID will be set to \code{ChartN}, 
+#' value of the \code{place} argument. And if both are not defined, the ID will be set to \code{ChartN}, 
 #' where \code{N - 1} is the number of existing charts.
 #'
 #' @section Available properties: 
@@ -2414,7 +2414,7 @@ lc_vLine <- function(data = list(), place = NULL, ..., chartId = NULL, layerId =
 #'  \item \code{heigth} - height of the chart in pixels. By default, height will be set to fit the content.
 #'  If height is defined and it's smaller than content's height, scrolling will be possible.
 #'  \item \code{paddings} - padding sizes in pixels. Must be a list with all the following fields: 
-#'  \code{"top", "bottom", "left", "right"}.
+#'  \code{"top", "bottom", "left", "right"}.}
 #'  
 #' @examples
 #' \donttest{lc_html(content = "Some <b>HTML</b> <br> <i>code</i>.")
@@ -2447,7 +2447,7 @@ lc_html <- function(data = list(), place = NULL, ..., chartId = NULL) {
 #' constant. These properties can still be changed later using the \code{\link{setProperties}} function.
 #' @param chartId ID for the chart. All charts must have unique IDs. If a chart with the same ID already
 #' exists, it will be replaced. If ID is not defined, it will be the same as
-#' value of the \code{place} argument. And if bothe are not defined, the ID will be set to \code{ChartN}, 
+#' value of the \code{place} argument. And if both are not defined, the ID will be set to \code{ChartN}, 
 #' where \code{N - 1} is the number of existing charts.
 #' 
 #' @section Available properties: 
@@ -2457,9 +2457,9 @@ lc_html <- function(data = list(), place = NULL, ..., chartId = NULL) {
 #' \itemize{
 #'  \item \code{type} - type of input. Must be one of \code{"text"}, \code{"range"}, \code{"checkbox"}, 
 #'  \code{"radio"} or \code{"button"}.
-#'  \item \code{value} - current state of the input block. For radio buttons it is an idex of the checked
+#'  \item \code{value} - current state of the input block. For radio buttons it is an index of the checked
 #'  button. For checkboxes - a vector of \code{TRUE} (for each checked box) and \code{FALSE} (for each unchecked ones),
-#'  for ranges and textboxes - a vector of values for each text field or slider.
+#'  for ranges and text boxes - a vector of values for each text field or slider.
 #'  \item \code{step} (only for \code{type = "range"}) - stepping interval for values that can be selected with the slider.
 #'  Must be a numeric vector with one value for each slider in the input block.
 #'  \item \code{min, max} (only for \code{type = "range"}) - minimal and maximal values that can be selected with the slider.
@@ -2469,7 +2469,7 @@ lc_html <- function(data = list(), place = NULL, ..., chartId = NULL) {
 #' Interactivity settings
 #' \itemize{
 #'   \item \code{on_click, on_change} - function, to be called, when user clicks on a button, enters text in a text field
-#'   or moves a slider. The two properties are complete synonymes and can replace one another.
+#'   or moves a slider. The two properties are complete synonyms and can replace one another.
 #' }
 #'  
 #' Global chart settings

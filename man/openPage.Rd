@@ -20,7 +20,7 @@ openPage(
 \item{useViewer}{If \code{TRUE}, a page will be opened in the RStudio Viewer. If \code{FALSE},
 a default web browser will be used.}
 
-\item{rootDirectory}{A path to the root directory fpr the server. Any file, requested by the server
+\item{rootDirectory}{A path to the root directory for the server. Any file, requested by the server
 will be searched for in this directory. If \code{rootDirectory} is not
 defined, the \code{http_root} in the package directory will be used as a root directory.}
 
@@ -50,7 +50,7 @@ This argument should be a vector of R function names.}
 on the R side. All other variable reassignments must be confirmed in the current R session.
 This argument should be a vector of variable names.}
 
-\item{...}{Further arguments passed to \code{\link[jrc]{openPage}}. Check detatils for more information.}
+\item{...}{Further arguments passed to \code{\link[jrc]{openPage}}. Check details for more information.}
 }
 \value{
 A new instance of class \code{\link{LCApp}}.
@@ -68,7 +68,7 @@ with \code{beforeLoad} and \code{afterLoad}. The reason for that is when the pag
 has to put there all the existing charts. Different situations may require some code be loaded before or after
 that happens. \code{beforeLoad} and \code{afterLoad} provide a way to define two callback functions, each
 receiving a \code{\link[jrc]{Session}} object as an argument and is called once for each new page.
-\code{beforeLoad} runs before anything else has happend, while \code{afterLoad} is called after all the
+\code{beforeLoad} runs before anything else has happened, while \code{afterLoad} is called after all the
 existing charts have been added to the page.
 
 This function initializes a new instance of class \code{\link{LCApp}} and wraps around methods

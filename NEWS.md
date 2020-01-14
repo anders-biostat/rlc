@@ -7,5 +7,5 @@
 
 * NAs are correctly processed.
 
-* Bug with mispositioning a click in Fireforx v.70 fixed.
+* Bug with mispositioning a click in Firefox v.70 fixed.
 
