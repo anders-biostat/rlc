@@ -3,6 +3,8 @@
 #' @import R6
 #' @importFrom stats runif
 pkg.env <- new.env()
+.app <- NULL
+.id <- NULL
 
 pkg.env$dataFun <- list(
   scatter = function(l) {
@@ -546,8 +548,8 @@ pkg.env$dataFun <- list(
 #'       Creates new instance of class \code{LCApp}. Most of its arguments are inherited from method \code{new} of
 #'       class \code{\link[jrc]{App}} from the \code{jrc} package. There are only three arguments specific for the
 #'       \code{LCApp} class. \code{layout} sets a default
-#'       layout for each new webpage (currently only tables of arbitrary size are supported, see \code{\link{setLayout}} for
-#'       more information). \code{beforeLoad} and \code{afterLoad} replace \code{onStart} from the \code{\link[jrc]{App}}
+#'       layout for each new webpage (currently only tables of arbitrary size are supported).
+#'       \code{beforeLoad} and \code{afterLoad} replace \code{onStart} from the \code{\link[jrc]{App}}
 #'       class. For more information, please, check \code{\link{openPage}}.
 #'    }
 #' }
@@ -1334,7 +1336,7 @@ removeLayer <- function(chartId, layerId) {
 #' @export
 #' @importFrom plyr rename
 setProperties <- function(data, chartId, layerId = NULL) {
-  workWith <- getAppAndSession(app = app)
+  workWith <- getAppAndSession()
   print(workWith$sessionId)
   workWith$app$setProperties(data, chartId, layerId)
 }
@@ -1598,7 +1600,7 @@ getMarked <- function(chartId = NULL, layerId = NULL, sessionId = NULL) {
 #'
 #' @export
 mark <- function(elements, chartId = NULL, layerId = NULL, preventEvent = TRUE, sessionId = NULL) {
-  workWith <- getAppAndSession(sessionId, app)
+  workWith <- getAppAndSession(sessionId)
   
   workWith$app$mark(elements, chartId, layerId, preventEvent, workWith$sessionId)
 }
@@ -1816,7 +1818,7 @@ lc_beeswarm <- function(data = list(), place = NULL, ..., chartId = NULL, layerI
     pkg.env$app$setEnvironment(parent.frame())
   }
   
-  pck.env$app$setChart("beeswarm", data, ..., place = place, chartId = chartId, layerId = layerId, addLayer = addLayer, pacerStep = pacerStep)
+  pkg.env$app$setChart("beeswarm", data, ..., place = place, chartId = chartId, layerId = layerId, addLayer = addLayer, pacerStep = pacerStep)
 }
 
 #' Lines and ribbons
@@ -2093,7 +2095,10 @@ lc_ribbon <- function(data = list(), place = NULL, ..., chartId = NULL, layerId 
 #'             stackIds = c(rep("case", 6), rep("control", 6))))
 #' 
 #' #It is easy to put data in a convenient form for barplots using tidyverse
-#' library(tidyverse)
+#' library(magrittr)
+#' library(dplyr)
+#' library(tidyr)
+#' library(stringr)
 #' 
 #' esoph %>%
 #'   gather(type, cases, (ncases:ncontrols)) %>%

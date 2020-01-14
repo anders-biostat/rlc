@@ -74,8 +74,8 @@ method are the same.
 Creates new instance of class \code{LCApp}. Most of its arguments are inherited from method \code{new} of
 class \code{\link[jrc]{App}} from the \code{jrc} package. There are only three arguments specific for the
 \code{LCApp} class. \code{layout} sets a default
-layout for each new webpage (currently only tables of arbitrary size are supported, see \code{\link{setLayout}} for
-more information). \code{beforeLoad} and \code{afterLoad} replace \code{onStart} from the \code{\link[jrc]{App}}
+layout for each new webpage (currently only tables of arbitrary size are supported).
+\code{beforeLoad} and \code{afterLoad} replace \code{onStart} from the \code{\link[jrc]{App}}
 class. For more information, please, check \code{\link{openPage}}.
 }
 }

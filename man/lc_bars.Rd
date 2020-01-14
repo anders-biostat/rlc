@@ -127,7 +127,10 @@ lc_bars(dat(value = c(tapply(esoph$ncases, esoph$agegp, sum),
             stackIds = c(rep("case", 6), rep("control", 6))))
 
 #It is easy to put data in a convenient form for barplots using tidyverse
-library(tidyverse)
+library(magrittr)
+library(dplyr)
+library(tidyr)
+library(stringr)
 
 esoph \%>\%
   gather(type, cases, (ncases:ncontrols)) \%>\%
