@@ -6,17 +6,17 @@
 \description{
 Object of this class represents the entire linked-charts app. It stores all charts, client sessions and
 local variables. You can create and manage interactive apps solely by creating new instances of this class and utilizing
-its methods. There are no limitations on the number of apps simultaneously running in one R session.
-However, it is also possible to create and manage app via the provided by the package wrapper functions. In this case an
-instance of this class is created and stored in the package namespace, and therefore only one app can be active simultaneously.
+their methods. There are no limitations on the number of apps simultaneously running in one R session.
+However, it is also possible to create and manage app via the wrapper functions provided in this package. In this case an
+instance of \code{\link{LCApp}} class is initialized and stored in the package's namespace. Therefore, only one app can be active simultaneously.
 You can always retrieve the active app with the \code{\link{getPage}} function. The \code{LCApp} class inherits from
-the \code{\link[jrc]{App}} class.
+the \code{\link[jrc]{App}} class of the \code{jrc} package.
 }
 \section{Methods}{
 
 \describe{
 \item{\code{removeChart(chartId)}}{
-Removes chart with the given ID from the app. See also \code{\link{removeChart}}.
+Removes a chart with the given ID from the app. See also \code{\link{removeChart}}.
 }
 \item{\code{removeLayer(chartId, layerId)}}{
 Removes a layer from a chart by their IDs. See also \code{\link{removeLayer}}.
@@ -25,16 +25,16 @@ Removes a layer from a chart by their IDs. See also \code{\link{removeLayer}}.
 Changes or sets properties for a given chart and layer. For more information, please, check \code{\link{setProperties}}.
 }
 \item{\code{updateCharts(chartId = NULL, layerId = NULL, updateOnly = NULL, sessionId = NULL)}}{
-Updates charts or specific layers for one or multiple users. For more information about arguments,
+Updates charts or specific layers for one or multiple users. For more information on the arguments,
 please, check \code{\link{updateCharts}}.
 }
 \item{\code{chartEvent(d, chartId, layerId = "main", event, sessionId = NULL)}}{
-Triggers a reaction to mouse event on the web page. Generally, this method is not supposed to be
-called explicitely. It is called internally each time, user clicks or hovers over an interactive chart element.
+Triggers a reaction to mouse event on a web page. Generally, this method is not supposed to be
+called explicitely. It is called internally each time, client clicks or hovers over an interactive chart element.
 However, experienced users can use this method to simulate mouse events on the R side. For more information
 on the arguments, please, check \code{\link{chartEvent}}.
 }
-\itme{\code{listCharts()}}{
+\item{\code{listCharts()}}{
 Prints a list of all existing charts and their layers. See also \code{\link{listCharts}}.
 }
 \item{\code{getMarked(chartId = NULL, layerId = NULL, sessionId = NULL)}}{
@@ -42,12 +42,12 @@ Returns a vector of indices of all currently marked elements of a certain chart 
 For more information, please, check \code{\link{getMarked}}.
 }
 \item{\code{mark(elements, chartId = NULL, layerId = NULL, preventEvent = TRUE, sessionId = NULL)}}{
-Maks elements of a given chart and layer on one of the currently opened web pages. Please, check
-\code{\link{mark}}.
+Marks elements of a given chart and layer on one of the currently opened web pages. Please, check
+\code{\link{mark}} for more information on the arguments.
 }
-\item{\code{setChart(chartType, data, ..., place = NULL, chartId = NULL, layerId = NULL, addLayer = FALSE, pacerStep = 50)}}{
+\item{\code{setChart(chartType, data, ..., place = NULL, chartId = NULL, layerId = NULL, [...])}}{
 Adds a new chart (or replaces an existing one) to the app. This is the main method of the package, that
-allows to define any chart and all its properties. There exist multiple wrappers for this method - one for each type of
+allows to define any chart and all its properties. There are multiple wrappers for this method - one for each type of
 chart. Here is a full list:
 \itemize{
 \item{\code{\link{lc_scatter}}}
@@ -63,18 +63,19 @@ chart. Here is a full list:
 \item{\code{\link{lc_abLine}}}
 \item{\code{\link{lc_vLine}}}
 \item{\code{\link{lc_html}}}
-\itme{\code{\link{lc_input}}}
+\item{\code{\link{lc_input}}}
 }
 You can check the wrapper funcitons for information about arguments and available properties. Compared to them, this
 method gets additional argument \code{chartType}, which is always the same as the second part of the name of a
 corresponding wrapper function (\code{lc_`chartType`}). In all other aspects, wrapper functions and the \code{setChart}
 method are the same.
 }
-\item{\code{new(layout = NULL, beforeLoad = function(session) {}, afterLoad = function(session) {}, ...)}}{
+\item{\code{new(layout = NULL, beforeLoad = function(s) {}, afterLoad = function(s) {}, ...)}}{
 Creates new instance of class \code{LCApp}. Most of its arguments are inherited from method \code{new} of
-the \code{\link[jrc]{App}} class. The ones specific to \code{LCApp} are \code{layout} which sets a default
-layout for each new webpage (currently only tables of any size are available, see \code{\link{setLayout}} for
-more information), \code{beforeLoad} and \code{afterLoad} replace \code{onStart} from the \code{\link[jrc]{App}}
+class \code{\link[jrc]{App}} from the \code{jrc} package. There are only three arguments specific for the
+\code{LCApp} class. \code{layout} sets a default
+layout for each new webpage (currently only tables of arbitrary size are supported, see \code{\link{setLayout}} for
+more information). \code{beforeLoad} and \code{afterLoad} replace \code{onStart} from the \code{\link[jrc]{App}}
 class. For more information, please, check \code{\link{openPage}}.
 }
 }

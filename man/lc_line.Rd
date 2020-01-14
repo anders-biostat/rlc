@@ -67,26 +67,28 @@ lc_vLine(
 \item{data}{Name value pairs of properties, passed through the \code{\link{dat}} function. These
 properties will be reevaluated on each \code{\link{updateCharts}} call.}
 
-\item{place}{An ID of a container, where to place the chart. Will be ignored if the chart already
-exists. If not defined, the chart will be placed directly in the body of the opened page.}
+\item{place}{ID of a container, where to place new chart. Will be ignored if the chart already
+exists. If not defined, the chart will be appended to the body of the web pages.}
 
-\item{...}{Name value pairs of properties that can be evaluated only once and then will remain
-constant. These properties can still be changed later using the \code{\link{setProperties}} function}
+\item{...}{Name-value pairs of properties that will be evaluated only once and then will remain
+constant. These properties can still be changed later using the \code{\link{setProperties}} function.}
 
-\item{chartId}{An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
-exists, a new layer will be added to it. If you want to replace one chart with another, use \code{\link{removeChart}}
-first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} is the number of currently existing charts.}
+\item{chartId}{ID for the chart. All charts must have unique IDs. If a chart with the same ID already
+exists, it will be replaced unless \code{addLayer = TRUE}. If ID is not defined, it will be the same as
+value of the \code{place} argument. And if bothe are not defined, the ID will be set to \code{ChartN},
+where \code{N - 1} is the number of existing charts.}
 
 \item{layerId}{An ID for the new layer. All layers within one chart must have different IDs. If a layer with the same
 ID already exists, it will be replaced. If not defined, will be set to \code{LayerN}, where \code{N - 1}
 is the number of currently existing layers in this chart.}
 
-\item{addLayer}{whether to add a new layer or to replace the existing one. This argument influences the chart only if
-it has only one layer and the \code{layerId} is not defined.}
+\item{addLayer}{if there is already a chart with the same ID, this argument defines whether to replace it or to add a
+new layer to it. This argument is ignored if both \code{place} and \code{chartId} are \code{NULL} or if there is no
+chart with the given ID.}
 }
 \description{
-These functions create different kind of lines. They connect observations or
-create filled area, bordered by a line. Each layer may have one or several lines.
+These functions create various kinds of lines. They connect observations or
+create filled areas with customized border. Each layer may have one or several lines.
 }
 \section{Functions}{
 \itemize{
@@ -111,20 +113,20 @@ You can read more about different properties
 \itemize{
 \item \code{x, y} - vector of x and y coordinates of the points to connect. Can be
 vectors for a single line or \code{m x n} matrix for \code{n} lines.
-\item \code{ymax, ymin} - (only for \code{lc_ribbon}) vectors of maximal and minimal values of the ribbon.
+\item \code{ymax, ymin} - (only for \code{lc_ribbon}) vectors of maximal and minimal values for a ribbon.
 \item \code{a, b} - (only for \code{lc_abLine}) vectors of slope and intercept values respectively.
 \item \code{v} - (only for \code{lc_vLine}) vector of x-intercepts.
 \item \code{h} - (only for \code{lc_hLine}) vector of y-intercepts.
-\item \code{lineWidth} - width of each line.
-\item \code{opacity} - opacity of the lines in the range from 0 to 1.
-\item \code{label} - vector of text labels for each line.
+\item \code{lineWidth} - (nor for \code{lc_ribbon}) width of each line.
+\item \code{opacity} - opacity of each line in the range from 0 to 1.
+\item \code{label} - vector of text labels for each line (labels by default are shown, when mouse hovers over a line).
 \item \code{dasharray} - defines pattern of dashes and gaps for each line. }
 
 Colour settings
 \itemize{
 \item \code{colour} - colour of the lines. Must be a colour name or hexadecimal code. For
-\code{lc_ribbon} this property defined the colour of the ribbon, not the strokes.
-\item \code{fill} - colour with which to fill area inside the line.
+\code{lc_ribbon} this property defines colour of the ribbon, not the strokes.
+\item \code{fill} - (not for \code{lc_ribbon}) colour with which to fill area inside the line.
 Must be a colour name or hexadecimal code.
 \item \code{colourValue} - grouping values for different colours. Can be numbers or characters.
 \item \code{colourDomain} - vector of all possible values for discrete colour scales
@@ -144,10 +146,15 @@ If 0 or \code{FALSE} no transformation will be performed.
 \item \code{layerDomainX, layerDomainY} - default axes ranges for the given layer.
 \item \code{domainX, domainY} - default axes ranges for the entire chart. If not defined,
 is automatically set to include all layer domains.
-\item \code{contScaleX, consScaleY} - whether or not the axis should be continuous.
+\item \code{contScaleX, contScaleY} - whether or not the axis should be continuous.
 \item \code{aspectRatio} - aspect ratio.
 \item \code{axisTitleX, axisTitleY} - axes titles.
-\item \code{ticksRotateX, ticksRotateY} - degrees of angle to rotate ticks. Must be between
+\item \code{axisTitlePosX, axisTitlePosY} - position of axes titles. For each axis one can specify title position
+\code{across} or \code{along} the corresponding axis. Possible options are \code{"up"} (for title inside the plotting area)
+or \code{"down"} (outside the plottting area, under the axis) for \code{across}, and
+\code{"start"}, \code{"middle"}, \code{"end"} for \code{along}. This properties must be a list with one or two fields
+named \code{"across"} and/or \code{"along"}.
+\item \code{ticksRotateX, ticksRotateY} - angle by which to rotate ticks (in degrees). Must be between
 0 (horizontal ticks, default) and 90 (vertical ticks).
 \item \code{ticksX, ticksY} - set of ticks for the axes.}
 
@@ -159,7 +166,8 @@ index of the clicked line as an argument.
 Gets an index of the clicked line as an argument.
 \item \code{on_mouseout} - function, to be called, when mouse moves out of one of the lines.
 \item \code{on_marked} - function, to be called, when any of the lines are selected (marked)
-or deselected. Use \code{\link{getMarked}} function to get the IDs of the currently marked lines.}
+or deselected. Use \code{\link{getMarked}} function to get the IDs of the currently marked lines. To mark lines,
+select them with your mouse while holding the \emph{Shift} key.}
 
 Global chart settings
 \itemize{
@@ -167,13 +175,13 @@ Global chart settings
 \item \code{heigth} - height of the chart in pixels.
 \item \code{plotWidth} - width of the plotting area in pixels.
 \item \code{plotHeight} - height of the plotting area in pixels.
-\item \code{paddings} - paddings size in pixels. Must be a list with all the following fields:
+\item \code{paddings} - padding sizes in pixels. Must be a list with all the following fields:
 \code{"top", "bottom", "left", "right"}.
 \item \code{title} - title of the chart.
 \item \code{titleX, titleY} - coordinates of the chart title.
 \item \code{titleSize} - font-size of the chart title.
 \item \code{showLegend} - whether or not to show the legend.
-\item \code{showPanel} - whether of not to show the tools panel.
+\item \code{showPanel} - whether of not to show the instrument panel (grey triangle in the upper-left corner of the chart).
 \item \code{transitionDuration} - duration of the transitions between any two states of the chart. If 0,
 no animated transition is shown. It can be useful to turn the transition off, when lots of frequent
 changes happen to the chart.

@@ -17,3 +17,12 @@ provided wrapper functions that are exported by the package. These functions int
 the \code{\link{LCApp}} object, which is stored in the package namespace upon initialization with
 \code{\link{openPage}} function. \code{getPage} returns this object if any.
 }
+\details{
+Note that \code{rlc} package is based on \code{jrc} library. Both packages are organized in similar manner.
+Both have a central class that represents the entire app and can be fully managed with their methods (\code{\link{LCApp}}
+and \code{\link[jrc]{App}}, respectively). And both also provide a set of wrapper functions, that can be used instead of
+the methods. However, wrapper functions of the \code{jrc} package can't be use for \code{rlc} apps, while all the
+methods of class \code{\link[jrc]{App}} are inherited by \code{\link{LCApp}}. Therefore, if you want to get more low level
+control over your app, such as managing client sessions, local variables and memory usage, you should methods of
+\code{\link[jrc]{App}} class.
+}

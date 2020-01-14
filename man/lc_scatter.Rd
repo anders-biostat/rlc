@@ -29,22 +29,24 @@ lc_beeswarm(
 \item{data}{Name value pairs of properties, passed through the \code{\link{dat}} function. These
 properties will be reevaluated on each \code{\link{updateCharts}} call.}
 
-\item{place}{An ID of a container, where to place the chart. Will be ignored if the chart already
-exists. If not defined, the chart will be placed directly in the body of the opened page.}
+\item{place}{ID of a container, where to place new chart. Will be ignored if the chart already
+exists. If not defined, the chart will be appended to the body of the web pages.}
 
-\item{...}{Name value pairs of properties that can be evaluated only once and then will remain
-constant. These properties can still be changed later using the \code{\link{setProperties}} function}
+\item{...}{Name-value pairs of properties that will be evaluated only once and then will remain
+constant. These properties can still be changed later using the \code{\link{setProperties}} function.}
 
-\item{chartId}{An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
-exists, a new layer will be added to it. If you want to replace one chart with another, use \code{\link{removeChart}}
-first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} is the number of currently existing charts.}
+\item{chartId}{ID for the chart. All charts must have unique IDs. If a chart with the same ID already
+exists, it will be replaced unless \code{addLayer = TRUE}. If ID is not defined, it will be the same as
+value of the \code{place} argument. And if bothe are not defined, the ID will be set to \code{ChartN},
+where \code{N - 1} is the number of existing charts.}
 
 \item{layerId}{An ID for the new layer. All layers within one chart must have different IDs. If a layer with the same
 ID already exists, it will be replaced. If not defined, will be set to \code{LayerN}, where \code{N - 1}
 is the number of currently existing layers in this chart.}
 
-\item{addLayer}{whether to add a new layer or to replace the existing one. This argument influences the chart only if
-it has only one layer and the \code{layerId} is not defined.}
+\item{addLayer}{if there is already a chart with the same ID, this argument defines whether to replace it or to add a
+new layer to it. This argument is ignored if both \code{place} and \code{chartId} are \code{NULL} or if there is no
+chart with the given ID.}
 
 \item{pacerStep}{Time in ms between two consecutive calls of an \code{onmouseover} event. Prevents overqueuing in case
 of cumbersome computations. May be important when the chart works in canvas mode.}
@@ -70,10 +72,10 @@ You can read more about different properties
 \itemize{
 \item \code{x, y} - vector of x and y coordinates of the points.
 \item \code{size} - sizes of the points. Default size is 6.
-\item \code{opacity} - opacity of the points in the range from 0 to 1.
-\item \code{label} - vector of text labels for each point.
-\item \code{valueAxis} - (for \code{lc_beeswarm} only) defines, values along
-which of the axes should not be changed. Must be \code{"x"} or \code{"y"}.}
+\item \code{opacity} - opacity of each point in the range from 0 to 1.
+\item \code{label} - vector of text labels for each point (labels by default are shown, when mouse hovers over a point).
+\item \code{valueAxis} - (for \code{lc_beeswarm} only) defines axis with values that will
+not be changed. Must be \code{"x"} or \code{"y"} (default).}
 
 Colour and shape settings
 \itemize{
@@ -85,8 +87,8 @@ or range of all possible colour values for the continuous ones.
 \item \code{colourLegendTitle} - title for the colour legend.
 \item \code{addColourScaleToLegend} - whether or not to show colour legend for the current layer.
 \item \code{globalColourScale} - whether or not to use one colour scale for all the layers.
-\item \code{symbol} - shape of each point. Must be one of \code{"Circle", "Cross", "Diamond", 
- "Square", "Star", "Triangle", "Wye"}.
+\item \code{symbol} - shape of each point. Must be one of \code{"Circle"}, \code{"Cross"}, \code{"Diamond"},
+\code{"Square"}, \code{"Star"}, \code{"Triangle"}, \code{"Wye"}.
 \item \code{symbolValue} - grouping values for different symbols.
 \item \code{symbolLegendTitle} - title for the symbol value.
 \item \code{stroke} - stroke colour for each element. Must be a colour name or hexadecimal code.
@@ -99,18 +101,23 @@ If 0 or \code{FALSE} no transformation will be performed.
 \item \code{jitterX, jitterY} - amount of random variation to be added to the position of the
 points along one of the axes. 0 means no variation. 1 stands for distance between \code{x} and
 \code{x + 1} for linear scale, \code{x} and \code{b*x} for logarithmic scale (\code{b} is a base
-of the logarithm), and between neighbouring ticks for categorical scale.
+of the logarithm), or between neighbouring ticks for categorical scale.
 \item \code{shiftX, shiftY} - shift for each point from its original position along one of the
 axes. 0 means no shift. 1 stands for distance between \code{x} and
 \code{x + 1} for linear scale, \code{x} and \code{b*x} for logarithmic scale (\code{b} is a base
-of the logarithm), and between neighbouring ticks for categorical scale.
+of the logarithm), or between neighbouring ticks for categorical scale.
 \item \code{layerDomainX, layerDomainY} - default axes ranges for the given layer.
 \item \code{domainX, domainY} - default axes ranges for the entire chart. If not defined,
 is automatically set to include all layer domains.
-\item \code{contScaleX, consScaleY} - whether or not the axis should be continuous.
+\item \code{contScaleX, contScaleY} - whether or not the axis should be continuous.
 \item \code{aspectRatio} - aspect ratio.
 \item \code{axisTitleX, axisTitleY} - axes titles.
-\item \code{ticksRotateX, ticksRotateY} - degrees of angle to rotate ticks. Must be between
+\item \code{axisTitlePosX, axisTitlePosY} - position of axes titles. For each axis one can specify title position
+\code{across} or \code{along} the corresponding axis. Possible options are \code{"up"} (for title inside the plotting area)
+or \code{"down"} (outside the plottting area, under the axis) for \code{across}, and
+\code{"start"}, \code{"middle"}, \code{"end"} for \code{along}. This properties must be a list with one or two fields
+named \code{"across"} and/or \code{"along"}.
+\item \code{ticksRotateX, ticksRotateY} - angle by which to rotate ticks (in degrees). Must be between
 0 (horizontal ticks, default) and 90 (vertical ticks).
 \item \code{ticksX, ticksY} - set of ticks for the axes.}
 
@@ -122,7 +129,8 @@ index of the clicked point as an argument.
 Gets an index of the clicked point as an argument.
 \item \code{on_mouseout} - function, to be called, when mouse moves out of one of the points.
 \item \code{on_marked} - function, to be called, when any of the points are selected (marked)
-or deselected. Use \code{\link{getMarked}} function to get the IDs of the currently marked points.}
+or deselected. Use \code{\link{getMarked}} function to get the IDs of the currently marked points. To mark points,
+select them with your mouse while holding the \emph{Shift} key.}
 
 Global chart settings
 \itemize{
@@ -130,13 +138,13 @@ Global chart settings
 \item \code{heigth} - height of the chart in pixels.
 \item \code{plotWidth} - width of the plotting area in pixels.
 \item \code{plotHeight} - height of the plotting area in pixels.
-\item \code{paddings} - paddings size in pixels. Must be a list with all the following fields:
+\item \code{paddings} - padding sizes in pixels. Must be a list with all the following fields:
 \code{"top", "bottom", "left", "right"}.
 \item \code{title} - title of the chart.
 \item \code{titleX, titleY} - coordinates of the chart title.
 \item \code{titleSize} - font-size of the chart title.
 \item \code{showLegend} - whether or not to show the legend.
-\item \code{showPanel} - whether of not to show the tools panel.
+\item \code{showPanel} - whether of not to show the instrument panel (grey triangle in the upper-left corner of the chart).
 \item \code{transitionDuration} - duration of the transitions between any two states of the chart. If 0,
 no animated transition is shown. It can be useful to turn the transition off, when lots of frequent
 changes happen to the chart.}

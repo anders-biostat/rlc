@@ -7,13 +7,13 @@
 dat(...)
 }
 \arguments{
-\item{...}{List of name values pair to define the properties.}
+\item{...}{List of name-value pairs to define the properties.}
 }
 \description{
 \code{dat} allows to link variables from the current environment to chart's properties.
-On every \code{\link{updateCharts}} call all the data, provided via the \code{dat} function,
+On every \code{\link{updateCharts}} call all the data provided via the \code{dat} function
 will be automatically reevaluated and the chart will be changed accordingly. One can also
-put properties outside of the \code{dat} function, if they are going to be constant.
+put properties outside of the \code{dat} function to prevent their reevaluation.
 }
 \examples{
 \donttest{lc_scatter(dat(x = rnorm(30)), y = rnorm(30))

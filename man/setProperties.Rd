@@ -7,16 +7,16 @@
 setProperties(data, chartId, layerId = NULL)
 }
 \arguments{
-\item{data}{Set of properties to be redefined for this layer or chart. Created by \code{\link{dat}}
+\item{data}{List of properties to be redefined for this layer or chart. Created by the \code{\link{dat}}
 function.}
 
-\item{chartId}{ID of the chart, whose properties you want to redefine.}
+\item{chartId}{ID of the chart, for which to redefine properties.}
 
-\item{layerId}{ID of the layer, whose properties you want to redefine. If the chart has a single
+\item{layerId}{ID of the layer, for which to redefine properties. If the chart has a single
 layer or doesn't have layers, default value (which is NULL) can be used.}
 }
 \description{
-Changes already defined properties or sets the new ones for an
+Sets or resets properties for an
 existing chart. Changes will be applied to all currently opened and future pages.
 This function is a wrapper around method \code{setProperties} of class \code{\link{LCApp}}.
 }

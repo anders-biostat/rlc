@@ -8,7 +8,7 @@ closePage()
 }
 \description{
 Stops the server and closes all currently opened pages (if any). This function is a
-wrapper of \code{stopServer} method inherited by the \code{\link{LCApp}} class from \code{\link[jrc]{App}}.
+wrapper of \code{stopServer} method inherited by the \code{\link{LCApp}} class from the \code{\link[jrc]{App}} class.
 }
 \examples{
 \donttest{openPage(useViewer = FALSE)
