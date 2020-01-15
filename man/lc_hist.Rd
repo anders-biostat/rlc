@@ -5,32 +5,46 @@
 \alias{lc_dens}
 \title{Histograms and density plots}
 \usage{
-lc_hist(data = list(), place = NULL, ..., id = NULL,
-  layerId = NULL, addLayer = FALSE)
+lc_hist(
+  data = list(),
+  place = NULL,
+  ...,
+  chartId = NULL,
+  layerId = NULL,
+  addLayer = FALSE
+)
 
-lc_dens(data = list(), place = NULL, ..., id = NULL,
-  layerId = NULL, addLayer = FALSE)
+lc_dens(
+  data = list(),
+  place = NULL,
+  ...,
+  chartId = NULL,
+  layerId = NULL,
+  addLayer = FALSE
+)
 }
 \arguments{
 \item{data}{Name value pairs of properties, passed through the \code{\link{dat}} function. These
 properties will be reevaluated on each \code{\link{updateCharts}} call.}
 
-\item{place}{An ID of a container, where to place the chart. Will be ignored if the chart already
-exists. If not defined, the chart will be placed directly in the body of the opened page.}
+\item{place}{ID of a container, where to place new chart. Will be ignored if the chart already
+exists. If not defined, the chart will be appended to the body of the web pages.}
 
-\item{...}{Name value pairs of properties that can be evaluated only once and then will remain
-constant. These properties can still be changed later using the \code{\link{setProperties}} function}
+\item{...}{Name-value pairs of properties that will be evaluated only once and then will remain
+constant. These properties can still be changed later using the \code{\link{setProperties}} function.}
 
-\item{id}{An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
-exists, a new layer will be added to it. If you want to replace one chart with another, use \code{\link{removeChart}}
-first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} is the number of currently existing charts.}
+\item{chartId}{ID for the chart. All charts must have unique IDs. If a chart with the same ID already
+exists, it will be replaced unless \code{addLayer = TRUE}. If ID is not defined, it will be the same as
+value of the \code{place} argument. And if both are not defined, the ID will be set to \code{ChartN},
+where \code{N - 1} is the number of existing charts.}
 
 \item{layerId}{An ID for the new layer. All layers within one chart must have different IDs. If a layer with the same
 ID already exists, it will be replaced. If not defined, will be set to \code{LayerN}, where \code{N - 1}
 is the number of currently existing layers in this chart.}
 
-\item{addLayer}{whether to add a new layer or to replace the existing one. This argument influences the chart only if
-it has only one layer and the \code{layerId} is not defined.}
+\item{addLayer}{if there is already a chart with the same ID, this argument defines whether to replace it or to add a
+new layer to it. This argument is ignored if both \code{place} and \code{chartId} are \code{NULL} or if there is no
+chart with the given ID.}
 }
 \description{
 These functions make either a histogram or a density plot of the given data
@@ -45,13 +59,15 @@ and either add them as a new layer to an existing chart or create a new chart.
 
 \section{Available properties}{
 
+You can read more about different properties
+\href{https://anders-biostat.github.io/linked-charts/rlc/tutorials/props.html}{here}.
 
 \itemize{
-\item \code{value} - vector of data.
+\item \code{value} - vector of data values.
 \item \code{nbins} - (only for \code{lc_hist}) number of bins.}
 
 These functions are extensions of \code{\link{lc_line}} (\code{lc_dens}) or \code{\link{lc_bars}}
-(\code{lc_hist}) and therefore can also understand their properties.
+(\code{lc_hist}) and therefore also accept all their properties.
 }
 
 \examples{

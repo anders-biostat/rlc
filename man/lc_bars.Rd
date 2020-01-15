@@ -4,32 +4,40 @@
 \alias{lc_bars}
 \title{Create a barplot}
 \usage{
-lc_bars(data = list(), place = NULL, ..., id = NULL,
-  layerId = NULL, addLayer = FALSE)
+lc_bars(
+  data = list(),
+  place = NULL,
+  ...,
+  chartId = NULL,
+  layerId = NULL,
+  addLayer = FALSE
+)
 }
 \arguments{
 \item{data}{Name value pairs of properties, passed through the \code{\link{dat}} function. These
 properties will be reevaluated on each \code{\link{updateCharts}} call.}
 
-\item{place}{An ID of a container, where to place the chart. Will be ignored if the chart already
-exists. If not defined, the chart will be placed directly in the body of the opened page.}
+\item{place}{ID of a container, where to place new chart. Will be ignored if the chart already
+exists. If not defined, the chart will be appended to the body of the web pages.}
 
-\item{...}{Name value pairs of properties that can be evaluated only once and then will remain
-constant. These properties can still be changed later using the \code{\link{setProperties}} function}
+\item{...}{Name-value pairs of properties that will be evaluated only once and then will remain
+constant. These properties can still be changed later using the \code{\link{setProperties}} function.}
 
-\item{id}{An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
-exists, a new layer will be added to it. If you want to replace one chart with another, use \code{\link{removeChart}}
-first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} is the number of currently existing charts.}
+\item{chartId}{ID for the chart. All charts must have unique IDs. If a chart with the same ID already
+exists, it will be replaced unless \code{addLayer = TRUE}. If ID is not defined, it will be the same as
+value of the \code{place} argument. And if both are not defined, the ID will be set to \code{ChartN},
+where \code{N - 1} is the number of existing charts.}
 
 \item{layerId}{An ID for the new layer. All layers within one chart must have different IDs. If a layer with the same
 ID already exists, it will be replaced. If not defined, will be set to \code{LayerN}, where \code{N - 1}
 is the number of currently existing layers in this chart.}
 
-\item{addLayer}{whether to add a new layer or to replace the existing one. This argument influences the chart only if
-it has only one layer and the \code{layerId} is not defined.}
+\item{addLayer}{if there is already a chart with the same ID, this argument defines whether to replace it or to add a
+new layer to it. This argument is ignored if both \code{place} and \code{chartId} are \code{NULL} or if there is no
+chart with the given ID.}
 }
 \description{
-\code{lc_bars} creates a new barplot and adds it on the page
+\code{lc_bars} creates a new barplot and adds it to the app and to the all currently opened pages
 as a new chart or as a new layer of an existing chart.
 }
 \section{Available properties}{
@@ -39,9 +47,9 @@ You can read more about different properties
 
 \itemize{
 \item \code{value} - heights of bars/stacks.
-\item \code{stackIds} - IDs for all stacks (if necessary). Must be the same size as \code{values}.
-\item \code{barIds} - IDs for all bars (if necessary). Must be the same size as \code{values}.
-\item \code{groupIds} - IDs for all groups (if necessary). Must be the same size as \code{values}.
+\item \code{stackIds} - IDs of all stacks (\emph{optional}). Must be the same size as \code{values}.
+\item \code{barIds} - IDs of all bars (\emph{optional}). Must be the same size as \code{values}.
+\item \code{groupIds} - IDs of all groups (\emph{optional}). Must be the same size as \code{values}.
 \item \code{groupWidth} - ratio of width of a group of bars to the space, available to the group. }
 
 Style settings
@@ -65,10 +73,15 @@ If 0 or \code{FALSE} no transformation will be performed.
 \item \code{layerDomainX, layerDomainY} - default axes ranges for the given layer.
 \item \code{domainX, domainY} - default axes ranges for the entire chart. If not defined,
 is automatically set to include all layer domains.
-\item \code{contScaleX, consScaleY} - whether or not the axis should be continuous.
+\item \code{contScaleX, contScaleY} - whether or not the axis should be continuous.
 \item \code{aspectRatio} - aspect ratio.
 \item \code{axisTitleX, axisTitleY} - axes titles.
-\item \code{ticksRotateX, ticksRotateY} - degrees of angle to rotate ticks. Must be between
+\item \code{axisTitlePosX, axisTitlePosY} - position of axes titles. For each axis one can specify title position
+\code{across} or \code{along} the corresponding axis. Possible options are \code{"up"} (for title inside the plotting area)
+or \code{"down"} (outside the plottting area, under the axis) for \code{across}, and
+\code{"start"}, \code{"middle"}, \code{"end"} for \code{along}. This properties must be a list with one or two fields
+named \code{"across"} and/or \code{"along"}.
+\item \code{ticksRotateX, ticksRotateY} - angle by which to rotate ticks (in degrees). Must be between
 0 (horizontal ticks, default) and 90 (vertical ticks).
 \item \code{ticksX, ticksY} - set of ticks for the axes.}
 
@@ -80,7 +93,8 @@ index of the clicked bar as an argument.
 Gets an index of the clicked bar as an argument.
 \item \code{on_mouseout} - function, to be called, when mouse moves out of one of the bars.
 \item \code{on_marked} - function, to be called, when any of the bars are selected (marked)
-or deselected. Use \code{\link{getMarked}} function to get the IDs of the currently marked bars.}
+or deselected. Use \code{\link{getMarked}} function to get the IDs of the currently marked bars. To mark bars,
+select them with your mouse while holding the \emph{Shift} key.}
 
 Global chart settings
 \itemize{
@@ -88,13 +102,13 @@ Global chart settings
 \item \code{heigth} - height of the chart in pixels.
 \item \code{plotWidth} - width of the plotting area in pixels.
 \item \code{plotHeight} - height of the plotting area in pixels.
-\item \code{paddings} - paddings size in pixels. Must be a list with all the following fields:
+\item \code{paddings} - padding sizes in pixels. Must be a list with all the following fields:
 \code{"top", "bottom", "left", "right"}.
 \item \code{title} - title of the chart.
 \item \code{titleX, titleY} - coordinates of the chart title.
 \item \code{titleSize} - font-size of the chart title.
 \item \code{showLegend} - whether or not to show the legend.
-\item \code{showPanel} - whether of not to show the tools panel.
+\item \code{showPanel} - whether of not to show the instrument panel (grey triangle in the upper-left corner of the chart).
 \item \code{transitionDuration} - duration of the transitions between any two states of the chart. If 0,
 no animated transition is shown. It can be useful to turn the transition off, when lots of frequent
 changes happen to the chart.}
@@ -113,7 +127,10 @@ lc_bars(dat(value = c(tapply(esoph$ncases, esoph$agegp, sum),
             stackIds = c(rep("case", 6), rep("control", 6))))
 
 #It is easy to put data in a convenient form for barplots using tidyverse
-library(tidyverse)
+library(magrittr)
+library(dplyr)
+library(tidyr)
+library(stringr)
 
 esoph \%>\%
   gather(type, cases, (ncases:ncontrols)) \%>\%

@@ -4,27 +4,39 @@
 \alias{chartEvent}
 \title{Trigger an event}
 \usage{
-chartEvent(d, id, layerId = "main", event)
+chartEvent(d, chartId, layerId = "main", event, sessionId = .id, app = .app)
 }
 \arguments{
-\item{d}{ID of an element that triggered the event. May be index of a point or line, vector or
-row and column indices for a heatmap, value of an input block (please, check \code{\link{lc_input}}
-for more details about values). Should be \code{NULL} for \code{mouseout} or \code{marked} events.
+\item{d}{Value that is used to identify interactive element or its state. A single numeric index for
+a point or a line, vector or
+row and column indices of a cell for a heatmap, value for an input block (please, check \code{\link{lc_input}}
+for more details about input blocks and their values). Should be \code{NULL} for \code{mouseout} or \code{marked} events.
 N.B. This function is called from the web page and therefore all element indices start from zero as it is
-used in JavaScript.}
+happens in JavaScript.}
 
-\item{id}{ID of the chart.}
+\item{chartId}{ID of the chart.}
 
-\item{layerId}{ID of the layer. You can get IDs of all charts and their layers with \code{\link{listCharts}}.}
+\item{layerId}{ID of the layer. You can print IDs of all charts and their layers with \code{\link{listCharts}}.}
 
-\item{event}{Type of event. Must be one of \code{"click", "mouseover", "mouseout", "marked", "labelClickRow", "labelClickCol"}.}
+\item{event}{Type of event. Must be one of \code{"click"}, \code{"mouseover"}, \code{"mouseout"}, \code{"marked"},
+\code{"labelClickRow"}, \code{"labelClickCol"}.}
+
+\item{sessionId}{ID of the session (opened client page) that triggered the event. The default value uses a local session
+variable. This must be a single session ID. You can get a list of IDs of all currently active with the
+method \code{getSessionIds} inherited from class \code{\link{App}} by \code{\link{LCApp}}. Possible errors in evaluation of
+this argument are ignored.}
+
+\item{app}{Object of class \code{\link{LCApp}} for which the event was triggered. Note that this argument is here for
+internal use and its default value is a variable, stored in each session locally. If you are not using wrapper functions,
+it is preferred to call method \code{chartEvent} of an object of class \code{\link{LCApp}}.}
 }
 \description{
-This function is called whenever user clicks, selects or hover over elements of a chart. In turn,
-it calls a corresponding callback function, if any was specified by the user. This function
-is meant to be used internally. However, an experienced user can still use it to customize app
-behavior in some complicated cases. This function can also emulate events triggered by non-existing
-elements.
+This function is called whenever any interactive element of a chart is activated by clicking, marking,
+hovering, etc. In turn,
+it calls a corresponding callback function, if any has been specified. This function
+is meant to be used internally. However, an experienced user can still use it to simulate mouse events,
+even those triggered by non-existing elements. This function is a wrapper around method
+\code{chartEvent} of class \code{\link{LCApp}}.
 }
 \examples{
 \donttest{x <- rnorm(50)

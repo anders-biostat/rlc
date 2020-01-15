@@ -4,18 +4,18 @@
 \alias{updateCharts}
 \title{Update a chart}
 \usage{
-updateCharts(id = NULL, layerId = NULL, updateOnly = NULL)
+updateCharts(chartId = NULL, layerId = NULL, updateOnly = NULL)
 }
 \arguments{
-\item{id}{An ID of the chart to be updated (or vector of IDs). If NULL then all the
+\item{chartId}{ID of the chart to be updated (or vector of IDs). If \code{NULL}, all the
 existing charts will be updated.}
 
-\item{layerId}{An ID of the layer to be updated (or vector of IDs). If NULL of the
-layers of the selected charts will be updated. To update only the selected layers of
-multiple charts the lengths of \code{id} and \code{layerId} must be the same.}
+\item{layerId}{ID of the layer to be updated (or vector of IDs). If \code{NULL}, all the
+layers of the selected charts will be updated. To update only some layers of
+multiple charts the lengths of \code{chartId} and \code{layerId} must be the same.}
 
 \item{updateOnly}{To improve performance it may be useful to change only certain
-aspects of the chart (e.g. location of the points, colour of the heatmap cells,
+aspects of a chart (e.g. positions of points, colour of heatmap cells,
 etc.). This argument can specify which part of chart to update. Possible options are
 \code{Elements}, \code{ElementPosition}, \code{ElementStyle}, \code{Axes}, \code{Labels},
 \code{Cells}, \code{Texts}, \code{LabelPosition}, \code{CellPosition},
@@ -23,31 +23,37 @@ etc.). This argument can specify which part of chart to update. Possible options
 \code{Canvas}, \code{Size}. See details for more information.}
 }
 \description{
-\code{updateCharts} redraws a chart or a single layer of the chart to make it up
-to date with the current state of the environment.
+\code{updateCharts} redraws a chart or a single layer of a chart to make it up
+to date with the current state of the environment variables.
 }
 \details{
-Linked charts of the \emph{rlc} package are based on the idea that the variables
+Linked charts of the \emph{rlc} package are based on the idea that the variables that are
 used to define a chart are not constant, but can change as a result of user's
-actions. Each time the \code{updateCharts} function is called, all the properties passed
-via \code{\link{dat}} function are reevaluated and the chart is changed in accordance with the
+actions. Each time the \code{updateCharts} function is called, all the properties that were set inside
+the \code{\link{dat}} function are reevaluated and the chart is redrawn in accordance with the
 new state.
+
+If this function is called from the R session, changes will be applied
+to all currently opened pages. If it is used as a part of any \code{rlc} callback, only the page
+that triggered the call will be affected.
+
+This function is a wrapper around method \code{updateCharts} of class \code{\link{LCApp}}.
 }
 \section{Update types}{
 
-To improve performance you can update only a certain part of the chart (e.g. colours,
+To improve performance you can update only a certain part of a chart (e.g. colours,
 size, etc.). This can be done by setting the \code{updateOnly} argument. Here are all
 possible values for this argument.
 
 These are valid for all the charts:
 \itemize{
-\item \code{Size} changes the size of the chart (and consequently the location
+\item \code{Size} changes the size of the chart (and consequently position
 of all its elements).
 \item \code{Title} changes the title of the chart.
 \item \code{Canvas} If number of elements is too high the
 charts switch to the canvas mode and instead of multiple SVG point or cells
 a single Canvas image is generated. This type of update redraws the Canvas
-image. \emph{It is not recommended to use this function.}
+image. \emph{It is not recommended to use this option, since it will be used automatically when necessary.}
 }
 
 These can be updated only in heatmaps (\code{\link{lc_heatmap}}):
@@ -70,8 +76,8 @@ data values.
 
 These aspects are present in all the charts with axes.
 \itemize{
-\item \code{Axes} updates axes of the chart and changes positions
-of all the elements accordingly.
+\item \code{Axes} updates axes of a chart and changes position
+of its elements (points, lines, etc.) accordingly.
 \item \code{Elements} updates (add or removes) all the elements of the layer.
 \item \code{ElementPosition} updates positions of all the elements in the layer.
 \item \code{ElementStyle} updates the style (colour, opacity, etc.) of all the elements

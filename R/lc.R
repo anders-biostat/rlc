@@ -1,126 +1,1229 @@
 #' @import jrc
 #' @import stringr
-#' @importFrom methods setRefClass
-#' @importFrom methods new
+#' @import R6
+#' @importFrom stats runif
+pkg.env <- new.env()
+.app <- NULL
+.id <- NULL
 
-lc <- new.env()
-lc$pageOpened <- F
+pkg.env$dataFun <- list(
+  scatter = function(l) {
+    if(is.null(l$x) && is.null(l$y))
+      stop("Required properties 'x' and 'y' are not defined.")
+    
+    if(is.factor(l$x))
+      l$layerDomainX <- levels(l$x)
+    if(is.factor(l$y))
+      l$layerDomainY <- levels(l$y)
+    
+    if(is.null(l$x))
+      l$x <- 1:length(l$y)
+    if(is.null(l$y))
+      l$y <- 1:length(l$x)
+    
+    l$nelements <- length(l$x)
+    
+    if(is.null(l$label)){
+      if(!is.null(names(l$y)))
+        l$label <- names(l$y)
+      if(!is.null(names(l$x)))
+        l$label <- names(l$x)
+    }
+    
+    if(!is.null(l$jitterX)) {
+      if(!is.numeric(l$jitterX))
+        stop("'jitterX' must be a number")
+      l$jitterX = abs(l$jitterX)
+      
+      l$shiftX <- runif(length(l$x), -l$jitterX, l$jitterX)
+      l$jitterX <- NULL
+    }
+    if(!is.null(l$jitterY)) {
+      if(!is.numeric(l$jitterY))
+        stop("'jitterY' must be a number")
+      l$jitterY = abs(l$jitterY)
+      
+      l$shiftY <- runif(length(l$y), -l$jitterY, l$jitterY)
+      l$jitterY <- NULL
+    }
+    
+    if(!is.null(l$axisTitlePosX)){
+      l$axisTitlePos <- list()
+      l$axisTitlePos$x <- l$axisTitlePosX
+      l$axisTitlePosX <- NULL
+    }
+    if(!is.null(l$axisTitlePosY)) {
+      if(is.null(l$axisTitlePos))
+        l$axisTitlePos <- list()
+      l$axisTitlePos$y <- l$axisTitlePosY
+      l$axisTitlePosY <- NULL
+    }
+    l
+  },
+  beeswarm = function(l) {
+    if(is.null(l$x) || is.null(l$y))
+      stop("Required properties 'x' and 'y' are not defined.")
+    
+    if(is.factor(l$x))
+      l$layerDomainX <- levels(l$x)
+    if(is.factor(l$y))
+      l$layerDomainY <- levels(l$y)    
+    
+    if(is.null(l$label)){
+      if(!is.null(names(l$y)))
+        l$label <- names(l$y)
+      if(!is.null(names(l$x)))
+        l$label <- names(l$x)
+    }
 
-lc$nameList <- c("labels" = "label", "color" = "colour", "colorValue" = "colourValue",
-                 "colourValues" = "colourValue", "colorValues" = "colourValue", "colorDomain" = "colourDomain",
-                 "colorLegendTitle" = "colourLegendTitle", "addColorScaleToLegend" = "addColourScaleToLegend",
-                 "symbols" = "symbol", "symbolValues" = "symbolValue", "strokes" = "stroke", "values" = "value",
-                 "heatmapRows" = "heatmapRow", "heatmapCols" = "heatmapCol", "showValues" = "showValue",
-                 "globalColorScale" = "globalColourScale", "steps" = "step")
-
-lc$props <- list(scatter = c("x", "y", "size", "stroke", "strokeWidth", "symbol", "symbolValue", "symbolLegendTitle",
-                             "jitterX", "jitterY", "shiftX", "shiftY"),
-                barchart = c("ngroups", "groupIds", "nbars", "barIds", "nstacks", "stackIds", "value", "groupWidth", "stroke", "strokeWidth",
-                             "nbins"), 
-                beeswarm = c("x", "y", "size", "stroke", "strokeWidth", "symbol", "symbolValue", "symbolLegendTitle", "valueAxis"),
-                pointLine = c("lineWidth", "dasharray", "x", "y", "nsteps", "value", "fill"),
-                xLine = c("lineWidth", "dasharray", "lineFun", "nsteps", "a", "b", "h", "fill"),
-                yLine = c("lineWidth", "dasharray", "lineFun", "nsteps", "v", "fill"),
-                pointRibbon = c("lineWidth", "dasharray", "x", "ymax", "ymin", "nsteps"),
-                layer = c("nelements", "elementIds", "label", "layerDomainX", "layerDomainY", "contScaleX", "contScaleY",
-                          "colour", "colourValue", "palette", "colourDomain", "colourLegendTitle", "addColourScaleToLegend", "opacity", "on_click",
-                          "informText", "on_mouseover", "on_mouseout", "on_marked"),
-                input = c("step", "min", "max"),
-                all = c("width", "height", "plotWidth", "plotHeight", "paddings", "title", "titleX", "titleY", "titleSize",
-                        "showLegend", "showPanel", "transitionDuration", "value", "rowLabel", "colLabel", "showDendogramRow",
-                        "clusterRows", "clusterCols", "mode", "heatmapRow", "heatmapCol", "showValue", "rowTitle", 
-                        "colTitle", "palette", "colourDomain", "on_click", "on_change", "on_mouseover", "on_mouseout", "on_marked", 
-                        "chart", "layer", "content", "type", "domainX", "domainY", "apectRatio", "axisTitleX", "axisTitleY",
-                        "logScaleX", "logScaleY", "ticksRotateX", "ticksRotateY", "globalColourScale", "aspectRatio",
-                        "rankRows", "rankCols", "ticksX", "ticksY", "showDendogramCol", "on_labelClickCol", "on_labelClickRow"))
-
-Layer <- setRefClass("Layer", fields = list(type = "character", id = "character", 
-                                            properties = "list", dataFun = "function",
-                                            on_click = "function", on_mouseover = "function",
-                                            on_mouseout = "function", init = "logical",
-                                            on_marked = "function", pacerStep = "numeric",
-                                            on_labelClickRow = "function", on_labelClickCol = "function"))
-Layer$methods(
-  setProperty = function(name, expr) {
-    properties[[name]] <<- expr
+    l   
+  },
+  
+  path = function(l) {
+    if(is.null(l$x) && is.null(l$y))
+      stop("Required properties 'x' and 'y' are missing.")
+    
+    if(is.factor(l$x))
+      l$layerDomainX <- levels(l$x)
+    if(is.factor(l$y))
+      l$layerDomainY <- levels(l$y)
+    
+    if(!is.null(l$x)) l$x <- as.matrix(l$x)
+    if(!is.null(l$y)) l$y <- as.matrix(l$y)
+    
+    if(is.null(l$y))
+      l$y <- matrix(rep(1:nrow(l$x), ncol(l$x)), nrow = ncol(l$x))
+    if(is.null(l$x))
+      l$x <- matrix(rep(1:nrow(l$y), ncol(l$y)), nrow = ncol(l$y))
+    
+    if(!is.matrix(l$x) || !is.matrix(l$y))
+      stop("One of the properties 'x' or 'y' can not be converted into matrix")
+    
+    if(nrow(l$x) != nrow(l$y))
+      stop("Lengths of 'x' and 'y' differ.")
+    
+    if(ncol(l$x) != ncol(l$y)){
+      if(ncol(l$x) == 1)
+        l$x <- matrix(rep(l$x, ncol(l$y)), ncol = ncol(l$y))
+      if(ncol(l$y) == 1)
+        l$y <- matrix(rep(l$y, ncol(l$x)), ncol = ncol(l$x))
+      if(ncol(l$x) != ncol(l$y))
+        stop("'x' and 'y' define different number of lines.")
+    }
+    
+    if(!is.null(l$x)) {
+      l$nelements <- ncol(l$x)
+      l$nsteps <- nrow(l$x)      
+    }
+    if(!is.null(l$axisTitlePosX)){
+      l$axisTitlePos <- list()
+      l$axisTitlePos$x <- l$axisTitlePosX
+      l$axisTitlePosX <- NULL
+    }
+    if(!is.null(l$axisTitlePosY)) {
+      if(is.null(l$axisTitlePos))
+        l$axisTitlePos <- list()
+      l$axisTitlePos$y <- l$axisTitlePosY
+      l$axisTitlePosY <- NULL
+    }
+    
+    l
+  },
+  
+  line = function(l) {
+    l <- pkg.env$dataFun$path(l)
+    
+    for(i in 1:ncol(l$x)) {
+      l$y[, i] <- l$y[order(l$x[, i]), i]
+      l$x[, i] <- l$x[order(l$x[, i]), i]
+    }
+    l
+  },
+  
+  ribbon = function(l) {
+    if(is.factor(l$x))
+      l$layerDomainX <- levels(l$x)
+    if(is.factor(l$ymax))
+      l$layerDomainY <- levels(l$ymax)
+    if(is.factor(l$ymin))
+      l$layerDomainY <- levels(l$ymin)
+    
+    if(!is.null(l$x) && !is.vector(l$x)) l$x <- as.matrix(l$x)
+    if(!is.null(l$ymax) && !is.vector(l$ymax)) l$ymax <- as.matrix(l$ymax)
+    if(!is.null(l$ymin) && !is.vector(l$ymin)) l$ymin <- as.matrix(l$ymin)
+    
+    if(!is.null(l$ymax) | !is.null(l$ymin) | !is.null(l$x)){
+      if(is.matrix(l$x)) {
+        if((nrow(l$ymax) != nrow(l$ymin)) | (nrow(l$x) != nrow(l$ymin)))
+          stop("'x', 'ymax' and 'ymin' define different number of lines.")
+        if((ncol(l$ymax) != ncol(l$ymin)) | (ncol(l$x) != ncol(l$ymin)))
+          stop("Lengths of 'x', 'ymax' and 'ymin' differ.")
+        
+      } else {
+        if(length(l$ymax) != length(l$ymin) | length(l$x) != length(l$ymin))
+          stop("Lengths of 'x', 'ymax' and 'ymin' differ.")
+      }
+    }
+    
+    if(!is.null(l$x)) {
+      if(is.matrix(l$x)) {
+        l$nelements <- ncol(l$x)
+        l$nsteps <- nrow(l$x)      
+      } else {
+        l$nelements <- 1
+        l$nsteps <- length(l$x)
+      }
+    }
+    if(!is.null(l$axisTitlePosX)){
+      l$axisTitlePos <- list()
+      l$axisTitlePos$x <- l$axisTitlePosX
+      l$axisTitlePosX <- NULL
+    }
+    if(!is.null(l$axisTitlePosY)) {
+      if(is.null(l$axisTitlePos))
+        l$axisTitlePos <- list()
+      l$axisTitlePos$y <- l$axisTitlePosY
+      l$axisTitlePosY <- NULL
+    }
+    
+    l
+  },
+  
+  bars = function(l) {
+    if(!is.null(l$barIds) && length(l$barIds) != length(l$value))
+      stop("Number of bar IDs is not equal to the number of provided values.")
+    if(!is.null(l$stackIds) && length(l$stackIds) != length(l$value))
+      stop("Number of stack IDs is not equal to the number of provided values.")
+    if(!is.null(l$groupIds) && length(l$groupIds) != length(l$value))
+      stop("Number of group IDs is not equal to the number of provided values.")
+    
+    if(all(is.null(l$groupIds), !is.null(l$barIds), is.null(l$stackIds))) {
+      l$groupIds <- l$barIds
+      l$barIds <- NULL
+    }
+    if(is.null(l$groupIds) &is.null(l$barIds))
+      if(is.null(names(l$value))) {
+        l$groupIds <- 1:length(l$value)  
+      } else {
+        l$groupIds <- names(l$value)
+      }
+    
+    if(is.null(l$barIds) & is.null(l$stackIds))
+      l$addColourScaleToLegend <- FALSE
+    
+    if(is.null(l$groupIds)) l$groupIds <- rep("group", length(l$value))
+    if(is.null(l$barIds)) l$barIds <- rep(1, length(l$value))
+    if(is.null(l$stackIds)) l$stackIds <- rep(1, length(l$value))
+    
+    ngroups <- length(unique(l$groupIds))
+    nbars <- length(unique(l$barIds))
+    nstacks <- length(unique(l$stackIds))
+    
+    if(is.factor(l$groupIds))
+      l$layerDomainX <- levels(l$groupIds)
+    
+    inds <- NULL
+    
+    if(is.numeric(l$groupIds) & !is.integer(l$groupIds)){
+      inds <- unique(l$groupIds)
+      l$groupIds <- match(l$groupIds, inds)
+    }
+    
+    vals <- list()
+    
+    for(i in 1:length(l$value)) {
+      
+      if(is.null(vals[[as.character(l$groupIds[i])]])) vals[[as.character(l$groupIds[i])]] <- list()
+      if(is.null(vals[[as.character(l$groupIds[i])]][[as.character(l$barIds[i])]])) 
+        vals[[as.character(l$groupIds[i])]][[as.character(l$barIds[i])]] <- list()
+      
+      vals[[as.character(l$groupIds[i])]][[as.character(l$barIds[i])]][[as.character(l$stackIds[i])]] <- l$value[i]
+    }
+    
+    if(!is.null(inds)) {
+      vals$`__inds__` <- inds
+      l$groupIds <- inds
+    }
+    
+    
+    l$value <- vals
+    l$groupIds <- unique(l$groupIds)
+    l$barIds <- unique(l$barIds)
+    l$stackIds <- unique(l$stackIds)
+    
+    if(!is.null(l$axisTitlePosX)){
+      l$axisTitlePos <- list()
+      l$axisTitlePos$x <- l$axisTitlePosX
+      l$axisTitlePosX <- NULL
+    }
+    if(!is.null(l$axisTitlePosY)) {
+      if(is.null(l$axisTitlePos))
+        l$axisTitlePos <- list()
+      l$axisTitlePos$y <- l$axisTitlePosY
+      l$axisTitlePosY <- NULL
+    }
+    
+    l
+  },
+  
+  hist = function(l) {
+    if(is.null(l$nbins)) {
+      nbins <- 10
+    } else {
+      nbins <- l$nbins
+    }
+    if(!is.numeric(nbins) || nbins < 1) 
+      stop("'nbins' must be a positive number")
+    
+    l$nbins <- NULL
+    
+    l$contScaleX <- TRUE
+    l$addColourScaleToLegend <- FALSE
+    l$groupWidth <- 1
+    
+    if(!is.null(l$value)) {
+      minV <- min(l$value, na.rm = TRUE)
+      maxV <- max(l$value, na.rm = TRUE)
+      breaks <- seq(minV, maxV, length.out = nbins + 1)
+      step <- breaks[2] - breaks[1]
+      groupIds <- breaks - step/2
+      groupIds <- groupIds[-1]
+      binned <- .bincode(l$value, breaks, include.lowest = TRUE)
+      value <- sapply(1:nbins, function(i) {sum(binned == i)})
+      
+      l$groupIds <- groupIds
+      l$value <- value
+    }
+    pkg.env$dataFun$bars(l)
+  },
+  
+  dens = function(l) {
+    if(!is.null(l$value)) {
+      dens <- density.default(l$value)
+      l$x <- dens$x
+      l$y <- dens$y
+      l$value <- NULL
+    }
+    pkg.env$dataFun$path(l)
+  },
+  
+  heatmap = function(l) {
+    if(!is.null(l$value)) {
+      l$nrows <- nrow(l$value)
+      l$ncols <- ncol(l$value)
+      
+      l$value <- as.matrix(l$value)
+      
+      if(is.null(l$rowLabel) & !is.null(rownames(l$value)))
+        l$rowLabel <- rownames(l$value)
+      if(is.null(l$colLabel) & !is.null(colnames(l$value)))
+        l$colLabel <- colnames(l$value)
+    }
+    
+    l
+  },
+  
+  colourSlider = function(l) {
+    if(!is.null(l$chart)) {
+      l$linkedChart <- str_c("charts.", l$chart)
+      if(is.null(l$layer) && getChart(l$chart)$nLayers() == 1) 
+        l$layer <- names(getChart(l$chart)$layers)[2]
+      if(!is.null(l$layer))
+        l$linkedChart <- str_c(l$linkedChart, ".layers.", l$layer)
+      
+    }
+    l$chart <- NULL
+    l$layer <- NULL
+    l
+  },
+  
+  abLine = function(l) {
+    if(is.null(l$a) || is.null(l$b))
+      stop("Required properties 'a' and 'b' are not defined.");
+    if(length(l$a) != length(l$b))
+      stop("Lengths of 'a' and 'b' differ.")
+    
+    l$a <- as.vector(l$a)
+    l$b <- as.vector(l$b)
+    
+    l$nelements <- length(l$a)
+    l$lineFun <- str_c("function(x, d) { a = ", toJSON(l$a, digits = NA), ";",
+                       "b = ", toJSON(l$b, digits = NA), ";", 
+                       "return a[d] * x + b[d]; }")
+    l$a <- NULL
+    l$b <- NULL
+    
+    if(!is.null(l$axisTitlePosX)){
+      l$axisTitlePos <- list()
+      l$axisTitlePos$x <- l$axisTitlePosX
+      l$axisTitlePosX <- NULL
+    }
+    if(!is.null(l$axisTitlePosY)) {
+      if(is.null(l$axisTitlePos))
+        l$axisTitlePos <- list()
+      l$axisTitlePos$y <- l$axisTitlePosY
+      l$axisTitlePosY <- NULL
+    }
+    
+    l
+  },
+  
+  hLine = function(l) {
+    if(is.null(l$h))
+      stop("Required property 'h' is not defined.");
+    
+    l$h <- as.vector(l$h)
+    
+    l$nelements <- length(l$h)
+    l$lineFun <- str_c("function(x, d) { h = ", toJSON(l$h, digits = NA), ";",
+                       "return h[d]; }")
+    l$h <- NULL
+    
+    if(!is.null(l$axisTitlePosX)){
+      l$axisTitlePos <- list()
+      l$axisTitlePos$x <- l$axisTitlePosX
+      l$axisTitlePosX <- NULL
+    }
+    if(!is.null(l$axisTitlePosY)) {
+      if(is.null(l$axisTitlePos))
+        l$axisTitlePos <- list()
+      l$axisTitlePos$y <- l$axisTitlePosY
+      l$axisTitlePosY <- NULL
+    }
+    
+    l
+  },
+  
+  vLine = function(l) {
+    if(is.null(l$v))
+      stop("Required property 'v' is not defined.");
+    
+    l$v <- as.vector(l$v)
+    
+    l$nelements <- length(l$v)
+    l$lineFun <- str_c("function(x, d) { v = ", toJSON(l$v, digits = NA), ";",
+                       "return v[d]; }")
+    l$v <- NULL
+    if(!is.null(l$axisTitlePosX)){
+      l$axisTitlePos <- list()
+      l$axisTitlePos$x <- l$axisTitlePosX
+      l$axisTitlePosX <- NULL
+    }
+    if(!is.null(l$axisTitlePosY)) {
+      if(is.null(l$axisTitlePos))
+        l$axisTitlePos <- list()
+      l$axisTitlePos$y <- l$axisTitlePosY
+      l$axisTitlePosY <- NULL
+    }
+    
+    l
+  },
+  
+  html = function(l) {
+    if(!is.character(l$content) || length(l$content) != 1)
+      l$content <- hwrite(l$content)
+    
+    #l$content <- gsub("[\r\n]", "", l$content)
+    #l$content <- str_replace_all(l$content, "(\\W)", "\\\\\\1")
+    
+    l
+  },
+  
+  input = function(l){
+    if(!(l$type %in% c("checkbox", "radio", "text", "button", "range")))
+      stop("Unsupported type of input. Please, use one of \"checkbox\", \"radio\", \"text\", \"button\", \"range\"")
+    
+    if(!is.null(l$label)) {
+      l$nelements <- length(l$label)
+    } else {
+      l$nelements <- 1
+    }
+    
+    if(l$type == "checkbox")
+      if(!is.null(l$values))
+        if(length(l$value) != 1 & length(l$value) != l$nelements)
+          stop("Length of 'values' vector must be either 1 or equal to the number of checkboxes.")
+    
+    if(l$type == "radio")
+      if(!is.null(l$value))
+        if(length(l$value) != 1 | !is.numeric(l$value)) {
+          stop("'value' must be a number of the checked radio button")
+        } else {
+          l$value = l$value - 1
+        }
+    
+    
+    if(l$type == "text")
+      if(!is.null(l$value) & length(l$value) != l$nelements)
+        stop("Length of 'values' must be equal to the number of text fields.")
+    
+    if(l$type == "range") {
+      if(!is.null(l$value) & length(l$value) != 1 & length(l$value) != l$nelements)
+        stop("Length of 'values' vector must be either 1 or equal to the number of ranges.")
+      if(!is.null(l$step) & length(l$step) != 1 & length(l$step) != l$nelements)
+        stop("Length of 'step' vector must be either 1 or equal to the number of ranges.")
+      if(!is.null(l$min) & length(l$min) != 1 & length(l$min) != l$nelements)
+        stop("Length of 'min' vector must be either 1 or equal to the number of ranges.")
+      if(!is.null(l$max) & length(l$max) != 1 & length(l$max) != l$nelements)
+        stop("Length of 'max' vector must be either 1 or equal to the number of ranges.")
+    }
+    
+    if(!is.null(l$on_change)) {
+      l$on_click <- l$on_change
+      l$on_change <- NULL
+    }
+    l
   }
 )
-Layer$accessors("type")
 
-Chart <- setRefClass("Chart", fields = list(layers = "list", id = "character", place = "character"))
-Chart$methods(
-  addLayer = function(layerId, type) {
-    if((length(layers) != 0) && (layerId %in% names(layers)))
-      stop(str_c("Layer with ID ", layerId, " already exists in chart ", id, ".", 
-                 " Use 'chart$removeLayer(layerId)' to remove it."))
+#' @name LCApp
+#' @title LCApp class
+#' 
+#' @description Object of this class represents the entire linked-charts app. It stores all charts, client sessions and
+#' local variables. You can create and manage interactive apps solely by creating new instances of this class and utilizing
+#' their methods. There are no limitations on the number of apps simultaneously running in one R session.
+#' However, it is also possible to create and manage app via the wrapper functions provided in this package. In this case an
+#' instance of \code{\link{LCApp}} class is initialized and stored in the package's namespace. Therefore, only one app can be active simultaneously.
+#' You can always retrieve the active app with the \code{\link{getPage}} function. The \code{LCApp} class inherits from 
+#' the \code{\link[jrc]{App}} class of the \code{jrc} package.
+#' 
+#' @section Methods:
+#' \describe{
+#'    \item{\code{removeChart(chartId)}}{
+#'       Removes a chart with the given ID from the app. See also \code{\link{removeChart}}.
+#'    }
+#'    \item{\code{removeLayer(chartId, layerId)}}{
+#'       Removes a layer from a chart by their IDs. See also \code{\link{removeLayer}}.
+#'    }
+#'    \item{\code{setProperties(data, chartId, layerId = NULL)}}{
+#'       Changes or sets properties for a given chart and layer. For more information, please, check \code{\link{setProperties}}.
+#'    }
+#'    \item{\code{updateCharts(chartId = NULL, layerId = NULL, updateOnly = NULL, sessionId = NULL)}}{
+#'       Updates charts or specific layers for one or multiple users. For more information on the arguments,
+#'       please, check \code{\link{updateCharts}}.
+#'    }
+#'    \item{\code{chartEvent(d, chartId, layerId = "main", event, sessionId = NULL)}}{
+#'       Triggers a reaction to mouse event on a web page. Generally, this method is not supposed to be 
+#'       called explicitly. It is called internally each time, client clicks or hovers over an interactive chart element.
+#'       However, experienced users can use this method to simulate mouse events on the R side. For more information
+#'       on the arguments, please, check \code{\link{chartEvent}}.
+#'    }
+#'    \item{\code{listCharts()}}{
+#'       Prints a list of all existing charts and their layers. See also \code{\link{listCharts}}.
+#'    }
+#'    \item{\code{getMarked(chartId = NULL, layerId = NULL, sessionId = NULL)}}{
+#'       Returns a vector of indices of all currently marked elements of a certain chart and layer and from a given client.
+#'       For more information, please, check \code{\link{getMarked}}.
+#'    }
+#'    \item{\code{mark(elements, chartId = NULL, layerId = NULL, preventEvent = TRUE, sessionId = NULL)}}{
+#'       Marks elements of a given chart and layer on one of the currently opened web pages. Please, check
+#'       \code{\link{mark}} for more information on the arguments.
+#'    }
+#'    \item{\code{setChart(chartType, data, ..., place = NULL, chartId = NULL, layerId = NULL, [...])}}{
+#'       Adds a new chart (or replaces an existing one) to the app. This is the main method of the package, that
+#'       allows to define any chart and all its properties. There are multiple wrappers for this method - one for each type of 
+#'       chart. Here is a full list:
+#'          \itemize{
+#'             \item{\code{\link{lc_scatter}}}
+#'             \item{\code{\link{lc_beeswarm}}}
+#'             \item{\code{\link{lc_line}}}
+#'             \item{\code{\link{lc_path}}}
+#'             \item{\code{\link{lc_ribbon}}}
+#'             \item{\code{\link{lc_bars}}}
+#'             \item{\code{\link{lc_hist}}}
+#'             \item{\code{\link{lc_dens}}}
+#'             \item{\code{\link{lc_heatmap}}}
+#'             \item{\code{\link{lc_colourSlider}}}
+#'             \item{\code{\link{lc_abLine}}}
+#'             \item{\code{\link{lc_vLine}}}
+#'             \item{\code{\link{lc_html}}}
+#'             \item{\code{\link{lc_input}}}
+#'          }
+#'      You can check the wrapper functions for information about arguments and available properties. Compared to them, this 
+#'      method gets additional argument \code{chartType}, which is always the same as the second part of the name of a 
+#'      corresponding wrapper function (\code{lc_`chartType`}). In all other aspects, wrapper functions and the \code{setChart} 
+#'      method are the same.
+#'    }
+#'    \item{\code{new(layout = NULL, beforeLoad = function(s) {}, afterLoad = function(s) {}, ...)}}{
+#'       Creates new instance of class \code{LCApp}. Most of its arguments are inherited from method \code{new} of
+#'       class \code{\link[jrc]{App}} from the \code{jrc} package. There are only three arguments specific for the
+#'       \code{LCApp} class. \code{layout} sets a default
+#'       layout for each new webpage (currently only tables of arbitrary size are supported).
+#'       \code{beforeLoad} and \code{afterLoad} replace \code{onStart} from the \code{\link[jrc]{App}}
+#'       class. For more information, please, check \code{\link{openPage}}.
+#'    }
+#' }
+#'
+NULL
+
+#' @export
+LCApp <- R6Class("LCApp", inherit = App, public = list(
+  removeChart = function(chartId) {
+    if(!is.vector(chartId) | !is.character(chartId))
+      stop("Chart ID must be a vector of characters")
+
+    for(id in chartId){
+      private$charts[[id]] <- NULL
+      for(session in private$sessions)
+        if(!is.null(session))
+          session$sendCommand(str_interp("rlc.removeChart('${chartId}');"))
+    }
     
-    layers[[layerId]] <<- Layer$new(type = type, id = layerId, properties = list(), init = FALSE,
-                                    dataFun = function(l) l, on_click = function(d) NULL)
-    layers[[layerId]]
+    invisible(self)
   },
-  getLayer = function(layerId = NULL) {
-    if(is.null(layerId))
-      if(length(layers) == 2) {
-        #1st layer is always 'main', which is a dummy
-        layerId <- layers[[2]]$id
-      } else {
-        stop(str_c("Chart ", id, " has multiple or no layers. You need to specify the 'layerID'."))
-      }
-    layers[[layerId]]
+  
+  removeLayer = function(chartId, layerId) {
+    chart <- private$getChart(chartId)
+    chart$removeLayer(layerId)
+    
+    invisible(self)
   },
-  removeLayer = function(layerId) {
-    if(layerId == "main"){
-      warning(str_c("You are attempting to remove the main layer of the chart ", id, 
-              ". The entire chart will be removed."))
-      removeChart(id)
+  
+  setLayout = function(layout) {
+    if(grepl("^table", layoutName)){
+      size <- as.numeric(str_extract_all(layoutName, "\\d", simplify = TRUE))
+      if(length(size) != 2) stop("Size of the table is specified incorrectly")
+      private$layout <- c("Table", size)
     } else {
-      if(!(layerId %in% names(layers))) {
-        stop(str_c("There is no layer with ID ", layerId))
+      stop("Unknown default layout name")        
+    }
+    invisible(self)
+  },
+
+  setProperties = function(data, chartId, layerId = NULL){
+    chart <- private$getChart(chartId)
+    if(is.null(chart))
+      stop(str_c("Chart with ID ", chartId, " is not defined."))
+    
+    if(is.null(layerId))
+      if(chart$getLayer("main")$type != "axesChart") {
+        layerId <- "main"
       } else {
-        sendCommand(str_interp("rlc.removeLayer('${id}', '${layerId}')"))
-        layers[[layerId]] <<- NULL
+        if(chart$nLayers() == 1) {
+          layerId <- names(chart$layers)[2]
+        } else {
+          stop("The chart ", chart$id, " has more then one layer. Please, specify the 'layerId'.")
+        }
+      }
+    
+    layer <- chart$getLayer(layerId)
+    mainLayer <- chart$getLayer("main")
+    
+    data <- plyr::rename(data, private$nameList, warn_missing = FALSE)
+    if(is.null(layer))
+      stop(str_c("Layer with ID ", layerId, " is not defined."))
+    
+    for(prop in names(data))
+      if(prop %in% private$props[[layer$type]] | prop %in% private$props$layer) {
+        layer$setProperty(prop, data[[prop]])
+      } else {
+        if(prop %in% private$props$all) {
+          mainLayer$setProperty(prop, data[[prop]])
+        } else {
+          warning(str_c("In chart '", chart$id, "': Property '", prop, "' doesn't exist."))
+        }
+      }
+    
+    invisible(self)
+  },
+  
+  updateCharts = function(chartId = NULL, layerId = NULL, updateOnly = NULL, sessionId = NULL) {
+    if(length(private$charts) == 0) {
+      stop("There are no charts yet.")
+    }
+    
+    if(is.null(chartId)) chartId <- names(private$charts)
+    if(!is.vector(chartId))
+      stop("'chartId' should be a vector of IDs")
+
+    maxL <- max(length(chartId), length(layerId), length(updateOnly))
+    if(maxL > 1) {
+      if(length(chartId) == 1) chartId <- rep(chartId, maxL)
+      if(length(layerId) == 1) layerId <- rep(layerId, maxL)
+      if(length(updateOnly) == 1) updateOnly <- rep(updateOnly, maxL)
+    }
+    
+    if(!is.null(layerId) & length(layerId) != length(chartId))
+      stop("Lengths of 'chartId' and 'layerId' differ")
+    if(!is.null(updateOnly) & length(updateOnly) != length(chartId))
+      stop("Lengths of 'chartId' and 'updateOnly' differ")        
+      
+    if(is.null(sessionId))
+      sessionId <- names(private$sessions)
+
+    for(i in 1:length(chartId)) {
+      chart <- private$getChart(chartId[i])
+      if(!is.null(chart)) {
+        chart$update(sessionId, layerId[i], updateOnly[i])
+      } else {
+        warning(str_c("There is no chart with ID ", chartId[i]))
       }
     }
   },
-  nLayers = function() {
-    length(layers) - 1
+  
+  chartEvent = function(d, chartId, layerId = "main", event, sessionId = NULL) {
+
+    #lame. This also must go to jrc with the nearest update
+    d <- type.convert(d, as.is = TRUE)
+    if(is.numeric(d)) d <- d + 1
+    # should we move that to jrc? And add some parameter, like 'flatten'?
+    if(is.list(d))
+      if(all(sapply(d, function(el) length(el) == 1)))
+        d <- unlist(d)
+  
+    chart <- private$getChart(chartId)
+    if(is.null(chart))
+      stop(str_interp("Chart with ID ${id} is not defined"))
+ 
+    layer <- chart$getLayer(layerId)
+    if(is.null(layer))
+      stop(str_interp("Chart ${id} doesn't have layer ${layerId}"))
+    
+    session <- super$getSession(sessionId)
+    if(is.null(session))
+      stop("Can't retreive the session")
+    
+    env <- session$sessionVariables()
+    
+    f <- layer[[paste0("on_", event)]]
+    environment(f) <- env
+    do.call(f, list(d))
+
+    invisible(self)  
   },
-  JSinitialize = function() {
-    lapply(layers, function(layer) {
-      if(!layer$init) {
+  
+  listCharts = function() {
+    for(chartId in names(private$charts)) {
+      print(str_interp("Chart: ${chartId}"))
+      chart <- private$getChart(chartId)
+      if(chart$nLayers() > 1) {
+        print("- Layers:")
+        for(layerId in names(chart$layers)){
+          layer <- chart$getLayer(layerId)
+          if(layer$id != "main")
+            print(str_interp("-- ${layer$id} - ${layer$type}"))
+        }
+      }
+    }
+    
+    invisible(self)
+  },
+  
+  getMarked = function(chartId = NULL, layerId = NULL, sessionId = NULL) {
+    session <- super$getSession(sessionId)
+    if(is.null(session))
+      stop("Can't retreive the session")
+
+    if(is.null(chartId))
+      if(length(private$charts) == 1) {
+        chartId <- private$charts[[1]]$id
+      } else {
+        stop(str_c("There are more than one chart on the page. 'chartId' must be ",
+                   "specified. Use 'listCharts()' to get IDs of all existing charts."))
+      }
+    
+    chart <- private$getChart(chartId)
+    if(is.null(chart))
+      stop(str_c("Chart ", chartId, " is not defined."))
+    
+    if(is.null(layerId)) {
+      if(chart$nLayers() == 0)
+        layerId <- "main"
+      if(chart$nLayers() == 1)
+        layerId <- names(chart$layers)[2]
+      if(chart$nLayers() > 1)
+        stop(str_c("There is more than one layer in this chart. 'layerId' must be specified. ",
+                   "Use 'listCharts()' to get IDs of all existing charts and their layers."))
+    }
+    session$sessionVariables(list(.marked = NULL))
+    session$sendCommand(str_interp("rlc.getMarked('${chartId}', '${layerId}')"), wait = 5)
+    marked <- session$sessionVariables(varName = ".marked", remove = ".marked")
+    
+    if( is.null(marked) ) {
+      warning( "Can't load marked elements" )
+    }
+    
+    if(is.numeric(marked)) marked <- marked + 1
+    if(length(marked) == 0)
+      return (c())
+    
+    marked
+  },
+  
+  mark = function(elements, chartId = NULL, layerId = NULL, preventEvent = TRUE, sessionId = NULL){
+    session <- super$getSession(sessionId)
+    if(is.null(session))
+      stop("Can't retreive the session")
+    
+    if(is.null(chartId))
+      if(length(private$charts) == 1) {
+        chartId <- private$charts[[1]]$id
+      } else {
+        stop(str_c("There is more than one chart on the page. 'chartId' must be ",
+                   "specified. Use 'listCharts()' to get IDs of all existing charts."))
+      }
+    
+    chart <- private$getChart(chartId)
+    if(is.null(chart))
+      stop(str_c("Chart ", chartId, " is not defined."))
+    
+    if(is.null(layerId)) {
+      if(chart$nLayers() == 0)
+        layerId <- "main"
+      if(chart$nLayers() == 1)
+        layerId <- names(chart$layers)[2]
+      if(chart$nLayers() > 1)
+        stop(str_c("There is more than one layer in this chart. 'layerId' must be specified. ",
+                   "Use 'listCharts()' to get IDs of all existing charts and their layers."))
+    }
+    
+    if(length(elements) != 0 & !is.vector(elements))
+      stop("'elements' must be a vector of indices.")
+    if(preventEvent) {
+      preventEvent = "true"
+    } else {
+      preventEvent = "false"
+    }
+    
+    if(length(elements) == 0) {
+      elements <- "__clear__"
+    } else {
+      elements <- elements - 1
+    }
+    
+    session$sendData("markElements", elements)
+    session$sendCommand(str_c("rlc.mark('", chartId, "', '", layerId, "', ", preventEvent, ");"))    
+  },
+  
+  setChart = function(chartType, data, ..., place = NULL, chartId = NULL, layerId = NULL, addLayer = FALSE, pacerStep = 50) {
+    if(is.null(private$serverHandle)){
+      super$startServer()
+      super$openPage()
+    }
+    
+    if(length(chartType) > 1){
+      warning("Attempt supply several types for one chart. Only the first one will be used.")
+      chartType <- chartType[1]
+    }
+    
+    if(!(chartType %in% names(private$jsTypes)))
+      stop("Unknown chart type")
+    
+    if(is.null(place) && is.null(chartId))
+      place <- str_c("Chart", length(private$charts) + 1)
+    
+    if(is.null(chartId))
+      chartId <- place
+    if(is.null(place))
+      place <- chartId
+    
+    chart <- private$getChart(chartId)
+    if(!is.null(chart) && ((!is.null(layerId) && layerId == "main") || 
+                           chart$nLayers() == 0)) {
+      self$removeChart(chart$id)
+      chart <- private$getChart(chartId)
+    }
+    
+    if(is.null(chart)) {
+      chart <- private$addChart(chartId, place)
+      if(is.null(layerId) || layerId != "main")
+        chart$addLayer("main", "axesChart")
+    }
+
+    if(is.null(layerId)){
+      if(!addLayer & chart$nLayers() > 1) {
+        warning(str_c("Chart '", chartId, "' has ", chart$nLayers(), " layers and the layer ID is not specified. ", 
+                      "'addLayer' will be set to TRUE."))
+        addLayer <- T
+      }
+      
+      if(addLayer | chart$nLayers() == 0) {
+        layerId <- str_c("Layer", (chart$nLayers() + 1))
+      } else {
+        layerId <- chart$getLayerIds()[2]
+      }
+    }
+
+    if(!is.null(chart$getLayer(layerId)))
+      chart$removeLayer(layerId)
+    
+    layer <- chart$addLayer(layerId, private$jsTypes[chartType])
+    if(!is.null(pkg.env$dataFun[[chartType]])){
+      layer$dataFun <- pkg.env$dataFun[[chartType]]
+    }
+
+    layer$pacerStep <- pacerStep
+
+    self$setProperties(c(data, list(...)), chartId, layerId)
+    
+    for(session in private$sessions){
+      chart$JSInitialize(session)
+      chart$update(session)
+    }
+    
+    invisible(self)
+  },  
+  
+  initialize = function(layout = NULL, beforeLoad = function(session) {}, afterLoad = function(session) {}, ...){
+    onStart_lc <- function(session) {
+
+      srcDir <- "http_root_rlc"
+      reqPage <- system.file( "/http_root/linked-charts.css", package = "rlc" )
+      
+      session$sessionVariables(list(s1 = 0, s2 = 0))
+      session$sendCommand(str_c("link = document.createElement('link');", 
+                        "link.rel = 'stylesheet';", 
+                        "link.href = '", srcDir, "/linked-charts.css';", 
+                        "document.head.appendChild(link);", collapse = "\n")) 
+      session$sendCommand(str_c("script = document.createElement('script');", 
+                        "script.src = '", srcDir, "/rlc.js';",
+                        "script.onload = function() {jrc.sendData('s1', 1)};",
+                        "document.head.appendChild(script);", collapse = "\n"), wait = 5)
+      
+      session$sendCommand(str_c("script = document.createElement('script');", 
+                        "script.src = '", srcDir, "/linked-charts.min.js';",
+                        "script.onload = function() {jrc.sendData('s2', 1)};",                    
+                        "document.head.appendChild(script);", collapse = "\n"), wait = 5)
+
+      if( session$sessionVariables(varName = "s1") == 0 || 
+          session$sessionVariables(varName = "s2") == 0 ) {
+        super$closeSession(session)
+        stop( "Can't load linked-charts.js or rlc.js" )
+      }
+      session$sessionVariables(vars = list(.app = self), remove = c("s1", "s2"))
+      
+      session$sendCommand("d3.select('title').text('R/linked-charts');")
+      
+      beforeLoad(session)
+      
+      private$addLayout(session)
+      for(chart in private$charts){
+        chart$JSInitialize(session)
+        chart$update(session)
+      }
+      
+      afterLoad(session)
+    }
+
+    super$initialize(..., onStart = onStart_lc)
+    if(!is.null(layout))
+      self$setLayout(layout)
+    
+    private$envir <- parent.frame(n = 2)
+    invisible(self)
+  }
+), private = list(
+  props = list(scatter = c("x", "y", "size", "stroke", "strokeWidth", "symbol", "symbolValue", "symbolLegendTitle",
+                           "jitterX", "jitterY", "shiftX", "shiftY"),
+               barchart = c("ngroups", "groupIds", "nbars", "barIds", "nstacks", "stackIds", "value", "groupWidth", "stroke", "strokeWidth",
+                            "nbins"), 
+               beeswarm = c("x", "y", "size", "stroke", "strokeWidth", "symbol", "symbolValue", "symbolLegendTitle", "valueAxis"),
+               pointLine = c("lineWidth", "dasharray", "x", "y", "nsteps", "value", "fill"),
+               xLine = c("lineWidth", "dasharray", "lineFun", "nsteps", "a", "b", "h", "fill"),
+               yLine = c("lineWidth", "dasharray", "lineFun", "nsteps", "v", "fill"),
+               pointRibbon = c("lineWidth", "dasharray", "x", "ymax", "ymin", "nsteps"),
+               layer = c("nelements", "elementIds", "label", "layerDomainX", "layerDomainY", "contScaleX", "contScaleY",
+                         "colour", "colourValue", "palette", "colourDomain", "colourLegendTitle", "addColourScaleToLegend", "opacity", "on_click",
+                         "informText", "on_mouseover", "on_mouseout", "on_marked"),
+               input = c("step", "min", "max"),
+               all = c("width", "height", "plotWidth", "plotHeight", "paddings", "title", "titleX", "titleY", "titleSize",
+                       "showLegend", "showPanel", "transitionDuration", "value", "rowLabel", "colLabel", "showDendogramRow",
+                       "clusterRows", "clusterCols", "mode", "heatmapRow", "heatmapCol", "showValue", "rowTitle", 
+                       "colTitle", "palette", "colourDomain", "on_click", "on_change", "on_mouseover", "on_mouseout", "on_marked", 
+                       "chart", "layer", "content", "type", "domainX", "domainY", "apectRatio", "axisTitleX", "axisTitleY",
+                       "logScaleX", "logScaleY", "ticksRotateX", "ticksRotateY", "globalColourScale", "aspectRatio",
+                       "rankRows", "rankCols", "ticksX", "ticksY", "showDendogramCol", "on_labelClickCol", "on_labelClickRow",
+                       "axisTitlePos")),
+  nameList = c("labels" = "label", "color" = "colour", "colorValue" = "colourValue",
+               "colourValues" = "colourValue", "colorValues" = "colourValue", "colorDomain" = "colourDomain",
+               "colorLegendTitle" = "colourLegendTitle", "addColorScaleToLegend" = "addColourScaleToLegend",
+               "symbols" = "symbol", "symbolValues" = "symbolValue", "strokes" = "stroke", "values" = "value",
+               "heatmapRows" = "heatmapRow", "heatmapCols" = "heatmapCol", "showValues" = "showValue",
+               "globalColorScale" = "globalColourScale", "steps" = "step"),
+  jsTypes = c(scatter = "scatter", beeswarm = "beeswarm", line = "pointLine", path = "poinLine",
+              ribbon = "pointRibbon", bars = "barchart", hist = "barchart", dens = "pointLine",
+              heatmap = "heatmap", colourSlider = "colourSlider", abLine = "xLine", hLine = "xLine",
+              vLine = "yLine", html = "html", input = "input"),
+  charts = list(),
+  layout = NULL,
+
+  addLayout = function(session) {
+    if(!is.null(private$layout)) {
+      pars <- str_c(private$layout[-1], sep = ", ")
+      session$sendCommand(str_interp("rlc.add${private$layout[1]}(${pars});"))
+    }
+    invisible(self)
+  },
+
+  getChart = function(id) {
+    if(!is.character(id))
+      stop("Chart ID must be a character")
+    if(length(id) > 1) {
+      warning("Attempt to supply several chart IDs at once. Only the first one will be used.")
+      id <- id[1]
+    }
+    
+    private$charts[[id]]
+  },
+  
+  addChart = function(chartId, place) {
+    chart <- Chart$new(chartId, place, self)
+    private$charts[[chartId]] <- chart
+    
+    message(str_interp("Chart '${chartId}' added."))
+    
+    invisible(chart)
+  }
+))
+
+Layer <- R6Class("Layer", public = list(
+  type = NULL,
+  id = NULL,
+  pacerStep = 50,
+  init = c(),
+  
+  setProperty = function(name, expr = NULL) {
+    if(is.null(expr))
+      return(self$properties[[name]])
+    
+    self$properties[[name]] <- expr
+  },
+  initialize = function(type, id) {
+    self$type <- type
+    self$id <- id
+    self$on_click <- function(d) {}
+    self$dataFun <- function(l) {l}
+
+    invisible(self)
+  },
+
+  properties = list(),
+  dataFun = NULL,
+  on_click = NULL,
+  on_mouseover = NULL,
+  on_mouseout = NULL,
+  on_marked = NULL,
+  on_labelClickRow  = NULL,
+  on_labelClickCol = NULL
+))
+
+
+Chart <- R6Class("Chart", public = list(
+  id = NULL,
+  place = NULL,
+  addLayer = function(layerId, type){
+    if(layerId %in% names(private$layers))
+      stop(str_c("Layer with ID ", layerId, " already exists in chart ", self$id, ".", 
+                 " Use 'chart$removeLayer(layerId)' to remove it."))
+    
+    private$layers[[layerId]] <<- Layer$new(type, layerId)
+    invisible(private$layers[[layerId]])    
+  },
+  
+  getLayer = function(layerId = NULL) {
+    if(is.null(layerId))
+      if(length(private$layers) == 2) {
+        #1st layer is always 'main', which is a dummy
+        layerId <- private$layers[[2]]$id
+      } else {
+        stop(str_c("Chart ", self$id, " has multiple or no layers. You need to specify the 'layerID'."))
+      }
+    private$layers[[layerId]]
+  },
+  
+  getLayerIds = function() {
+    names(private$layers)
+  }, 
+  
+  nLayers = function() {
+    length(private$layers) - 1
+  },
+  
+  removeLayer = function(layerId) {
+    if(layerId == "main"){
+      warning(str_c("You are attempting to remove the main layer of the chart ", self$id, 
+                    ". The entire chart will be removed."))
+      private$app$removeChart(self$id)
+    } else {
+      if(!(layerId %in% names(private$layers))) {
+        stop(str_c("There is no layer with ID ", layerId))
+      } else {
+        sessionIds <- private$app$getSessionIds()
+        for(id in sessionIds)
+          private$app$getSession(id)$sendCommand(str_interp("rlc.removeLayer('${self$id}', '${layerId}')"))
+        private$layers[[layerId]] <- NULL
+      }
+    }
+  },
+  
+  update = function(sessionId, layerId = NULL, updateOnly = NULL) {
+    if("Session" %in% class(sessionId))
+      sessionId <- sessionId$id
+    
+    args <- str_c("'", self$id, "', '")
+      
+    if(!is.null(updateOnly)) {
+        args <- str_c(args, updateOnly, "', '")
+    } else {
+      args <- str_c(args, "', '")
+    }
+      
+    if(!is.null(layerId)) {
+      args <- str_c(args, layerId, "'")
+      private$sendProperties(sessionId, layerId)
+    } else {
+      private$sendProperties(sessionId)
+      args <- str_c(args, "'")
+    }
+    if(is.vector(sessionId)){
+      for(id in sessionId){
+        session <- private$app$getSession(id)
+        if(!is.null(session))
+          session$sendCommand(str_interp("rlc.updateCharts(${args});"))
+      }
+    } else {
+      sessionId$sendCommand(str_interp("rlc.updateCharts(${args});"))
+    }
+    invisible(self)
+  },
+  JSInitialize = function(session) {
+    session$sendCommand(str_interp("rlc.prepareContainer('${self$place}');"))
+    
+    lapply(private$layers, function(layer) {
+      if(!(session$id %in% layer$init)) {
         if(layer$id != "main")
-          message(str_interp("Layer '${layer$id}' is added to chart '${id}'."))
-        sendCommand(str_interp("rlc.addChart('${id}', '${layer$type}', '${place}', '${layer$id}');"))
-        layer$init <- T
+          message(str_interp("Layer '${layer$id}' is added to chart '${self$id}'."))
+        session$sendCommand(str_interp("rlc.addChart('${self$id}', '${layer$type}', '${self$place}', '${layer$id}');"))
+        layer$init <- c(session$id, layer$init)
       }
     })
-  })
-                                    
-Chart$accessors("place")
-lc$charts <- list()
+  },  
+    
+  initialize = function(id, place, app) {
+    self$id <- id
+    self$place <- place
+    private$app <- app
+    invisible(self)
+  }
+), private = list(
+  layers = list(),
+  app = NULL,
+  
+  sendProperties = function(sessionId, layerId = ls(private$layers)){
+    
+    for(layerName in layerId){
+      layer <- self$getLayer(layerName)
+      if(is.null(layer))
+        stop(str_c("There is no layer ", layerName, " in the chart ", self$id))
 
+      name <- str_c(self$id, layer$id, sep = "_")
+
+      for(id in sessionId){
+        session <- private$app$getSession(id)
+        if(!is.null(session)) {
+
+          env <- session$sessionVariables()
+
+          tryCatch({
+            d <- lapply(layer$properties, function(expr) eval(expr, env))
+            d <- layer$dataFun(d)
+          },
+          error = function(e) 
+            stop( str_interp( "in data expression for chart '${self$id}': ${e$message}." ), call.=FALSE ) ) 
+          
+          if(!is.null(d$ticksX) & !is.vector(d$ticksX))
+            d$ticksX <- t(d$ticksX)
+          if(!is.null(d$ticksY) & !is.vector(d$ticksY))
+            d$ticksY <- t(d$ticksY)
+          
+          if(!is.null(d$on_click)) {
+            layer$on_click <- d$on_click
+            d$on_click <- NULL
+          }
+          
+          if(!is.null(d$on_marked)) {
+            layer$on_marked <- d$on_marked
+            d$maekedUpdated <- NULL
+            session$sendCommand(str_interp("rlc.setCustomOnMarked('${self$id}', '${layerName}');"))
+          }
+          
+          if(!is.null(d$on_mouseover)) {
+            layer$on_mouseover <- d$on_mouseover
+            d$on_mouseover <- NULL
+            session$sendCommand(str_interp("rlc.setCustomMouseOver('${self$id}', '${layerName}', ${layer$pacerStep});"))
+          }
+          if(!is.null(d$on_mouseout)) {
+            layer$on_mouseout <- d$on_mouseout
+            d$on_mouseout <- NULL
+            session$sendCommand(str_interp("rlc.setCustomMouseOut('${self$id}', '${layerName}');"))
+          }    
+          if(!is.null(d$on_labelClickRow)) {
+            layer$on_labelClickRow <- d$on_labelClickRow
+            d$on_labelClickRow <- NULL
+            session$sendCommand(str_interp("rlc.setCustomClickLabel('${self$id}', 'Row');"))
+          }    
+          if(!is.null(d$on_labelClickCol)) {
+            layer$on_labelClickCol <- d$on_labelClickCol
+            d$on_labelClickCol <- NULL
+            session$sendCommand(str_interp("rlc.setCustomClickLabel('${self$id}', 'Col');"))
+          }    
+          
+          session$sendData(name, d)
+          session$sendCommand(str_interp("rlc.setProperty('${name}')"))
+          
+        }
+      }
+    }
+  }
+))                 
+                   
 #' Open a new empty page
 #' 
-#' \code{openPage} creates a server, establishes a web socket connection between it and the current
-#' R session and loads linked-charts JS library with all the dependencies. If there is already an 
-#' opened page, it will be automatically closed.
+#' \code{openPage} starts a server, establishes a web socket connection between it and the current
+#' R session and loads linked-charts JS library with all the dependencies. This function initializes
+#' an instance of class \code{\link{LCApp}} and stores it in the namespace of the package. If another
+#' instance has already been stored (i.e. another app has been started with this function), the existing
+#' app will be closed.
 #' 
-#' @param useViewer If \code{TRUE}, the page will be opened in the RStudio Viewer. If \code{FALSE}
+#' Argument \code{onStart} of \code{jrc} \code{\link[jrc]{openPage}} function is replaced in \code{rlc}
+#' with \code{beforeLoad} and \code{afterLoad}. The reason for that is when the page opens, \code{rlc}
+#' has to put there all the existing charts. Different situations may require some code be loaded before or after
+#' that happens. \code{beforeLoad} and \code{afterLoad} provide a way to define two callback functions, each 
+#' receiving a \code{\link[jrc]{Session}} object as an argument and is called once for each new page.
+#' \code{beforeLoad} runs before anything else has happened, while \code{afterLoad} is called after all the
+#' existing charts have been added to the page.
+#' 
+#' This function initializes a new instance of class \code{\link{LCApp}} and wraps around methods 
+#' \code{startServer} and \code{openPage} of its parent class \code{\link[jrc]{App}}.
+#' 
+#' @param useViewer If \code{TRUE}, a page will be opened in the RStudio Viewer. If \code{FALSE},
 #' a default web browser will be used.
-#' @param rootDirectory A path to the root directory of the server. If \code{rootDirectory} is not 
+#' @param rootDirectory A path to the root directory for the server. Any file, requested by the server
+#' will be searched for in this directory. If \code{rootDirectory} is not 
 #' defined, the \code{http_root} in the package directory will be used as a root directory.
-#' @param startPage A path to the HTML file that should be opened, when the server is initialized.
-#' This can be an absolute path to a local file, or it can be relative from the \code{rootDirectory}
-#' or to the current R working directory. If \code{startPage} is not defined, this function opens an 
-#' empty HTML page. The file must have \emph{.html} extension.
-#' @param layout Adds one of the defaults layouts to the page. Currently, only tables of arbitrary 
-#' size are supported. To add a table set this parameter to \code{tableNxM}, where \code{N} is the
+#' @param startPage A path to an HTML file that should be used as a starting page of the app.
+#' It can be an absolute path to a local file, or it can be relative to the \code{rootDirectory}
+#' or to the current R working directory. If \code{startPage} is not defined, an empty page will be used.
+#' The file must have \emph{.html} extension.
+#' @param layout Adds one of the defaults layouts to each new page. Currently, only tables of arbitrary 
+#' size are supported. To add a table, this parameter must be equal to \code{"tableNxM"}, where \code{N} is the
 #' number of rows and \code{M} is the number of columns. Each cell will get an ID that consists of 
 #' a letter (indicating the row) and a number (indicating the column) (e.g. \code{B3} is an ID of 
 #' the second row and third column).
-#' @param newPage Determines whether or not to open a new page. If \code{FALSE}, one can add 
-#' interactive charts to another apps, created the with \code{jrc} package.
-#' @param ... Further arguments passed to \code{\link[jrc]{openPage}}.
+#' @param port Defines which TCP port the server will listen to. If not defined, random available port
+#' will be used (see \code{\link[httpuv]{randomPort}}).
+#' @param browser A browser in which to open a new web page.
+#' If not defined, default browser will be used. For more information check \code{\link[utils]{browseURL}}.
+#' If this argument is specified, \code{useViewer} will be ignored.
+#' @param allowedFunctions List of functions that can be called from a web page without any additional actions 
+#' on the R side. All other functions will require authorization in the current R session before they are called. 
+#' This argument should be a vector of R function names. 
+#' @param allowedVariables List of variables that can be modified from a web page without any additional actions 
+#' on the R side. All other variable reassignments must be confirmed in the current R session. 
+#' This argument should be a vector of variable names.
+#' @param ... Further arguments passed to \code{\link[jrc]{openPage}}. Check details for more information.
+#' 
+#' @return A new instance of class \code{\link{LCApp}}.
 #' 
 #' @examples
 #' \donttest{openPage()
@@ -128,137 +1231,96 @@ lc$charts <- list()
 #' openPage(useViewer = FALSE, layout = "table2x3")}
 #' 
 #' @export
-#' @importFrom httpuv service
-openPage <- function(useViewer = TRUE, rootDirectory = NULL, startPage = NULL, layout = NULL, newPage = TRUE, ...) {
-  
-  lc$charts <- list()
-  lc$pageOpened <- F
-  lc$useViewer <- useViewer
-  if(newPage == TRUE){
-    jrc::openPage(useViewer = useViewer, rootDirectory = rootDirectory, startPage = startPage, 
-                  allowedFunctions = "chartEvent", allowedVariables = c("marked", "s1", "s2"), ...)
-    jrc::limitStorage(n = 0)
-    
-  }
-  
-  srcDir <- "http_root_rlc"
-
-  s1 <- 0
-  s2 <- 0
-  setEnvironment(environment())
-  sendCommand(str_c("link = document.createElement('link');", 
-                    "link.rel = 'stylesheet';", 
-                    "link.href = '", srcDir, "/linked-charts.css';", 
-                    "document.head.appendChild(link);", collapse = "\n")) 
-  sendCommand(str_c("script = document.createElement('script');", 
-                    "script.src = '", srcDir, "/rlc.js';",
-                    "script.onload = function() {jrc.sendData('s1', 1)};",
-                    "document.head.appendChild(script);", collapse = "\n"))
-    
-  sendCommand(str_c("script = document.createElement('script');", 
-                    "script.src = '", srcDir, "/linked-charts.min.js';",
-                    "script.onload = function() {jrc.sendData('s2', 1)};",                    
-                    "document.head.appendChild(script);", collapse = "\n"))
-  for( i in 1:(10/0.05) ) {
-    service()
-    if( s1 == 1 & s2 == 1) {
-      setEnvironment(globalenv())
-      break
-    } 
-    Sys.sleep( .05 )
-  }
-  
-  if( s1 == 0 | s2 == 0 ) {
+openPage <- function(useViewer = TRUE, rootDirectory = NULL, startPage = NULL, layout = NULL, port = NULL, 
+                     browser = NULL, allowedFunctions = NULL, allowedVariables = NULL, ...) {
+  if(!is.null(pkg.env$app)) 
     closePage()
-    stop( "Can't load linked-charts.js or rlc.js" )
-  }
   
-  sendCommand("d3.select('title').text('R/linked-charts');")
+  allowedFunctions <- c("chartEvent", allowedFunctions)
+  allowedVariables <- c("marked", "s1", "s2", allowedVariables)
   
-  if(!is.null(layout)) addDefaultLayout(layout)
+  app <- LCApp$new(rootDirectory = rootDirectory, startPage = startPage, layout = layout, 
+                   allowedFunctions = allowedFunctions, allowedVariables = allowedVariables, ...)
+  app$startServer(port)
+  app$openPage(useViewer, browser)
+  app$setEnvironment(parent.frame())
   
-  lc$pageOpened <- T
+  pkg.env$app <- app
+  
+  invisible(app)
 }
 
-#' Add a default layout to the opened web page
-#' 
-#' \code{addDefaultLayout} adds a layout that can be later used to arrange charts on the page (by
-#' default each new chart is added to the bottom of the page).
-#' 
-#' Currently the only supported type
-#' of a default layout is table with arbitrary number of rows and columns.
-#' To use it set the layout argument to \code{tableMxN}, where \code{N} is the
-#' number of rows and \code{M} is the number of columns. Each cell will get an ID that consists of 
-#' a letter (indicating the row) and a number (indicating the column) (e.g. \code{B3} is an ID of 
-#' the second row and third column).
-#' 
-#' @param layoutName Type of the layout. See 'Details' for more information.
-#' 
-#' @examples
-#' \donttest{openPage(useViewer = FALSE)
-#' addDefaultLayout("table3x2")}
-#' 
-#' @export
-addDefaultLayout <- function(layoutName) {
-  if(grepl("^table", layoutName)){
-    size <- as.numeric(str_extract_all(layoutName, "\\d", simplify = TRUE))
-    if(length(size) != 2) stop("Size of the table is specified incorrectly")
-    sendCommand(str_interp("rlc.addTable(${size[1]}, ${size[2]});"))
-      
-    invisible(return())
-  }
-  stop("Unknown default layout name")
-}
+getAppAndSession <- function(sessionId = NULL, app = NULL, all = TRUE) {
 
-#Makes sure that a container exists. Otherwise just creates a 'div' with the provided id
-prepareContainer <- function(place) {
-    sendCommand(str_interp("rlc.prepareContainer('${place}');"))
-}
+  if(is.null(app))
+    tryCatch(app <- get(".app", parent.env(parent.frame(n = 2)), inherits = FALSE), 
+           error = function(e) {
+             if(is.null(pkg.env$app))
+               stop("There is no opened page. Please, use 'openPage()' function to create one.") 
+             app <<- pkg.env$app
+           })
+  
+  if(is.null(sessionId))
+    tryCatch(sessionId <- get(".id", parent.env(parent.frame(n = 2)), inherits = FALSE), 
+      error = function(e) {
+        if(!all & length(app$getSessionIds()) != 1)
+          stop("There are several active sessions. Please, specify the session ID")
+        sessionId <<- app$getSessionIds()
+      })
 
-getChart <- function(id) {
-  lc$charts[[id]]
+  list(app = app, sessionId = sessionId)
 }
 
 #' Remove chart from the page
 #' 
-#' Removes an existing chart.
+#' Removes an existing chart. Changes will be applied to all currently opened and future pages.
+#' This function is a wrapper around method \code{removeChart} of
+#' class \code{\link{LCApp}}. 
 #' 
-#' @param id A vector of IDs of the charts to be removed.
+#' @param chartId A vector of IDs of the charts to be removed.
 #' 
 #' @examples 
 #' \donttest{lc_scatter(dat(x = 1:10, y = 1:10 * 2), id = "scatter")
 #' removeChart("scatter")}
 #' 
 #' @export
-removeChart <- function(id) {
-  if(!is.vector(id))
-    stop("Error in 'removeChart': 'id' should be a vector of IDs")
-  for(i in id){
-    lc$charts[[i]] <- NULL
-    sendCommand(str_interp("rlc.removeChart('${i}');"))  
-  }
+removeChart <- function(chartId) {
+  workWith <- getAppAndSession()
+  
+  workWith$app$removeChart(chartId)
 }
 
-addChart <- function(id, place) {
+#' Remove a layer from a chart
+#' 
+#' Removes a layer from an existing chart. Changes will be applied to all currently opened and future pages.
+#' This function is a wrapper around method \code{removeLayer} of
+#' class \code{\link{LCApp}}.
+#' 
+#' @param chartId ID of the chart from which to remove a layer.
+#' @param layerId ID of the layer to remove.
+#' 
+#' @examples 
+#' \donttest{lc_scatter(dat(x = 1:10, y = 1:10 * 2), id = "scatter")
+#' lc_abLine(a = 2, b = 0, id = "scatter", addLayer = TRUE)
+#' removeLayer("scatter", "Layer1")}
+#' 
+#' @export
+removeLayer <- function(chartId, layerId) {
+  workWith <- getAppAndSession()
   
-  chart <- Chart$new(layers = list(), id = id)
-  chart$setPlace(place)
-  lc$charts[[id]] <- chart
-  
-  message(str_interp("Chart '${id}' added."))
-  
-  invisible(chart)
+  workWith$app$removeLayer(chartId, layerId)
 }
 
 #' Set properties of the chart
 #' 
-#' Changes already defined properties or sets the new ones for an
-#' existing chart.
+#' Sets or resets properties for an
+#' existing chart. Changes will be applied to all currently opened and future pages.
+#' This function is a wrapper around method \code{setProperties} of class \code{\link{LCApp}}.
 #' 
-#' @param data Set of properties to be redefined for this layer or chart. Created by \code{\link{dat}}
+#' @param data List of properties to be redefined for this layer or chart. Created by the \code{\link{dat}}
 #' function.
-#' @param id ID of the chart, whose properties you want to redefine.
-#' @param layerId ID of the layer, whose properties you want to redefine. If the chart has a single
+#' @param chartId ID of the chart, for which to redefine properties.
+#' @param layerId ID of the layer, for which to redefine properties. If the chart has a single
 #' layer or doesn't have layers, default value (which is NULL) can be used.
 #' 
 #' @examples
@@ -273,69 +1335,43 @@ addChart <- function(id, place) {
 #' 
 #' @export
 #' @importFrom plyr rename
-setProperties <- function(data, id, layerId = NULL) {
-  chart <- getChart(id)
-  if(is.null(chart))
-    stop(str_c("Chart with ID ", id, " is not defined."))
-  
-  if(is.null(layerId))
-    if(chart$getLayer("main")$type != "axesChart") {
-      layerId <- "main"
-    } else {
-      if(chart$nLayers() == 1) {
-        layerId <- names(chart$layers)[2]
-      } else {
-        stop("The chart ", chart$id, " has more then one layer. Please, specify the 'layerId'.")
-      }
-    }
-    
-  layer <- chart$getLayer(layerId)
-  mainLayer <- chart$getLayer("main")
-  
-  data <- plyr::rename(data, lc$nameList, warn_missing = FALSE)
-    
-  if(is.null(layer))
-    stop(str_c("Layer with ID ", id, " is not defined."))
-  
-  for(prop in names(data))
-    if(prop %in% lc$props[[layer$type]] | prop %in% lc$props$layer) {
-      layer$setProperty(prop, data[[prop]])
-    } else {
-      if(prop %in% lc$props$all) {
-        mainLayer$setProperty(prop, data[[prop]])
-      } else {
-        warning(str_c("In chart '", chart$id, "': Property '", prop, "' doesn't exist."))
-      }
-    }
-  
-  invisible(chart)
+setProperties <- function(data, chartId, layerId = NULL) {
+  workWith <- getAppAndSession()
+  print(workWith$sessionId)
+  workWith$app$setProperties(data, chartId, layerId)
 }
 
 #' Update a chart
 #' 
-#' \code{updateCharts} redraws a chart or a single layer of the chart to make it up
-#' to date with the current state of the environment.
+#' \code{updateCharts} redraws a chart or a single layer of a chart to make it up
+#' to date with the current state of the environment variables.
 #' 
-#' Linked charts of the \emph{rlc} package are based on the idea that the variables
+#' Linked charts of the \emph{rlc} package are based on the idea that the variables that are
 #' used to define a chart are not constant, but can change as a result of user's
-#' actions. Each time the \code{updateCharts} function is called, all the properties passed
-#' via \code{\link{dat}} function are reevaluated and the chart is changed in accordance with the
+#' actions. Each time the \code{updateCharts} function is called, all the properties that were set inside
+#' the \code{\link{dat}} function are reevaluated and the chart is redrawn in accordance with the
 #' new state.
 #' 
+#' If this function is called from the R session, changes will be applied
+#' to all currently opened pages. If it is used as a part of any \code{rlc} callback, only the page
+#' that triggered the call will be affected.
+#' 
+#' This function is a wrapper around method \code{updateCharts} of class \code{\link{LCApp}}.
+#' 
 #' @section Update types: 
-#' To improve performance you can update only a certain part of the chart (e.g. colours,
+#' To improve performance you can update only a certain part of a chart (e.g. colours,
 #' size, etc.). This can be done by setting the \code{updateOnly} argument. Here are all
 #' possible values for this argument.
 #' 
 #' These are valid for all the charts:
 #' \itemize{
-#'   \item \code{Size} changes the size of the chart (and consequently the location
+#'   \item \code{Size} changes the size of the chart (and consequently position
 #'   of all its elements).
 #'   \item \code{Title} changes the title of the chart.
 #'   \item \code{Canvas} If number of elements is too high the 
 #'   charts switch to the canvas mode and instead of multiple SVG point or cells
 #'   a single Canvas image is generated. This type of update redraws the Canvas
-#'   image. \emph{It is not recommended to use this function.}
+#'   image. \emph{It is not recommended to use this option, since it will be used automatically when necessary.}
 #' }
 #' 
 #' These can be updated only in heatmaps (\code{\link{lc_heatmap}}):
@@ -358,8 +1394,8 @@ setProperties <- function(data, id, layerId = NULL) {
 #' 
 #' These aspects are present in all the charts with axes.
 #' \itemize{
-#'   \item \code{Axes} updates axes of the chart and changes positions 
-#'   of all the elements accordingly.
+#'   \item \code{Axes} updates axes of a chart and changes position 
+#'   of its elements (points, lines, etc.) accordingly.
 #'   \item \code{Elements} updates (add or removes) all the elements of the layer.
 #'   \item \code{ElementPosition} updates positions of all the elements in the layer.
 #'   \item \code{ElementStyle} updates the style (colour, opacity, etc.) of all the elements 
@@ -367,15 +1403,15 @@ setProperties <- function(data, id, layerId = NULL) {
 #' }
 #' 
 #' 
-#' @param id An ID of the chart to be updated (or vector of IDs). If NULL then all the
+#' @param chartId ID of the chart to be updated (or vector of IDs). If \code{NULL}, all the
 #' existing charts will be updated.
 #' 
-#' @param layerId An ID of the layer to be updated (or vector of IDs). If NULL of the
-#' layers of the selected charts will be updated. To update only the selected layers of
-#' multiple charts the lengths of \code{id} and \code{layerId} must be the same.
+#' @param layerId ID of the layer to be updated (or vector of IDs). If \code{NULL}, all the
+#' layers of the selected charts will be updated. To update only some layers of
+#' multiple charts the lengths of \code{chartId} and \code{layerId} must be the same.
 #' 
 #' @param updateOnly To improve performance it may be useful to change only certain 
-#' aspects of the chart (e.g. location of the points, colour of the heatmap cells,
+#' aspects of a chart (e.g. positions of points, colour of heatmap cells,
 #' etc.). This argument can specify which part of chart to update. Possible options are
 #' \code{Elements}, \code{ElementPosition}, \code{ElementStyle}, \code{Axes}, \code{Labels},
 #' \code{Cells}, \code{Texts}, \code{LabelPosition}, \code{CellPosition}, 
@@ -408,175 +1444,38 @@ setProperties <- function(data, id, layerId = NULL) {
 #' updateCharts("iris", updateOnly = "ElementStyle")}
 #' 
 #' @export
-updateCharts <- function(id = NULL, layerId = NULL, updateOnly = NULL) {
-  if(length(lc$charts) == 0) {
-    warning("There are no charts yet.")
-    return ();
-  }
+updateCharts <- function(chartId = NULL, layerId = NULL, updateOnly = NULL) {
+  workWith <- getAppAndSession()
   
-  if(is.null(id)) id <- ls(lc$charts)
-  if(!is.vector(id))
-    stop("'id' should be a vector of IDs")
-
-  
-  if(!is.null(layerId) & length(layerId) != length(id))
-    stop("Lengths of 'id' and 'layerId' differ")
-  if(!is.null(updateOnly) & length(updateOnly) != length(id))
-    stop("Lengths of 'id' and 'updateOnly' differ")
-  
-  for(i in 1:length(id)){
-    chart <- getChart(id[i])
-    if(is.null(chart))
-      stop(str_c("Chart with ID ", id[i], " is not defined."))
-    args <- str_c("'", id[i], "', '")
-    
-    if(!is.null(updateOnly)) {
-      args <- str_c(args, updateOnly[i], "', '")
-    } else {
-      args <- str_c(args, "', '")
-    }
-    
-    if(!is.null(layerId)) {
-      args <- str_c(args, layerId[i], "'")
-      sendProperties(chart, layerId[i])
-    } else {
-      sendProperties(chart)
-      args <- str_c(args, "'")
-    }
-    sendCommand(str_interp("rlc.updateCharts(${args});"))
-  }
-}
-
-sendProperties <- function(chart, layerId = ls(chart$layers)){
-  for(layerName in layerId){
-    layer <- chart$getLayer(layerName)
-    if(is.null(layer))
-      stop(str_c("There is no layer ", layerName, " in the chart ", chart$id))
-    
-    e <- new.env()
-    tryCatch({
-      d <- lapply(layer$properties, function(el) el())
-      d <- layer$dataFun(d)
-    },
-    error = function(e) 
-      stop( str_interp( "in data expression for chart '${chart$id}': ${e$message}." ), call.=FALSE ) ) 
-    
-    if(!is.null(d$ticksX) & !is.vector(d$ticksX))
-      d$ticksX <- t(d$ticksX)
-    if(!is.null(d$ticksY) & !is.vector(d$ticksY))
-      d$ticksY <- t(d$ticksY)
-    
-    if(!is.null(d$on_click)) {
-      layer$on_click <- d$on_click
-      d$on_click <- NULL
-    }
-    
-    if(!is.null(d$on_marked)) {
-      layer$on_marked <- d$on_marked
-      d$maekedUpdated <- NULL
-      sendCommand(str_interp("rlc.setCustomOnMarked('${chart$id}', '${layerName}');"))
-    }
-    
-    if(!is.null(d$on_mouseover)) {
-      layer$on_mouseover <- d$on_mouseover
-      d$on_mouseover <- NULL
-      sendCommand(str_interp("rlc.setCustomMouseOver('${chart$id}', '${layerName}', ${layer$pacerStep});"))
-    }
-    if(!is.null(d$on_mouseout)) {
-      layer$on_mouseout <- d$on_mouseout
-      d$on_mouseout <- NULL
-      sendCommand(str_interp("rlc.setCustomMouseOut('${chart$id}', '${layerName}');"))
-    }    
-    if(!is.null(d$on_labelClickRow)) {
-      layer$on_labelClickRow <- d$on_labelClickRow
-      d$on_labelClickRow <- NULL
-      sendCommand(str_interp("rlc.setCustomClickLabel('${chart$id}', 'Row');"))
-    }    
-    if(!is.null(d$on_labelClickCol)) {
-      layer$on_labelClickCol <- d$on_labelClickCol
-      d$on_labelClickCol <- NULL
-      sendCommand(str_interp("rlc.setCustomClickLabel('${chart$id}', 'Col');"))
-    }    
-    
-    name <- str_c(chart$id, layer$id, sep = "_")
-    
-    sendData(name, d)
-    sendCommand(str_interp("rlc.setProperty('${name}')"))
-  }
-}
-
-setChart <- function(.type, data, ..., place, id, layerId, dataFun, addLayer, pacerStep = 50) {
-  if(!lc$pageOpened) openPage()
-  
-  if(is.null(place))
-    place <- str_c("Chart", length(lc$charts) + 1)
-  prepareContainer(place)
-  
-  if(is.null(id))
-    id <- place
-  
-  chart <- getChart(id)
-  if(!is.null(chart) && !is.null(layerId) && layerId == "main") {
-    removeChart(chart$id)
-    chart <- getChart(id)
-  }
-  
-  if(is.null(chart)) {
-    chart <- addChart(id, place)
-    if(is.null(layerId) || layerId != "main")
-      chart$addLayer("main", "axesChart")
-  }
-
-  if(is.null(layerId)){
-    if(!addLayer & chart$nLayers() > 1) {
-      warning(str_c("Chart '", id, "' has ", chart$nLayers(), " layers and the layer ID is not specified. ", 
-                    "'addLayer' will be set to TRUE."))
-      addLayer <- T
-    }
-    
-    if(addLayer | chart$nLayers() == 0) {
-      layerId <- str_c("Layer", (chart$nLayers() + 1))
-    } else {
-      layerId <- names(chart$layers)[2]
-    }
-  }
-  
-  if(!is.null(chart$getLayer(layerId)))
-    chart$removeLayer(layerId)
-  
-  layer <- chart$addLayer(layerId, .type)
-  layer$dataFun <- dataFun
-  
-  layer$pacerStep <- pacerStep
-  
-  chart$JSinitialize()
-  
-  l <- list(...)
-  nonEv <- lapply(names(l), function(n) {function() l[[n]]})
-  names(nonEv) <- names(l)
-  setProperties(c(data, nonEv), id, layerId)
-  updateCharts(id)
-  
-  invisible(chart)
+  workWith$app$updateCharts(chartId, layerId, updateOnly, workWith$sessionId)
 }
 
 #' Trigger an event
 #' 
-#' This function is called whenever user clicks, selects or hover over elements of a chart. In turn,
-#' it calls a corresponding callback function, if any was specified by the user. This function
-#' is meant to be used internally. However, an experienced user can still use it to customize app
-#' behavior in some complicated cases. This function can also emulate events triggered by non-existing
-#' elements.
+#' This function is called whenever any interactive element of a chart is activated by clicking, marking,
+#' hovering, etc. In turn,
+#' it calls a corresponding callback function, if any has been specified. This function
+#' is meant to be used internally. However, an experienced user can still use it to simulate mouse events, 
+#' even those triggered by non-existing elements. This function is a wrapper around method 
+#' \code{chartEvent} of class \code{\link{LCApp}}.
 #' 
-#' @param d ID of an element that triggered the event. May be index of a point or line, vector or
-#' row and column indices for a heatmap, value of an input block (please, check \code{\link{lc_input}}
-#' for more details about values). Should be \code{NULL} for \code{mouseout} or \code{marked} events.
+#' @param d Value that is used to identify interactive element or its state. A single numeric index for 
+#' a point or a line, vector or
+#' row and column indices of a cell for a heatmap, value for an input block (please, check \code{\link{lc_input}}
+#' for more details about input blocks and their values). Should be \code{NULL} for \code{mouseout} or \code{marked} events.
 #' N.B. This function is called from the web page and therefore all element indices start from zero as it is
-#' used in JavaScript.
-#' @param id ID of the chart.
-#' @param layerId ID of the layer. You can get IDs of all charts and their layers with \code{\link{listCharts}}.
-#' @param event Type of event. Must be one of \code{"click", "mouseover", "mouseout", "marked", "labelClickRow", "labelClickCol"}.
-#' 
+#' happens in JavaScript.
+#' @param chartId ID of the chart.
+#' @param layerId ID of the layer. You can print IDs of all charts and their layers with \code{\link{listCharts}}.
+#' @param event Type of event. Must be one of \code{"click"}, \code{"mouseover"}, \code{"mouseout"}, \code{"marked"}, 
+#' \code{"labelClickRow"}, \code{"labelClickCol"}.
+#' @param sessionId ID of the session (opened client page) that triggered the event. The default value uses a local session
+#' variable. This must be a single session ID. You can get a list of IDs of all currently active with the
+#' method \code{getSessionIds} inherited from class \code{\link{App}} by \code{\link{LCApp}}. Possible errors in evaluation of 
+#' this argument are ignored.
+#' @param app Object of class \code{\link{LCApp}} for which the event was triggered. Note that this argument is here for
+#' internal use and its default value is a variable, stored in each session locally. If you are not using wrapper functions, 
+#' it is preferred to call method \code{chartEvent} of an object of class \code{\link{LCApp}}.
 #' @examples 
 #' \donttest{x <- rnorm(50)
 #' lc_scatter(x = x, y = 2*x + rnorm(50, 0.1), on_click = function(d) print(d))
@@ -584,45 +1483,23 @@ setChart <- function(.type, data, ..., place, id, layerId, dataFun, addLayer, pa
 #' 
 #' @export
 #' @importFrom utils type.convert
-chartEvent <- function(d, id, layerId = "main", event) {
-  
+chartEvent <- function(d, chartId, layerId = "main", event, sessionId = .id, app = .app) {
+  workWith <- list()
+  tryCatch(workWith$app <- app, error = function(e) {})
+  tryCatch(workWith$sessionId <- sessionId, error = function(e) {})
+  workWith <- getAppAndSession(app = workWith$app, sessionId = workWith$sessionId, all = FALSE)
+
   if(length(d) == 1)
     if(d == "NULL")
       d <- NULL
   
-  #lame. This also must go to jrc with the nearest update
-  d <- type.convert(d, as.is = TRUE)
-  if(is.numeric(d)) d <- d + 1
-  # should we move that to jrc? And add some parameter, like 'flatten'?
-  if(is.list(d))
-    if(all(sapply(d, function(el) length(el) == 1)))
-      d <- unlist(d)
-  
-  chart <- getChart(id)
-  if(is.null(chart))
-    stop(str_interp("Chart with ID ${id} is not defined"))
-  
-  layer <- chart$getLayer(layerId)
-  if(is.null(layer))
-    stop(str_interp("Chart ${id} doesn't have layer ${layerId}"))
-
-  if(event == "click")
-    layer$on_click(d)
-  if(event == "mouseover")
-    layer$on_mouseover(d)
-  if(event == "mouseout")
-    layer$on_mouseout()
-  if(event == "marked")
-    layer$on_marked()
-  if(event == "labelClickRow")
-    layer$on_labelClickRow(d)
-  if(event == "labelClickCol")
-    layer$on_labelClickCol(d)
+  workWith$app$chartEvent(d, chartId, layerId, event, workWith$sessionId)
 }
 
 #' List all existing charts and layers
 #' 
 #' \code{listCharts} prints a list of IDs of all existing charts and layers.
+#' This function is wrapper around method \code{listCharts} of class \code{\link{LCApp}}.
 #' 
 #' @examples 
 #' \donttest{noise <- rnorm(30)
@@ -638,33 +1515,28 @@ chartEvent <- function(d, id, layerId = "main", event) {
 #' listCharts()}
 #' @export
 listCharts <- function() {
-  for(chartId in names(lc$charts)) {
-    print(str_interp("Chart: ${chartId}"))
-    chart <- getChart(chartId)
-    if(chart$nLayers() > 1) {
-      print("- Layers:")
-      for(layerId in names(chart$layers)){
-        layer <- chart$getLayer(layerId)
-        if(layer$id != "main")
-          print(str_interp("-- ${layer$id} - ${layer$type}"))
-      }
-    }
-  }
+  workWith <- getAppAndSession()
+  
+  workWith$app$listCharts()
 }
 
 #' Get currently marked elements
 #' 
 #' \code{getMarked} returns indices of the chart's elements that are currently
-#' marked. To mark elements select them with you mouse while pressing the \emph{Shift} key.
-#' Double click on the chart while pressing the \emph{Shift} key will unmark all the 
-#' elements.
+#' marked. To mark elements select them with your mouse while holding the \emph{Shift} key.
+#' Double click on the chart with the \emph{Shift} key pressed will deselect all the 
+#' elements. This function is a wrapper of method \code{getMarked} of class \code{\link{LCApp}}.
 #' 
-#' @param chartId An ID of the chart.
-#' @param layerId An ID of the layer. This argument is required, if the chart has more
+#' @param chartId An ID of the chart. This argument is optional, if there is only one chart.
+#' @param layerId An ID of the layer. This argument is optional, if there is only one chart.
 #' than one layer.
+#' @param sessionId An ID of the session from which to get the marked elements. Can be \code{NULL}
+#' if there is only one active session. Otherwise must be a valid session ID. Check \code{\link[jrc]{Session}}
+#' for more information on client sessions. If a call to this function was triggered from an opened web page, ID of 
+#' the corresponding session will be used automatically.
 #' 
 #' @return a vector of indices or, in case of heatmaps, an \emph{n x 2} matrix were first and
-#' second columns contain, respectively, row and column indices of the marked cells.
+#' second columns contain row and column indices of the marked cells, respectively.
 #' 
 #' @examples
 #' \donttest{data(iris)
@@ -676,64 +1548,30 @@ listCharts <- function() {
 #' getMarked("Chart1")}
 #' 
 #' @export
-getMarked <- function(chartId = NULL, layerId = NULL) {
-  if(is.null(chartId))
-    if(length(lc$charts)) {
-      chartId <- lc$charts[[1]]$id
-    } else {
-      stop(str_c("There are more than one chart on the page. 'chartId' must be ",
-                 "specified. Use 'listCharts()' to get IDs of all existing charts."))
-    }
+getMarked <- function(chartId = NULL, layerId = NULL, sessionId = NULL) {
+  workWith <- getAppAndSession(sessionId = sessionId, all = FALSE)
   
-  chart <- getChart(chartId)
-  if(is.null(chart))
-    stop(str_c("Chart ", chartId, " is not defined."))
-  
-  if(is.null(layerId)) {
-    if(chart$nLayers() == 0)
-      layerId <- "main"
-    if(chart$nLayers() == 1)
-      layerId <- names(chart$layers)[2]
-    if(chart$nLayers() > 1)
-      stop(str_c("There is more than one layer in this chart. 'layerId' must be specified. ",
-                 "Use 'listCharts()' to get IDs of all existing charts and their layers."))
-  }
-  marked <- NULL
-  setEnvironment(environment()) 
-  sendCommand(str_interp("rlc.getMarked('${chartId}', '${layerId}')"))
-  for( i in 1:(5/0.05) ) {
-    service()
-    if(!is.null(marked)) {
-      setEnvironment(globalenv())
-      break
-    } 
-    Sys.sleep( .05 )
-  }
-  
-  if( is.null(marked) ) {
-    warning( "Can't load marked elements" )
-  }
-  
-  if(is.numeric(marked)) marked <- marked + 1
-  if(length(marked) == 0)
-    return (c())
-  
-  marked
+  workWith$getMarked(chartId, layerId, workWith$sessionId)
 }
 
 #' Mark elements of a chart
 #' 
 #' \code{mark} selects a set of elements in a given chart. It is equivalent to
 #' selecting elements interactively by drawing a rectangle with the mouse 
-#' while holding the \code{Shift} key.
+#' while holding the \code{Shift} key. This function is a wrapper of method \code{mark} of
+#' class \code{\link{LCApp}}.
 #' 
 #' @param elements numeric vector of indices of the elements to select.
 #' @param chartId ID of the chart where to select elements (can be omitted if 
 #' there is only one chart).
 #' @param layerId ID of the layer where to select elements (can be omitted if
 #' the chart has only one layer).
-#' @param preventEvent if \code{TRUE}, \code{on_marked} function will not be
-#' called.
+#' @param preventEvent if \code{TRUE}, \code{on_marked} callback function will not be
+#' called. Can be used to prevent endless stacks of calls.
+#' @param sessionId An ID of the session for which to mark elements. Can be \code{NULL}
+#' if there is only one active session. Otherwise must be a valid session ID. Check \code{\link[jrc]{Session}}
+#' for more information on client sessions. If a call to this function was triggered from an opened web page, ID of 
+#' the corresponding session will be used automatically.
 #'
 #' @examples 
 #' \donttest{data("iris")
@@ -761,56 +1599,44 @@ getMarked <- function(chartId = NULL, layerId = NULL) {
 #' ), "A2")}
 #'
 #' @export
-mark <- function(elements, chartId = NULL, layerId = NULL, preventEvent = TRUE) {
-  if(is.null(chartId))
-    if(length(lc$charts)) {
-      chartId <- lc$charts[[1]]$id
-    } else {
-      stop(str_c("There is more than one chart on the page. 'chartId' must be ",
-                 "specified. Use 'listCharts()' to get IDs of all existing charts."))
-    }
+mark <- function(elements, chartId = NULL, layerId = NULL, preventEvent = TRUE, sessionId = NULL) {
+  workWith <- getAppAndSession(sessionId)
   
-  chart <- getChart(chartId)
-  if(is.null(chart))
-    stop(str_c("Chart ", chartId, " is not defined."))
-  
-  if(is.null(layerId)) {
-    if(chart$nLayers() == 0)
-      layerId <- "main"
-    if(chart$nLayers() == 1)
-      layerId <- names(chart$layers)[2]
-    if(chart$nLayers() > 1)
-      stop(str_c("There is more than one layer in this chart. 'layerId' must be specified. ",
-                 "Use 'listCharts()' to get IDs of all existing charts and their layers."))
-  }
-  
-  if(length(elements) != 0 & !is.vector(elements))
-    stop("'elements' must be a vector of indices.")
-  if(preventEvent) {
-    preventEvent = "true"
-  } else {
-    preventEvent = "false"
-  }
-  
-  if(length(elements) == 0) {
-    elements <- "__clear__"
-  } else {
-    elements <- elements - 1
-  }
-  
-  sendData("markElements", elements)
-  sendCommand(str_c("rlc.mark('", chartId, "', '", layerId, "', ", preventEvent, ");"))
+  workWith$app$mark(elements, chartId, layerId, preventEvent, workWith$sessionId)
 }
 
+#' Get the currently running app
+#' 
+#' \code{rlc} offers two ways to control an interactive app. One is by using methods of class
+#' \code{\link{LCApp}}. This allows one to have any number of apps within one
+#' R session, but requires some understanding of object oriented programming. Another way is to use
+#' provided wrapper functions that are exported by the package. These functions internally work with 
+#' the \code{\link{LCApp}} object, which is stored in the package namespace upon initialization with 
+#' \code{\link{openPage}} function. \code{getPage} returns this object if any.
+#' 
+#' Note that \code{rlc} package is based on \code{jrc} library. Both packages are organized in similar manner.
+#' Both have a central class that represents the entire app and can be fully managed with their methods (\code{\link{LCApp}}
+#' and \code{\link[jrc]{App}}, respectively). And both also provide a set of wrapper functions, that can be used instead of
+#' the methods. However, wrapper functions of the \code{jrc} package can't be use for \code{rlc} apps, while all the
+#' methods of class \code{\link[jrc]{App}} are inherited by \code{\link{LCApp}}. Therefore, if you want to get more low level
+#' control over your app, such as managing client sessions, local variables and memory usage, you should methods of 
+#' \code{\link[jrc]{App}} class. 
+#' 
+#' @return Object of class \code{\link{LCApp}} or \code{NULL} if there is no active app.
+#' 
+#' @export
+getPage <- function(){
+  pkg.env$app
+}
 
 #' Link data to the chart
 #' 
 #' \code{dat} allows to link variables from the current environment to chart's properties.
-#' On every \code{\link{updateCharts}} call all the data, provided via the \code{dat} function,
+#' On every \code{\link{updateCharts}} call all the data provided via the \code{dat} function
 #' will be automatically reevaluated and the chart will be changed accordingly. One can also
-#' put properties outside of the \code{dat} function, if they are going to be constant.
+#' put properties outside of the \code{dat} function to prevent their reevaluation.
 #' 
-#' @param ... List of name values pair to define the properties. 
+#' @param ... List of name-value pairs to define the properties. 
 #' 
 #' @examples 
 #' \donttest{lc_scatter(dat(x = rnorm(30)), y = rnorm(30))
@@ -819,16 +1645,13 @@ mark <- function(elements, chartId = NULL, layerId = NULL, preventEvent = TRUE) 
 #' 
 #' @export
 dat <- function( ... ) {
-  e <- parent.frame()
-  l <- match.call()[-1]
-  lapply(l, function(el) {
-    function() eval(el, e)
-  })
+  as.list(match.call()[-1])
 }
 
-#' Close page
+#' Stop server
 #' 
-#' Close an opened web page and clear the list of charts.
+#' Stops the server and closes all currently opened pages (if any). This function is a 
+#' wrapper of \code{stopServer} method inherited by the \code{\link{LCApp}} class from the \code{\link[jrc]{App}} class.
 #' 
 #' @examples 
 #' \donttest{openPage(useViewer = FALSE)
@@ -836,54 +1659,12 @@ dat <- function( ... ) {
 #' 
 #' @export
 closePage <- function() {
-  lc$charts <- list()
-  lc$pageOpened <- F
-  jrc::closePage()
-}
-
-#' @importFrom stats runif
-scatterDataFun <- function(l) {
-  if(is.null(l$x) && is.null(l$y))
-    stop("Required properties 'x' and 'y' are not defined.")
-  
-  if(is.factor(l$x))
-    l$layerDomainX <- levels(l$x)
-  if(is.factor(l$y))
-    l$layerDomainY <- levels(l$y)
-    
-  if(is.null(l$x))
-    l$x <- 1:length(l$y)
-  if(is.null(l$y))
-    l$y <- 1:length(l$x)
-  
-  if(is.null(l$label)){
-    if(!is.null(names(l$y)))
-      l$label <- names(l$y)
-    if(!is.null(names(l$x)))
-      l$label <- names(l$x)
+  if(!is.null(pkg.env$app)) {
+    pkg.env$app$stopServer()
+    pkg.env$app <- NULL
+  } else {
+    message("There is no opened page.")
   }
-  
-  if(!is.null(l$jitterX)) {
-    if(!is.numeric(l$jitterX))
-      stop("'jitterX' must be a number")
-    l$jitterX = abs(l$jitterX)
-    
-    l$shiftX <- runif(length(l$x), -l$jitterX, l$jitterX)
-    l$jitterX <- NULL
-  }
-  if(!is.null(l$jitterY)) {
-    if(!is.numeric(l$jitterY))
-      stop("'jitterX' must be a number")
-    l$jitterY = abs(l$jitterY)
-    
-    l$shiftY <- runif(length(l$y), -l$jitterY, l$jitterY)
-    l$jitterY <- NULL
-  }
-  
-  if(lc$useViewer)
-    l$mode <- "svg"
-
-  l
 }
 
 #' Visualize a set of points
@@ -896,18 +1677,20 @@ scatterDataFun <- function(l) {
 #' 
 #' @param data Name value pairs of properties, passed through the \code{\link{dat}} function. These
 #' properties will be reevaluated on each \code{\link{updateCharts}} call. 
-#' @param place An ID of a container, where to place the chart. Will be ignored if the chart already
-#' exists. If not defined, the chart will be placed directly in the body of the opened page.
-#' @param ... Name value pairs of properties that can be evaluated only once and then will remain 
-#' constant. These properties can still be changed later using the \code{\link{setProperties}} function
-#' @param id An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
-#' exists, a new layer will be added to it. If you want to replace one chart with another, use \code{\link{removeChart}}
-#' first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} is the number of currently existing charts.
+#' @param place ID of a container, where to place new chart. Will be ignored if the chart already
+#' exists. If not defined, the chart will be appended to the body of the web pages.
+#' @param ... Name-value pairs of properties that will be evaluated only once and then will remain 
+#' constant. These properties can still be changed later using the \code{\link{setProperties}} function.
+#' @param chartId ID for the chart. All charts must have unique IDs. If a chart with the same ID already
+#' exists, it will be replaced unless \code{addLayer = TRUE}. If ID is not defined, it will be the same as
+#' value of the \code{place} argument. And if both are not defined, the ID will be set to \code{ChartN}, 
+#' where \code{N - 1} is the number of existing charts.
 #' @param layerId An ID for the new layer. All layers within one chart must have different IDs. If a layer with the same
 #' ID already exists, it will be replaced. If not defined, will be set to \code{LayerN}, where \code{N - 1} 
 #' is the number of currently existing layers in this chart.
-#' @param addLayer whether to add a new layer or to replace the existing one. This argument influences the chart only if
-#' it has only one layer and the \code{layerId} is not defined. 
+#' @param addLayer if there is already a chart with the same ID, this argument defines whether to replace it or to add a
+#' new layer to it. This argument is ignored if both \code{place} and \code{chartId} are \code{NULL} or if there is no
+#' chart with the given ID. 
 #' @param pacerStep Time in ms between two consecutive calls of an \code{onmouseover} event. Prevents overqueuing in case
 #' of cumbersome computations. May be important when the chart works in canvas mode.
 #' 
@@ -918,10 +1701,10 @@ scatterDataFun <- function(l) {
 #' \itemize{
 #'  \item \code{x, y} - vector of x and y coordinates of the points.
 #'  \item \code{size} - sizes of the points. Default size is 6.
-#'  \item \code{opacity} - opacity of the points in the range from 0 to 1.
-#'  \item \code{label} - vector of text labels for each point.
-#'  \item \code{valueAxis} - (for \code{lc_beeswarm} only) defines, values along 
-#'  which of the axes should not be changed. Must be \code{"x"} or \code{"y"}.} 
+#'  \item \code{opacity} - opacity of each point in the range from 0 to 1.
+#'  \item \code{label} - vector of text labels for each point (labels by default are shown, when mouse hovers over a point).
+#'  \item \code{valueAxis} - (for \code{lc_beeswarm} only) defines axis with values that will
+#'  not be changed. Must be \code{"x"} or \code{"y"} (default).} 
 #' 
 #' Colour and shape settings
 #' \itemize{
@@ -933,8 +1716,8 @@ scatterDataFun <- function(l) {
 #'  \item \code{colourLegendTitle} - title for the colour legend.
 #'  \item \code{addColourScaleToLegend} - whether or not to show colour legend for the current layer.
 #'  \item \code{globalColourScale} - whether or not to use one colour scale for all the layers.
-#'  \item \code{symbol} - shape of each point. Must be one of \code{"Circle", "Cross", "Diamond", 
-#'  "Square", "Star", "Triangle", "Wye"}.
+#'  \item \code{symbol} - shape of each point. Must be one of \code{"Circle"}, \code{"Cross"}, \code{"Diamond"}, 
+#'  \code{"Square"}, \code{"Star"}, \code{"Triangle"}, \code{"Wye"}.
 #'  \item \code{symbolValue} - grouping values for different symbols.
 #'  \item \code{symbolLegendTitle} - title for the symbol value.
 #'  \item \code{stroke} - stroke colour for each element. Must be a colour name or hexadecimal code.
@@ -947,18 +1730,23 @@ scatterDataFun <- function(l) {
 #'  \item \code{jitterX, jitterY} - amount of random variation to be added to the position of the
 #'  points along one of the axes. 0 means no variation. 1 stands for distance between \code{x} and
 #'  \code{x + 1} for linear scale, \code{x} and \code{b*x} for logarithmic scale (\code{b} is a base
-#'  of the logarithm), and between neighbouring ticks for categorical scale.
+#'  of the logarithm), or between neighbouring ticks for categorical scale.
 #'  \item \code{shiftX, shiftY} - shift for each point from its original position along one of the
 #'  axes. 0 means no shift. 1 stands for distance between \code{x} and
 #'  \code{x + 1} for linear scale, \code{x} and \code{b*x} for logarithmic scale (\code{b} is a base
-#'  of the logarithm), and between neighbouring ticks for categorical scale.
+#'  of the logarithm), or between neighbouring ticks for categorical scale.
 #'  \item \code{layerDomainX, layerDomainY} - default axes ranges for the given layer.
 #'  \item \code{domainX, domainY} - default axes ranges for the entire chart. If not defined, 
 #'  is automatically set to include all layer domains.
-#'  \item \code{contScaleX, consScaleY} - whether or not the axis should be continuous.
+#'  \item \code{contScaleX, contScaleY} - whether or not the axis should be continuous.
 #'  \item \code{aspectRatio} - aspect ratio.
 #'  \item \code{axisTitleX, axisTitleY} - axes titles.
-#'  \item \code{ticksRotateX, ticksRotateY} - degrees of angle to rotate ticks. Must be between 
+#'  \item \code{axisTitlePosX, axisTitlePosY} - position of axes titles. For each axis one can specify title position
+#'  \code{across} or \code{along} the corresponding axis. Possible options are \code{"up"} (for title inside the plotting area)
+#'  or \code{"down"} (outside the plottting area, under the axis) for \code{across}, and
+#'  \code{"start"}, \code{"middle"}, \code{"end"} for \code{along}. This properties must be a list with one or two fields
+#'  named \code{"across"} and/or \code{"along"}.
+#'  \item \code{ticksRotateX, ticksRotateY} - angle by which to rotate ticks (in degrees). Must be between 
 #'  0 (horizontal ticks, default) and 90 (vertical ticks).
 #'  \item \code{ticksX, ticksY} - set of ticks for the axes.} 
 #'
@@ -970,7 +1758,8 @@ scatterDataFun <- function(l) {
 #'  Gets an index of the clicked point as an argument.
 #'  \item \code{on_mouseout} - function, to be called, when mouse moves out of one of the points.
 #'  \item \code{on_marked} - function, to be called, when any of the points are selected (marked) 
-#'  or deselected. Use \code{\link{getMarked}} function to get the IDs of the currently marked points.} 
+#'  or deselected. Use \code{\link{getMarked}} function to get the IDs of the currently marked points. To mark points,
+#'  select them with your mouse while holding the \emph{Shift} key.} 
 #'  
 #' Global chart settings
 #' \itemize{
@@ -978,13 +1767,13 @@ scatterDataFun <- function(l) {
 #'  \item \code{heigth} - height of the chart in pixels. 
 #'  \item \code{plotWidth} - width of the plotting area in pixels.
 #'  \item \code{plotHeight} - height of the plotting area in pixels.
-#'  \item \code{paddings} - paddings size in pixels. Must be a list with all the following fields: 
+#'  \item \code{paddings} - padding sizes in pixels. Must be a list with all the following fields: 
 #'  \code{"top", "bottom", "left", "right"}.
 #'  \item \code{title} - title of the chart.
 #'  \item \code{titleX, titleY} - coordinates of the chart title.
 #'  \item \code{titleSize} - font-size of the chart title.
 #'  \item \code{showLegend} - whether or not to show the legend.
-#'  \item \code{showPanel} - whether of not to show the tools panel.
+#'  \item \code{showPanel} - whether of not to show the instrument panel (grey triangle in the upper-left corner of the chart).
 #'  \item \code{transitionDuration} - duration of the transitions between any two states of the chart. If 0,
 #'  no animated transition is shown. It can be useful to turn the transition off, when lots of frequent 
 #'  changes happen to the chart.} 
@@ -1009,8 +1798,13 @@ scatterDataFun <- function(l) {
 #'             axisTitleX = "Species",
 #'             colourLegendTitle = "Sepal Width")}
 #' @export
-lc_scatter <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE, pacerStep = 50) {
-  setChart("scatter", data, ...,  place = place, id = id, layerId = layerId, dataFun = scatterDataFun, addLayer = addLayer,
+lc_scatter <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, addLayer = FALSE, pacerStep = 50) {
+  if(is.null(pkg.env$app)){
+    openPage()
+    pkg.env$app$setEnvironment(parent.frame())
+  }
+  
+  pkg.env$app$setChart("scatter", data, ...,  place = place, chartId = chartId, layerId = layerId, addLayer = addLayer,
            pacerStep = pacerStep)
 }
 
@@ -1018,92 +1812,38 @@ lc_scatter <- function(data = list(), place = NULL, ..., id = NULL, layerId = NU
 #' the axes to avoid overlapping.
 #' 
 #' @export
-lc_beeswarm <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE, pacerStep = 50) {
-  setChart("beeswarm", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer, dataFun = function(l) {
-    if(is.null(l$x) || is.null(l$y))
-      stop("Required properties 'x' and 'y' are not defined.")
-
-    if(is.factor(l$x))
-      l$layerDomainX <- levels(l$x)
-    if(is.factor(l$y))
-      l$layerDomainY <- levels(l$y)    
-  
-    if(is.null(l$label)){
-      if(!is.null(names(l$y)))
-        l$label <- names(l$y)
-      if(!is.null(names(l$x)))
-        l$label <- names(l$x)
-    }
-    
-    if(lc$useViewer)
-      l$mode <- "svg"    
-    
-    l   
-  }, pacerStep = pacerStep)
-}
-
-#TO DO: Add grouping
-lineDataFun <- function(l) {
-  if(is.null(l$x) && is.null(l$y))
-    stop("Required properties 'x' and 'y' are missing.")
-  
-  if(is.factor(l$x))
-    l$layerDomainX <- levels(l$x)
-  if(is.factor(l$y))
-    l$layerDomainY <- levels(l$y)
-  
-  if(!is.null(l$x)) l$x <- as.matrix(l$x)
-  if(!is.null(l$y)) l$y <- as.matrix(l$y)
-
-  if(is.null(l$y))
-    l$y <- matrix(rep(1:nrow(l$x), ncol(l$x)), nrow = ncol(l$x))
-  if(is.null(l$x))
-    l$x <- matrix(rep(1:nrow(l$y), ncol(l$y)), nrow = ncol(l$y))
-
-  if(!is.matrix(l$x) || !is.matrix(l$y))
-    stop("One of the properties 'x' or 'y' can not be converted into matrix")
-
-  if(nrow(l$x) != nrow(l$y))
-    stop("Lengths of 'x' and 'y' differ.")
-  
-  if(ncol(l$x) != ncol(l$y)){
-    if(ncol(l$x) == 1)
-      l$x <- matrix(rep(l$x, ncol(l$y)), ncol = ncol(l$y))
-    if(ncol(l$y) == 1)
-      l$y <- matrix(rep(l$y, ncol(l$x)), ncol = ncol(l$x))
-    if(ncol(l$x) != ncol(l$y))
-      stop("'x' and 'y' define different number of lines.")
-  }
-    
-  if(!is.null(l$x)) {
-    l$nelements <- ncol(l$x)
-    l$nsteps <- nrow(l$x)      
+lc_beeswarm <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, addLayer = FALSE, pacerStep = 50) {
+  if(is.null(pkg.env$app)){
+    openPage()
+    pkg.env$app$setEnvironment(parent.frame())
   }
   
-  l
+  pkg.env$app$setChart("beeswarm", data, ..., place = place, chartId = chartId, layerId = layerId, addLayer = addLayer, pacerStep = pacerStep)
 }
 
 #' Lines and ribbons
 #' 
-#' These functions create different kind of lines. They connect observations or 
-#' create filled area, bordered by a line. Each layer may have one or several lines.
+#' These functions create various kinds of lines. They connect observations or 
+#' create filled areas with customized border. Each layer may have one or several lines.
 #' 
 #' @describeIn lc_line connects points in the order of variables on the x axis.
 #' 
 #' @param data Name value pairs of properties, passed through the \code{\link{dat}} function. These
 #' properties will be reevaluated on each \code{\link{updateCharts}} call. 
-#' @param place An ID of a container, where to place the chart. Will be ignored if the chart already
-#' exists. If not defined, the chart will be placed directly in the body of the opened page.
-#' @param ... Name value pairs of properties that can be evaluated only once and then will remain 
-#' constant. These properties can still be changed later using the \code{\link{setProperties}} function
-#' @param id An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
-#' exists, a new layer will be added to it. If you want to replace one chart with another, use \code{\link{removeChart}}
-#' first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} is the number of currently existing charts.
+#' @param place ID of a container, where to place new chart. Will be ignored if the chart already
+#' exists. If not defined, the chart will be appended to the body of the web pages.
+#' @param ... Name-value pairs of properties that will be evaluated only once and then will remain 
+#' constant. These properties can still be changed later using the \code{\link{setProperties}} function.
+#' @param chartId ID for the chart. All charts must have unique IDs. If a chart with the same ID already
+#' exists, it will be replaced unless \code{addLayer = TRUE}. If ID is not defined, it will be the same as
+#' value of the \code{place} argument. And if both are not defined, the ID will be set to \code{ChartN}, 
+#' where \code{N - 1} is the number of existing charts.
 #' @param layerId An ID for the new layer. All layers within one chart must have different IDs. If a layer with the same
 #' ID already exists, it will be replaced. If not defined, will be set to \code{LayerN}, where \code{N - 1} 
 #' is the number of currently existing layers in this chart.
-#' @param addLayer whether to add a new layer or to replace the existing one. This argument influences the chart only if
-#' it has only one layer and the \code{layerId} is not defined. 
+#' @param addLayer if there is already a chart with the same ID, this argument defines whether to replace it or to add a
+#' new layer to it. This argument is ignored if both \code{place} and \code{chartId} are \code{NULL} or if there is no
+#' chart with the given ID. 
 #' 
 #' @section Available properties: 
 #' You can read more about different properties
@@ -1112,20 +1852,20 @@ lineDataFun <- function(l) {
 #' \itemize{
 #'  \item \code{x, y} - vector of x and y coordinates of the points to connect. Can be 
 #'  vectors for a single line or \code{m x n} matrix for \code{n} lines.
-#'  \item \code{ymax, ymin} - (only for \code{lc_ribbon}) vectors of maximal and minimal values of the ribbon.
+#'  \item \code{ymax, ymin} - (only for \code{lc_ribbon}) vectors of maximal and minimal values for a ribbon.
 #'  \item \code{a, b} - (only for \code{lc_abLine}) vectors of slope and intercept values respectively.
 #'  \item \code{v} - (only for \code{lc_vLine}) vector of x-intercepts.
 #'  \item \code{h} - (only for \code{lc_hLine}) vector of y-intercepts.
-#'  \item \code{lineWidth} - width of each line.
-#'  \item \code{opacity} - opacity of the lines in the range from 0 to 1.
-#'  \item \code{label} - vector of text labels for each line.
+#'  \item \code{lineWidth} - (nor for \code{lc_ribbon}) width of each line.
+#'  \item \code{opacity} - opacity of each line in the range from 0 to 1.
+#'  \item \code{label} - vector of text labels for each line (labels by default are shown, when mouse hovers over a line).
 #'  \item \code{dasharray} - defines pattern of dashes and gaps for each line. }
 #' 
 #' Colour settings
 #' \itemize{
 #'  \item \code{colour} - colour of the lines. Must be a colour name or hexadecimal code. For
-#'  \code{lc_ribbon} this property defined the colour of the ribbon, not the strokes.
-#'  \item \code{fill} - colour with which to fill area inside the line. 
+#'  \code{lc_ribbon} this property defines colour of the ribbon, not the strokes.
+#'  \item \code{fill} - (not for \code{lc_ribbon}) colour with which to fill area inside the line. 
 #'  Must be a colour name or hexadecimal code.
 #'  \item \code{colourValue} - grouping values for different colours. Can be numbers or characters.
 #'  \item \code{colourDomain} - vector of all possible values for discrete colour scales 
@@ -1145,10 +1885,15 @@ lineDataFun <- function(l) {
 #'  \item \code{layerDomainX, layerDomainY} - default axes ranges for the given layer.
 #'  \item \code{domainX, domainY} - default axes ranges for the entire chart. If not defined, 
 #'  is automatically set to include all layer domains.
-#'  \item \code{contScaleX, consScaleY} - whether or not the axis should be continuous.
+#'  \item \code{contScaleX, contScaleY} - whether or not the axis should be continuous.
 #'  \item \code{aspectRatio} - aspect ratio.
 #'  \item \code{axisTitleX, axisTitleY} - axes titles.
-#'  \item \code{ticksRotateX, ticksRotateY} - degrees of angle to rotate ticks. Must be between 
+#'  \item \code{axisTitlePosX, axisTitlePosY} - position of axes titles. For each axis one can specify title position
+#'  \code{across} or \code{along} the corresponding axis. Possible options are \code{"up"} (for title inside the plotting area)
+#'  or \code{"down"} (outside the plottting area, under the axis) for \code{across}, and
+#'  \code{"start"}, \code{"middle"}, \code{"end"} for \code{along}. This properties must be a list with one or two fields
+#'  named \code{"across"} and/or \code{"along"}.
+#'  \item \code{ticksRotateX, ticksRotateY} - angle by which to rotate ticks (in degrees). Must be between 
 #'  0 (horizontal ticks, default) and 90 (vertical ticks).
 #'  \item \code{ticksX, ticksY} - set of ticks for the axes.} 
 #'
@@ -1160,7 +1905,8 @@ lineDataFun <- function(l) {
 #'  Gets an index of the clicked line as an argument.
 #'  \item \code{on_mouseout} - function, to be called, when mouse moves out of one of the lines.
 #'  \item \code{on_marked} - function, to be called, when any of the lines are selected (marked) 
-#'  or deselected. Use \code{\link{getMarked}} function to get the IDs of the currently marked lines.} 
+#'  or deselected. Use \code{\link{getMarked}} function to get the IDs of the currently marked lines. To mark lines,
+#'  select them with your mouse while holding the \emph{Shift} key.} 
 #'  
 #' Global chart settings
 #' \itemize{
@@ -1168,13 +1914,13 @@ lineDataFun <- function(l) {
 #'  \item \code{heigth} - height of the chart in pixels.
 #'  \item \code{plotWidth} - width of the plotting area in pixels.
 #'  \item \code{plotHeight} - height of the plotting area in pixels.
-#'  \item \code{paddings} - paddings size in pixels. Must be a list with all the following fields: 
+#'  \item \code{paddings} - padding sizes in pixels. Must be a list with all the following fields: 
 #'  \code{"top", "bottom", "left", "right"}.
 #'  \item \code{title} - title of the chart.
 #'  \item \code{titleX, titleY} - coordinates of the chart title.
 #'  \item \code{titleSize} - font-size of the chart title.
 #'  \item \code{showLegend} - whether or not to show the legend.
-#'  \item \code{showPanel} - whether of not to show the tools panel.
+#'  \item \code{showPanel} - whether of not to show the instrument panel (grey triangle in the upper-left corner of the chart).
 #'  \item \code{transitionDuration} - duration of the transitions between any two states of the chart. If 0,
 #'  no animated transition is shown. It can be useful to turn the transition off, when lots of frequent 
 #'  changes happen to the chart.
@@ -1210,152 +1956,58 @@ lineDataFun <- function(l) {
 #' lc_vLine(dat(v = seq(1, 9, 1)), id = "grid", addLayer = TRUE)}
 #' 
 #' @export
-lc_line <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE) {
-  setChart("pointLine", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer,
-           dataFun = function(l) {
-             l <- lineDataFun(l)
-             
-             for(i in 1:ncol(l$x)) {
-               l$y[, i] <- l$y[order(l$x[, i]), i]
-               l$x[, i] <- l$x[order(l$x[, i]), i]
-             }
-             
-             l
-           })
+lc_line <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, addLayer = FALSE) {
+  if(is.null(pkg.env$app)){
+    openPage()
+    pkg.env$app$setEnvironment(parent.frame())
+  }
+  
+  pkg.env$app$setChart("line", data, ..., place = place, chartId = chartId, layerId = layerId, addLayer = addLayer)
 }
 
 #' @describeIn lc_line connects points in the order they are given.
 #' @export
-lc_path <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE) {
-  setChart("pointLine", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer, dataFun = lineDataFun)
+lc_path <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, addLayer = FALSE) {
+  if(is.null(pkg.env$app)){
+    openPage()
+    pkg.env$app$setEnvironment(parent.frame())
+  }
+  
+  pkg.env$app$setChart("path", data, ..., place = place, chartId = chartId, layerId = layerId, addLayer = addLayer)
 }
 
 #' @describeIn lc_line displays a filled area, defined by \code{ymax} and \code{ymin} values.
 #' @export
-lc_ribbon <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE) {
-  setChart("pointRibbon", data, ...,  place = place, id = id, layerId = layerId, addLayer = addLayer, dataFun = function(l) {
-    if(is.factor(l$x))
-      l$layerDomainX <- levels(l$x)
-    if(is.factor(l$ymax))
-      l$layerDomainY <- levels(l$ymax)
-    if(is.factor(l$ymin))
-      l$layerDomainY <- levels(l$ymin)
-    
-    if(!is.null(l$x) && !is.vector(l$x)) l$x <- as.matrix(l$x)
-    if(!is.null(l$ymax) && !is.vector(l$ymax)) l$ymax <- as.matrix(l$ymax)
-    if(!is.null(l$ymin) && !is.vector(l$ymin)) l$ymin <- as.matrix(l$ymin)
-    
-    if(!is.null(l$ymax) | !is.null(l$ymin) | !is.null(l$x)){
-      if(is.matrix(l$x)) {
-        if((nrow(l$ymax) != nrow(l$ymin)) | (nrow(l$x) != nrow(l$ymin)))
-          stop("'x', 'ymax' and 'ymin' define different number of lines.")
-        if((ncol(l$ymax) != ncol(l$ymin)) | (ncol(l$x) != ncol(l$ymin)))
-          stop("Lengths of 'x', 'ymax' and 'ymin' differ.")
-        
-      } else {
-        if(length(l$ymax) != length(l$ymin) | length(l$x) != length(l$ymin))
-          stop("Lengths of 'x', 'ymax' and 'ymin' differ.")
-      }
-    }
-    
-    if(!is.null(l$x)) {
-      if(is.matrix(l$x)) {
-        l$nelements <- ncol(l$x)
-        l$nsteps <- nrow(l$x)      
-      } else {
-        l$nelements <- 1
-        l$nsteps <- length(l$x)
-      }
-    }
-  
-    l
-  })
-}
-
-barDataFun <- function(l) {
-  if(!is.null(l$barIds) && length(l$barIds) != length(l$value))
-    stop("Number of bar IDs is not equal to the number of provided values.")
-  if(!is.null(l$stackIds) && length(l$stackIds) != length(l$value))
-    stop("Number of stack IDs is not equal to the number of provided values.")
-  if(!is.null(l$groupIds) && length(l$groupIds) != length(l$value))
-    stop("Number of group IDs is not equal to the number of provided values.")
-  
-  if(all(is.null(l$groupIds), !is.null(l$barIds), is.null(l$stackIds))) {
-    l$groupIds <- l$barIds
-    l$barIds <- NULL
-  }
-  if(is.null(l$groupIds) &is.null(l$barIds))
-    if(is.null(names(l$value))) {
-      l$groupIds <- 1:length(l$value)  
-    } else {
-      l$groupIds <- names(l$value)
-    }
-  
-  if(is.null(l$barIds) & is.null(l$stackIds))
-    l$addColourScaleToLegend <- FALSE
-  
-  if(is.null(l$groupIds)) l$groupIds <- rep("group", length(l$value))
-  if(is.null(l$barIds)) l$barIds <- rep(1, length(l$value))
-  if(is.null(l$stackIds)) l$stackIds <- rep(1, length(l$value))
-  
-  ngroups <- length(unique(l$groupIds))
-  nbars <- length(unique(l$barIds))
-  nstacks <- length(unique(l$stackIds))
-  
-  if(is.factor(l$groupIds))
-    l$layerDomainX <- levels(l$groupIds)
-  
-  inds <- NULL
-  
-  if(is.numeric(l$groupIds) & !is.integer(l$groupIds)){
-    inds <- unique(l$groupIds)
-    l$groupIds <- match(l$groupIds, inds)
+lc_ribbon <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, addLayer = FALSE) {
+  if(is.null(pkg.env$app)){
+    openPage()
+    pkg.env$app$setEnvironment(parent.frame())
   }
   
-  vals <- list()
-  
-  for(i in 1:length(l$value)) {
-    
-    if(is.null(vals[[as.character(l$groupIds[i])]])) vals[[as.character(l$groupIds[i])]] <- list()
-    if(is.null(vals[[as.character(l$groupIds[i])]][[as.character(l$barIds[i])]])) 
-      vals[[as.character(l$groupIds[i])]][[as.character(l$barIds[i])]] <- list()
-    
-    vals[[as.character(l$groupIds[i])]][[as.character(l$barIds[i])]][[as.character(l$stackIds[i])]] <- l$value[i]
-  }
-  
-  if(!is.null(inds)) {
-    vals$`__inds__` <- inds
-    l$groupIds <- inds
-  }
-    
-  
-  l$value <- vals
-  l$groupIds <- unique(l$groupIds)
-  l$barIds <- unique(l$barIds)
-  l$stackIds <- unique(l$stackIds)
-  
-  l
+  pkg.env$app$setChart("ribbon", data, ...,  place = place, chartId = chartId, layerId = layerId, addLayer = addLayer)
 }
 
 #' Create a barplot
 #' 
-#' \code{lc_bars} creates a new barplot and adds it on the page
+#' \code{lc_bars} creates a new barplot and adds it to the app and to the all currently opened pages
 #' as a new chart or as a new layer of an existing chart.
 #' 
 #' @param data Name value pairs of properties, passed through the \code{\link{dat}} function. These
 #' properties will be reevaluated on each \code{\link{updateCharts}} call. 
-#' @param place An ID of a container, where to place the chart. Will be ignored if the chart already
-#' exists. If not defined, the chart will be placed directly in the body of the opened page.
-#' @param ... Name value pairs of properties that can be evaluated only once and then will remain 
-#' constant. These properties can still be changed later using the \code{\link{setProperties}} function
-#' @param id An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
-#' exists, a new layer will be added to it. If you want to replace one chart with another, use \code{\link{removeChart}}
-#' first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} is the number of currently existing charts.
+#' @param place ID of a container, where to place new chart. Will be ignored if the chart already
+#' exists. If not defined, the chart will be appended to the body of the web pages.
+#' @param ... Name-value pairs of properties that will be evaluated only once and then will remain 
+#' constant. These properties can still be changed later using the \code{\link{setProperties}} function.
+#' @param chartId ID for the chart. All charts must have unique IDs. If a chart with the same ID already
+#' exists, it will be replaced unless \code{addLayer = TRUE}. If ID is not defined, it will be the same as
+#' value of the \code{place} argument. And if both are not defined, the ID will be set to \code{ChartN}, 
+#' where \code{N - 1} is the number of existing charts.
 #' @param layerId An ID for the new layer. All layers within one chart must have different IDs. If a layer with the same
 #' ID already exists, it will be replaced. If not defined, will be set to \code{LayerN}, where \code{N - 1} 
 #' is the number of currently existing layers in this chart.
-#' @param addLayer whether to add a new layer or to replace the existing one. This argument influences the chart only if
-#' it has only one layer and the \code{layerId} is not defined. 
+#' @param addLayer if there is already a chart with the same ID, this argument defines whether to replace it or to add a
+#' new layer to it. This argument is ignored if both \code{place} and \code{chartId} are \code{NULL} or if there is no
+#' chart with the given ID.
 #' 
 #' @section Available properties: 
 #' You can read more about different properties 
@@ -1363,9 +2015,9 @@ barDataFun <- function(l) {
 #' 
 #' \itemize{
 #'  \item \code{value} - heights of bars/stacks.
-#'  \item \code{stackIds} - IDs for all stacks (if necessary). Must be the same size as \code{values}.
-#'  \item \code{barIds} - IDs for all bars (if necessary). Must be the same size as \code{values}.
-#'  \item \code{groupIds} - IDs for all groups (if necessary). Must be the same size as \code{values}.
+#'  \item \code{stackIds} - IDs of all stacks (\emph{optional}). Must be the same size as \code{values}.
+#'  \item \code{barIds} - IDs of all bars (\emph{optional}). Must be the same size as \code{values}.
+#'  \item \code{groupIds} - IDs of all groups (\emph{optional}). Must be the same size as \code{values}.
 #'  \item \code{groupWidth} - ratio of width of a group of bars to the space, available to the group. }
 #' 
 #' Style settings
@@ -1389,12 +2041,18 @@ barDataFun <- function(l) {
 #'  \item \code{layerDomainX, layerDomainY} - default axes ranges for the given layer.
 #'  \item \code{domainX, domainY} - default axes ranges for the entire chart. If not defined, 
 #'  is automatically set to include all layer domains.
-#'  \item \code{contScaleX, consScaleY} - whether or not the axis should be continuous.
+#'  \item \code{contScaleX, contScaleY} - whether or not the axis should be continuous.
 #'  \item \code{aspectRatio} - aspect ratio.
 #'  \item \code{axisTitleX, axisTitleY} - axes titles.
-#'  \item \code{ticksRotateX, ticksRotateY} - degrees of angle to rotate ticks. Must be between 
+#'  \item \code{axisTitlePosX, axisTitlePosY} - position of axes titles. For each axis one can specify title position
+#'  \code{across} or \code{along} the corresponding axis. Possible options are \code{"up"} (for title inside the plotting area)
+#'  or \code{"down"} (outside the plottting area, under the axis) for \code{across}, and
+#'  \code{"start"}, \code{"middle"}, \code{"end"} for \code{along}. This properties must be a list with one or two fields
+#'  named \code{"across"} and/or \code{"along"}.
+#'  \item \code{ticksRotateX, ticksRotateY} - angle by which to rotate ticks (in degrees). Must be between 
 #'  0 (horizontal ticks, default) and 90 (vertical ticks).
 #'  \item \code{ticksX, ticksY} - set of ticks for the axes.}
+#'  
 #'
 #' Interactivity settings
 #' \itemize{
@@ -1404,7 +2062,8 @@ barDataFun <- function(l) {
 #'  Gets an index of the clicked bar as an argument.
 #'  \item \code{on_mouseout} - function, to be called, when mouse moves out of one of the bars.
 #'  \item \code{on_marked} - function, to be called, when any of the bars are selected (marked) 
-#'  or deselected. Use \code{\link{getMarked}} function to get the IDs of the currently marked bars.} 
+#'  or deselected. Use \code{\link{getMarked}} function to get the IDs of the currently marked bars. To mark bars,
+#'  select them with your mouse while holding the \emph{Shift} key.} 
 #'  
 #' Global chart settings
 #' \itemize{
@@ -1412,13 +2071,13 @@ barDataFun <- function(l) {
 #'  \item \code{heigth} - height of the chart in pixels.
 #'  \item \code{plotWidth} - width of the plotting area in pixels.
 #'  \item \code{plotHeight} - height of the plotting area in pixels.
-#'  \item \code{paddings} - paddings size in pixels. Must be a list with all the following fields: 
+#'  \item \code{paddings} - padding sizes in pixels. Must be a list with all the following fields: 
 #'  \code{"top", "bottom", "left", "right"}.
 #'  \item \code{title} - title of the chart.
 #'  \item \code{titleX, titleY} - coordinates of the chart title.
 #'  \item \code{titleSize} - font-size of the chart title.
 #'  \item \code{showLegend} - whether or not to show the legend. 
-#'  \item \code{showPanel} - whether of not to show the tools panel.
+#'  \item \code{showPanel} - whether of not to show the instrument panel (grey triangle in the upper-left corner of the chart).
 #'  \item \code{transitionDuration} - duration of the transitions between any two states of the chart. If 0,
 #'  no animated transition is shown. It can be useful to turn the transition off, when lots of frequent 
 #'  changes happen to the chart.} 
@@ -1436,7 +2095,10 @@ barDataFun <- function(l) {
 #'             stackIds = c(rep("case", 6), rep("control", 6))))
 #' 
 #' #It is easy to put data in a convenient form for barplots using tidyverse
-#' library(tidyverse)
+#' library(magrittr)
+#' library(dplyr)
+#' library(tidyr)
+#' library(stringr)
 #' 
 #' esoph %>%
 #'   gather(type, cases, (ncases:ncontrols)) %>%
@@ -1450,8 +2112,13 @@ barDataFun <- function(l) {
 #'             groupIds = newData$agegp))}
 #' 
 #' @export
-lc_bars <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE) {
-  setChart("barchart", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer, dataFun = barDataFun)
+lc_bars <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, addLayer = FALSE) {
+  if(is.null(pkg.env$app)){
+    openPage()
+    pkg.env$app$setEnvironment(parent.frame())
+  }
+  
+  pkg.env$app$setChart("bars", data, ..., place = place, chartId = chartId, layerId = layerId, addLayer = addLayer)
 }
 
 #' Histograms and density plots
@@ -1461,27 +2128,31 @@ lc_bars <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL,
 #' 
 #' @param data Name value pairs of properties, passed through the \code{\link{dat}} function. These
 #' properties will be reevaluated on each \code{\link{updateCharts}} call. 
-#' @param place An ID of a container, where to place the chart. Will be ignored if the chart already
-#' exists. If not defined, the chart will be placed directly in the body of the opened page.
-#' @param ... Name value pairs of properties that can be evaluated only once and then will remain 
-#' constant. These properties can still be changed later using the \code{\link{setProperties}} function
-#' @param id An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
-#' exists, a new layer will be added to it. If you want to replace one chart with another, use \code{\link{removeChart}}
-#' first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} is the number of currently existing charts.
+#' @param place ID of a container, where to place new chart. Will be ignored if the chart already
+#' exists. If not defined, the chart will be appended to the body of the web pages.
+#' @param ... Name-value pairs of properties that will be evaluated only once and then will remain 
+#' constant. These properties can still be changed later using the \code{\link{setProperties}} function.
+#' @param chartId ID for the chart. All charts must have unique IDs. If a chart with the same ID already
+#' exists, it will be replaced unless \code{addLayer = TRUE}. If ID is not defined, it will be the same as
+#' value of the \code{place} argument. And if both are not defined, the ID will be set to \code{ChartN}, 
+#' where \code{N - 1} is the number of existing charts.
 #' @param layerId An ID for the new layer. All layers within one chart must have different IDs. If a layer with the same
 #' ID already exists, it will be replaced. If not defined, will be set to \code{LayerN}, where \code{N - 1} 
 #' is the number of currently existing layers in this chart.
-#' @param addLayer whether to add a new layer or to replace the existing one. This argument influences the chart only if
-#' it has only one layer and the \code{layerId} is not defined. 
+#' @param addLayer if there is already a chart with the same ID, this argument defines whether to replace it or to add a
+#' new layer to it. This argument is ignored if both \code{place} and \code{chartId} are \code{NULL} or if there is no
+#' chart with the given ID. 
 #' 
 #' @section Available properties:
+#' You can read more about different properties 
+#' \href{https://anders-biostat.github.io/linked-charts/rlc/tutorials/props.html}{here}.
 #' 
 #' \itemize{
-#'  \item \code{value} - vector of data. 
+#'  \item \code{value} - vector of data values. 
 #'  \item \code{nbins} - (only for \code{lc_hist}) number of bins.} 
 #' 
 #' These functions are extensions of \code{\link{lc_line}} (\code{lc_dens}) or \code{\link{lc_bars}} 
-#' (\code{lc_hist}) and therefore can also understand their properties.
+#' (\code{lc_hist}) and therefore also accept all their properties.
 #' 
 #' @describeIn lc_hist makes a histogram. It is an extension of \code{\link{lc_bars}}.
 #' 
@@ -1491,69 +2162,43 @@ lc_bars <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL,
 #' lc_dens(dat(value = rnorm(1000), height = 300)) }
 #' 
 #' @export 
-lc_hist <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE) {
+lc_hist <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, addLayer = FALSE) {
   # has a nbins property. Not implemented in JS
-  setChart("barchart", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer, dataFun = function(l) {
-    if(is.null(l$nbins)) {
-      nbins <- 10
-    } else {
-      nbins <- l$nbins
-    }
-    if(!is.numeric(nbins) || nbins < 1) 
-      stop("'nbins' must be a positive number")
-    
-    l$nbins <- NULL
-    
-    l$contScaleX <- TRUE
-    l$addColourScaleToLegend <- FALSE
-    l$groupWidth <- 1
-    
-    if(!is.null(l$value)) {
-      minV <- min(l$value, na.rm = TRUE)
-      maxV <- max(l$value, na.rm = TRUE)
-      breaks <- seq(minV, maxV, length.out = nbins + 1)
-      step <- breaks[2] - breaks[1]
-      groupIds <- breaks - step/2
-      groupIds <- groupIds[-1]
-      binned <- .bincode(l$value, breaks, include.lowest = TRUE)
-      value <- sapply(1:nbins, function(i) {sum(binned == i)})
-      
-      l$groupIds <- groupIds
-      l$value <- value
-    }
-    barDataFun(l)
-  })
+  if(is.null(pkg.env$app)){
+    openPage()
+    pkg.env$app$setEnvironment(parent.frame())
+  }
+  
+  pkg.env$app$setChart("hist", data, ..., place = place, chartId = chartId, layerId = layerId, addLayer = addLayer)
 }
 
 #' @describeIn lc_hist makes a density plot. Is an extension of \code{\link{lc_line}}.
 #' @export
 #' @importFrom stats density.default
-lc_dens <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE) {
-  setChart("pointLine", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer, dataFun = function(l) {
-    if(!is.null(l$value)) {
-      dens <- density.default(l$value)
-      l$x <- dens$x
-      l$y <- dens$y
-      l$value <- NULL
-    }
-    lineDataFun(l)
-  })
+lc_dens <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, addLayer = FALSE) {
+  if(is.null(pkg.env$app)){
+    openPage()
+    pkg.env$app$setEnvironment(parent.frame())
+  }
+  
+  pkg.env$app$setChart("dens", data, ..., place = place, chartId = chartId, layerId = layerId, addLayer = addLayer)
 }
 
 #' Create a heatmap
 #' 
-#' \code{lc_heatmap} creates a new heatmaps. Unlike charts with axes, heatmaps do not have
+#' \code{lc_heatmap} creates a new heatmap. Unlike charts with axes, heatmaps do not have
 #' any layers.
 #' 
 #' @param data Name value pairs of properties, passed through the \code{\link{dat}} function. These
 #' properties will be reevaluated on each \code{\link{updateCharts}} call. 
-#' @param place An ID of a container, where to place the chart. Will be ignored if the chart already
-#' exists. If not defined, the chart will be placed directly in the body of the opened page.
-#' @param ... Name value pairs of properties that can be evaluated only once and then will remain 
-#' constant. These properties can still be changed later using the \code{\link{setProperties}} function
-#' @param id An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
-#' exists, a new layer will be added to it. If you want to replace one chart with another, use \code{\link{removeChart}}
-#' first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} is the number of currently existing charts.
+#' @param place ID of a container, where to place new chart. Will be ignored if the chart already
+#' exists. If not defined, the chart will be appended to the body of the web pages.
+#' @param ... Name-value pairs of properties that will be evaluated only once and then will remain 
+#' constant. These properties can still be changed later using the \code{\link{setProperties}} function.
+#' @param chartId ID for the chart. All charts must have unique IDs. If a chart with the same ID already
+#' exists, it will be replaced. If ID is not defined, it will be the same as
+#' value of the \code{place} argument. And if both are not defined, the ID will be set to \code{ChartN}, 
+#' where \code{N - 1} is the number of existing charts.
 #' @param pacerStep Time in ms between two consecutive calls of an \code{onmouseover} event. Prevents overqueuing in case
 #' of cumbersome computations. May be important when the chart works in canvas mode.
 #' 
@@ -1562,7 +2207,7 @@ lc_dens <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL,
 #' \href{https://anders-biostat.github.io/linked-charts/rlc/tutorials/props.html}{here}.
 #' 
 #' \itemize{
-#'  \item \code{value} - matrix of values.
+#'  \item \code{value} - matrix of values that will be displayed as a heatmap.
 #'  \item \code{rowLabel, colLabel} - vector of labels for all rows or columns.
 #'  \item \code{showDendogramRow, showDendogramCol} - whether to show dendograms when rows or columns are
 #'  clustered. Even if these properties are set to \code{FALSE}, rows and columns can still be clustered. 
@@ -1573,24 +2218,25 @@ lc_dens <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL,
 #'  an SVG or Canvas object. \code{"default"} mode switches between the two, turning heatmap into Canvas 
 #'  image, when there are too many cell, and into SVG object otherwise.
 #'  \item \code{heatmapRow, heatmapCol} - default order of rows and columns of the heatmap.
-#'  \item \code{showValue} - if \code{TRUE}, than in the values will be shown as text in each cell.} 
+#'  \item \code{showValue} - if \code{TRUE}, values will be shown as text in each cell.} 
 #' 
 #' Style settings
 #' \itemize{
-#'  \item \code{rowTitle, colTilte} - titles of rows and columns.
-#'  \item \code{palette} - vector of colours to construct the colour scale.
+#'  \item \code{rowTitle, colTilte} - titles for rows and columns (similar to axes titles).
+#'  \item \code{palette} - vector of colours to construct a colour scale.
 #'  \item \code{colourDomain} - domain of the colour scale. All values outside it will
 #'  be clamped to its edges.} 
 #'  
 #' Interactivity settings
 #' \itemize{
-#'  \item \code{on_click} - function, to be called, when one of the cells is clicked. Gets row and column indices 
+#'  \item \code{on_click} - function, to be called, when one of the cells is clicked. Gets a vector of row and column indices 
 #'  of the clicked cell as its arguments.
 #'  \item \code{on_mouseover} - function, to be called, when mouse hovers over one of the cells.
-#'  Gets row and column indices of the clicked cell as its arguments.
-#'  \item \code{on_mouseout} - function, to be called, when mouse moves out of one of the cells.
+#'  Gets a vector of row and column indices of the clicked cell as its arguments.
+#'  \item \code{on_mouseout} - function, to be called, when mouse moves away from one of the cells.
 #'  \item \code{on_marked} - function, to be called, when any of the cells are selected (marked) 
-#'  or deselected. Use \code{\link{getMarked}} function to get the IDs of the currently marked cells.} 
+#'  or deselected. Use \code{\link{getMarked}} function to get the IDs of the currently marked cells. To mark cells,
+#'  select them with your mouse while holding the \emph{Shift} key.} 
 #'  
 #' Global chart settings
 #' \itemize{
@@ -1598,13 +2244,13 @@ lc_dens <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL,
 #'  \item \code{heigth} - height of the chart in pixels.
 #'  \item \code{plotWidth} - width of the plotting area in pixels.
 #'  \item \code{plotHeight} - height of the plotting area in pixels.
-#'  \item \code{paddings} - paddings size in pixels. Must be a list with all the following fields: 
+#'  \item \code{paddings} - padding sizes in pixels. Must be a list with all the following fields: 
 #'  \code{"top", "bottom", "left", "right"}.
 #'  \item \code{title} - title of the chart.
 #'  \item \code{titleX, titleY} - coordinates of the chart title.
 #'  \item \code{titleSize} - font-size of the chart title.
 #'  \item \code{showLegend} - whether or not to show the legend.
-#'  \item \code{showPanel} - whether of not to show the tools panel.
+#'  \item \code{showPanel} - whether of not to show the instrument panel (grey triangle in the upper-left corner of the chart).
 #'  \item \code{transitionDuration} - duration of the transitions between any two states of the chart. If 0,
 #'  no animated transition is shown. It can be useful to turn the transition off, when lots of frequent 
 #'  changes happen to the chart.} 
@@ -1636,25 +2282,13 @@ lc_dens <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL,
 #'                colourDomain = c(-1, 1),
 #'                palette = brewer.pal(11, "RdYlBu")))}
 #' @export
-lc_heatmap <- function(data = list(), place = NULL, ..., id = NULL, pacerStep = 50) {
-  setChart("heatmap", data, ..., place = place, id = id, layerId = "main", dataFun = function(l) {
-    if(!is.null(l$value)) {
-      l$nrows <- nrow(l$value)
-      l$ncols <- ncol(l$value)
-      
-      l$value <- as.matrix(l$value)
-      
-      if(is.null(l$rowLabel) & !is.null(rownames(l$value)))
-        l$rowLabel <- rownames(l$value)
-      if(is.null(l$colLabel) & !is.null(colnames(l$value)))
-        l$colLabel <- colnames(l$value)
-    }
-    
-    if(lc$useViewer)
-      l$mode <- "svg"
-    
-    l
-  }, pacerStep = pacerStep)
+lc_heatmap <- function(data = list(), place = NULL, ..., chartId = NULL, pacerStep = 50) {
+  if(is.null(pkg.env$app)){
+    openPage()
+    pkg.env$app$setEnvironment(parent.frame())
+  }
+  
+  pkg.env$app$setChart("heatmap", data, ..., place = place, chartId = chartId, layerId = "main", pacerStep = pacerStep)
 }
 
 #' Add a colour slider
@@ -1666,28 +2300,29 @@ lc_heatmap <- function(data = list(), place = NULL, ..., id = NULL, pacerStep = 
 #' 
 #' @param data Name value pairs of properties, passed through the \code{\link{dat}} function. These
 #' properties will be reevaluated on each \code{\link{updateCharts}} call. 
-#' @param place An ID of a container, where to place the chart. Will be ignored if the chart already
-#' exists. If not defined, the chart will be placed directly in the body of the opened page.
-#' @param ... Name value pairs of properties that can be evaluated only once and then will remain 
-#' constant. These properties can still be changed later using the \code{\link{setProperties}} function
-#' @param id An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
-#' exists, a new layer will be added to it. If you want to replace one chart with another, use \code{\link{removeChart}}
-#' first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} is the number of currently existing charts.
+#' @param place ID of a container, where to place new chart. Will be ignored if the chart already
+#' exists. If not defined, the chart will be appended to the body of the web pages.
+#' @param ... Name-value pairs of properties that will be evaluated only once and then will remain 
+#' constant. These properties can still be changed later using the \code{\link{setProperties}} function.
+#' @param chartId ID for the chart. All charts must have unique IDs. If a chart with the same ID already
+#' exists, it will be replaced. If ID is not defined, it will be the same as
+#' value of the \code{place} argument. And if both are not defined, the ID will be set to \code{ChartN}, 
+#' where \code{N - 1} is the number of existing charts..
 #' 
 #' @section Available properties: 
 #' You can read more about different properties
 #' \href{https://anders-biostat.github.io/linked-charts/rlc/tutorials/props.html}{here}.
 #' 
 #' \itemize{
-#'  \item \code{chart} - id of the chart whose colour scale should be linked to the colour slider.
-#'  \item \code{layer} - id of the layer whose colour scale should be linked to the colour slider.
-#'  If chart has only one layer, this property can be omitted.}
+#'  \item \code{chart} - ID of the chart to which the colour slider should be linked.
+#'  \item \code{layer} - id of the layer to which the colour slider should be linked.
+#'  If the chart has only one layer, this property is optional.}
 #'  
 #' Global chart settings
 #' \itemize{
 #'  \item \code{width} - width of the chart in pixels.
 #'  \item \code{heigth} - height of the chart in pixels.
-#'  \item \code{paddings} - paddings size in pixels. Must be a list with all the following fields: 
+#'  \item \code{paddings} - padding sizes in pixels. Must be a list with all the following fields: 
 #'  \code{"top", "bottom", "left", "right"}.
 #'  \item \code{title} - title of the chart.
 #'  \item \code{titleX, titleY} - coordinates of the chart title.
@@ -1705,101 +2340,69 @@ lc_heatmap <- function(data = list(), place = NULL, ..., id = NULL, pacerStep = 
 #'            colourLegendTitle = "Petal Width",
 #'            symbolLegendTitle = "Species",
 #'            showLegend = FALSE,
-#'            id = "scatter")
+#'            chartId = "scatter")
 #' 
 #' lc_colourSlider(chart = "scatter")}
 #' 
 #' @export
-lc_colourSlider <- function(data = list(), place = NULL, ..., id = NULL) {
-  setChart("colourSlider", data, ..., place = place, id = id, layerId = "main", dataFun = function(l) {
-    if(!is.null(l$chart)) {
-      l$linkedChart <- str_c("charts.", l$chart)
-      if(is.null(l$layer) && getChart(l$chart)$nLayers() == 1) 
-        l$layer <- names(getChart(l$chart)$layers)[2]
-      if(!is.null(l$layer))
-        l$linkedChart <- str_c(l$linkedChart, ".layers.", l$layer)
-      
-    }
-    l$chart <- NULL
-    l$layer <- NULL
-    l
-  })
+lc_colourSlider <- function(data = list(), place = NULL, ..., chartId = NULL) {
+  if(is.null(pkg.env$app)){
+    openPage()
+    pkg.env$app$setEnvironment(parent.frame())
+  }
+  
+  pkg.env$app$setChart("colourSlider", data, ..., place = place, chartId = chartId, layerId = "main")
 }
 
 #' @describeIn lc_line creates straight lines by intercept and slope values
 #' @export
 #' @importFrom jsonlite toJSON
-lc_abLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE) {
-  setChart("xLine", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer, dataFun = function(l) {
-    if(is.null(l$a) || is.null(l$b))
-      stop("Required properties 'a' and 'b' are not defined.");
-    if(length(l$a) != length(l$b))
-      stop("Lengths of 'a' and 'b' differ.")
-    
-    l$a <- as.vector(l$a)
-    l$b <- as.vector(l$b)
-    
-    l$nelements <- length(l$a)
-    l$lineFun <- str_c("function(x, d) { a = ", toJSON(l$a, digits = NA), ";",
-                       "b = ", toJSON(l$b, digits = NA), ";", 
-                       "return a[d] * x + b[d]; }")
-    l$a <- NULL
-    l$b <- NULL
-    
-    l
-  })
+lc_abLine <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, addLayer = FALSE) {
+  if(is.null(pkg.env$app)){
+    openPage()
+    pkg.env$app$setEnvironment(parent.frame())
+  }
+  
+  pkg.env$app$setChart("abLine", data, ..., place = place, chartId = chartId, layerId = layerId, addLayer = addLayer)
 }
 
 #' @describeIn lc_line creates horizontal lines by y-intercept values
 #' @export
-lc_hLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE) {
-  setChart("xLine", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer, dataFun = function(l) {
-    if(is.null(l$h))
-      stop("Required property 'h' is not defined.");
-
-    l$h <- as.vector(l$h)
-
-    l$nelements <- length(l$h)
-    l$lineFun <- str_c("function(x, d) { h = ", toJSON(l$h, digits = NA), ";",
-                         "return h[d]; }")
-    l$h <- NULL
-
-    l
-  })
+lc_hLine <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, addLayer = FALSE) {
+  if(is.null(pkg.env$app)){
+    openPage()
+    pkg.env$app$setEnvironment(parent.frame())
+  }
+  
+  pkg.env$app$setChart("hLine", data, ..., place = place, chartId = chartId, layerId = layerId, addLayer = addLayer)
 }
 
 #' @describeIn lc_line creates vertical lines by x-intercept values
 #' @export
-lc_vLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL, addLayer = FALSE) {
-  setChart("yLine", data, ..., place = place, id = id, layerId = layerId, addLayer = addLayer, dataFun = function(l) {
-    if(is.null(l$v))
-      stop("Required property 'v' is not defined.");
-    
-    l$v <- as.vector(l$v)
-      
-    l$nelements <- length(l$v)
-    l$lineFun <- str_c("function(x, d) { v = ", toJSON(l$v, digits = NA), ";",
-                       "return v[d]; }")
-    l$v <- NULL
-        
-    l
-  })
+lc_vLine <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, addLayer = FALSE) {
+  if(is.null(pkg.env$app)){
+    openPage()
+    pkg.env$app$setEnvironment(parent.frame())
+  }
+  
+  pkg.env$app$setChart("vLine", data, ..., place = place, chartId = chartId, layerId = layerId, addLayer = addLayer)
 }
 
 #' Add HTML code to the page
 #' 
-#' \code{lc_html} adds a block with HTML code. It uses \code{\link[hwriter]{hwrite}} function
+#' \code{lc_html} adds a block of HTML code. It uses \code{\link[hwriter]{hwrite}} function
 #' to transform some data structures (e.g. data frames) to HTML tables.
 #'
 #' @param data Name value pairs of properties, passed through the \code{\link{dat}} function. These
 #' properties will be reevaluated on each \code{\link{updateCharts}} call. 
-#' @param place An ID of a container, where to place the chart. Will be ignored if the chart already
-#' exists. If not defined, the chart will be placed directly in the body of the opened page.
-#' @param ... Name value pairs of properties that can be evaluated only once and then will remain 
-#' constant. These properties can still be changed later using the \code{\link{setProperties}} function
-#' @param id An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
-#' exists, a new layer will be added to it. If you want to replace one chart with another, use \code{\link{removeChart}}
-#' first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} is the number of currently existing charts.
+#' @param place ID of a container, where to place new chart. Will be ignored if the chart already
+#' exists. If not defined, the chart will be appended to the body of the web pages.
+#' @param ... Name-value pairs of properties that will be evaluated only once and then will remain 
+#' constant. These properties can still be changed later using the \code{\link{setProperties}} function.
+#' @param chartId ID for the chart. All charts must have unique IDs. If a chart with the same ID already
+#' exists, it will be replaced. If ID is not defined, it will be the same as
+#' value of the \code{place} argument. And if both are not defined, the ID will be set to \code{ChartN}, 
+#' where \code{N - 1} is the number of existing charts.
 #'
 #' @section Available properties: 
 #' You can read more about different properties 
@@ -1807,16 +2410,16 @@ lc_vLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL
 #' 
 #' \itemize{
 #'  \item \code{content} - HTML code to display on the page. Can also be a vector, data.frame or
-#'  any other structure, that can be transformed by \code{\link[hwriter]{hwrite}}. } 
+#'  any other structure, that can be transformed to HTML by \code{\link[hwriter]{hwrite}}. } 
 #'  
 #' Global chart settings
 #' \itemize{
-#'  \item \code{width} - width of the chart in pixels. By default, the entire content will be displayed.
+#'  \item \code{width} - width of the chart in pixels. By default, width will be set to fit the content.
 #'  If width is defined and it's smaller than content's width, scrolling will be possible.
-#'  \item \code{heigth} - height of the chart in pixels. By default, the entire content will be displayed.
+#'  \item \code{heigth} - height of the chart in pixels. By default, height will be set to fit the content.
 #'  If height is defined and it's smaller than content's height, scrolling will be possible.
-#'  \item \code{paddings} - paddings size in pixels. Must be a list with all the following fields: 
-#'  \code{"top", "bottom", "left", "right"}. }
+#'  \item \code{paddings} - padding sizes in pixels. Must be a list with all the following fields: 
+#'  \code{"top", "bottom", "left", "right"}.}
 #'  
 #' @examples
 #' \donttest{lc_html(content = "Some <b>HTML</b> <br> <i>code</i>.")
@@ -1826,62 +2429,62 @@ lc_vLine <- function(data = list(), place = NULL, ..., id = NULL, layerId = NULL
 #' 
 #' @export
 #' @importFrom hwriter hwrite
-lc_html <- function(data = list(), place = NULL, ..., id = NULL) {
-  setChart("html", data, ..., place = place, id = id, layerId = "main", dataFun = function(l) {
-    if(!is.character(l$content) || length(l$content) != 1)
-      l$content <- hwrite(l$content)
-    
-    #l$content <- gsub("[\r\n]", "", l$content)
-    #l$content <- str_replace_all(l$content, "(\\W)", "\\\\\\1")
-    
-    l
-  })
+lc_html <- function(data = list(), place = NULL, ..., chartId = NULL) {
+  if(is.null(pkg.env$app)){
+    openPage()
+    pkg.env$app$setEnvironment(parent.frame())
+  }
+  
+  pkg.env$app$setChart("html", data, ..., place = place, chartId = chartId, layerId = "main")
 }
 
 #' Add input forms to the page
 #'
 #' \code{lc_input} adds an input form. This function is an rlc wrapper for an
-#' HTML \code{<input>} tag. Five types of input are supported: \code{"text", "range", "checkbox", "radio" and "button"}.
+#' HTML \code{<input>} tag. Five types of input are supported: \code{"text"}, \code{"range"},
+#' \code{"checkbox"}, \code{"radio"} and \code{"button"}.
 #' 
 #' @param data Name value pairs of properties, passed through the \code{\link{dat}} function. These
 #' properties will be reevaluated on each \code{\link{updateCharts}} call. 
-#' @param place An ID of a container, where to place the chart. Will be ignored if the chart already
-#' exists. If not defined, the chart will be placed directly in the body of the opened page.
-#' @param ... Name value pairs of properties that can be evaluated only once and then will remain 
-#' constant. These properties can still be changed later using the \code{\link{setProperties}} function
-#' @param id An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
-#' exists, a new layer will be added to it. If you want to replace one chart with another, use \code{\link{removeChart}}
-#' first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} is the number of currently existing charts.
+#' @param place ID of a container, where to place new chart. Will be ignored if the chart already
+#' exists. If not defined, the chart will be appended to the body of the web pages.
+#' @param ... Name-value pairs of properties that will be evaluated only once and then will remain 
+#' constant. These properties can still be changed later using the \code{\link{setProperties}} function.
+#' @param chartId ID for the chart. All charts must have unique IDs. If a chart with the same ID already
+#' exists, it will be replaced. If ID is not defined, it will be the same as
+#' value of the \code{place} argument. And if both are not defined, the ID will be set to \code{ChartN}, 
+#' where \code{N - 1} is the number of existing charts.
 #' 
 #' @section Available properties: 
 #' You can read more about different properties 
 #' \href{https://anders-biostat.github.io/linked-charts/rlc/tutorials/props.html}{here}.
 #' 
 #' \itemize{
-#'  \item \code{type} - type of input. Must be one of \code{"text", "range", "checkbox", "radio", "button"}
-#'  \item \code{value} - current state of the input block. For radio buttons it is an idex of the checked
-#'  button. For checkboxes - a vector of \code{TRUE} (for each checked box) and \code{FALSE} (for each unchecked one),
-#'  for ranges and textfiels - a vector of values for each text field or slider.
-#'  \item \code{step} (only for \code{type = "range"}) - stepping interval for values that can be selected with a slider.
+#'  \item \code{type} - type of input. Must be one of \code{"text"}, \code{"range"}, \code{"checkbox"}, 
+#'  \code{"radio"} or \code{"button"}.
+#'  \item \code{value} - current state of the input block. For radio buttons it is an index of the checked
+#'  button. For checkboxes - a vector of \code{TRUE} (for each checked box) and \code{FALSE} (for each unchecked ones),
+#'  for ranges and text boxes - a vector of values for each text field or slider.
+#'  \item \code{step} (only for \code{type = "range"}) - stepping interval for values that can be selected with the slider.
 #'  Must be a numeric vector with one value for each slider in the input block.
-#'  \item \code{min, max} (only for \code{type = "range"}) - minimal and maximal values that can be selected with a slider.
+#'  \item \code{min, max} (only for \code{type = "range"}) - minimal and maximal values that can be selected with the slider.
 #'  Must be a numeric vector with one value for each slider in the input block.
 #'  }
 #'  
 #' Interactivity settings
 #' \itemize{
 #'   \item \code{on_click, on_change} - function, to be called, when user clicks on a button, enters text in a text field
-#'   or moves a slider. The two properties are complete synonymes and can replace one another.
+#'   or moves a slider. The two properties are complete synonyms and can replace one another.
 #' }
 #'  
 #' Global chart settings
 #' \itemize{
 #'  \item \code{title} - title of the input block.
-#'  \item \code{width} - width of the chart in pixels. By default, the entire content will be displayed.
+#'  \item \code{width} - width of the chart in pixels. By default, width will be set to fit the content.
 #'  If width is defined and it's smaller than content's width, scrolling will be possible.
-#'  \item \code{heigth} - height of the chart in pixels. By default, the entire content will be displayed.
+#'  \item \code{heigth} - height of the chart in pixels. By default, height will be set to fit the content.
 #'  If height is defined and it's smaller than content's height, scrolling will be possible.
-#'  \item \code{paddings} - paddings size in pixels. Must be a list with all the following fields: 
+#'  \item \code{paddings} - padding sizes in pixels. Must be a list with all the following fields: 
 #'  \code{"top", "bottom", "left", "right"}.}
 #'
 #'@examples
@@ -1896,50 +2499,11 @@ lc_html <- function(data = list(), place = NULL, ..., id = NULL) {
 #' lc_input(type = "button", labels = paste0("el", 1:5), on_click = function(value) print(value))}
 #'
 #' @export
-lc_input <- function(data = list(), place = NULL, ..., id = NULL) {
-  setChart("input", data, ..., place = place, id = id, layerId = "main", dataFun = function(l){
-    if(!(l$type %in% c("checkbox", "radio", "text", "button", "range")))
-       stop("Unsupported type of input. Please, use one of \"checkbox\", \"radio\", \"text\", \"button\", \"range\"")
-    
-    if(!is.null(l$label)) {
-      l$nelements <- length(l$label)
-    } else {
-      l$nelements <- 1
-    }
-    
-    if(l$type == "checkbox")
-      if(!is.null(l$values))
-        if(length(l$value) != 1 & length(l$value) != l$nelements)
-          stop("Length of 'values' vector must be either 1 or equal to the number of checkboxes.")
-    
-    if(l$type == "radio")
-      if(!is.null(l$value))
-        if(length(l$value) != 1 | !is.numeric(l$value)) {
-          stop("'value' must be a number of the checked radio button")
-        } else {
-          l$value = l$value - 1
-        }
-          
-    
-    if(l$type == "text")
-      if(!is.null(l$value) & length(l$value) != l$nelements)
-        stop("Length of 'values' must be equal to the number of text fields.")
-    
-    if(l$type == "range") {
-      if(!is.null(l$value) & length(l$value) != 1 & length(l$value) != l$nelements)
-        stop("Length of 'values' vector must be either 1 or equal to the number of ranges.")
-      if(!is.null(l$step) & length(l$step) != 1 & length(l$step) != l$nelements)
-        stop("Length of 'step' vector must be either 1 or equal to the number of ranges.")
-      if(!is.null(l$min) & length(l$min) != 1 & length(l$min) != l$nelements)
-        stop("Length of 'min' vector must be either 1 or equal to the number of ranges.")
-      if(!is.null(l$max) & length(l$max) != 1 & length(l$max) != l$nelements)
-        stop("Length of 'max' vector must be either 1 or equal to the number of ranges.")
-    }
-    
-    if(!is.null(l$on_change)) {
-      l$on_click <- l$on_change
-      l$on_change <- NULL
-    }
-    l
-  })
+lc_input <- function(data = list(), place = NULL, ..., chartId = NULL) {
+  if(is.null(pkg.env$app)){
+    openPage()
+    pkg.env$app$setEnvironment(parent.frame())
+  }
+  
+  pkg.env$app$setChart("input", data, ..., place = place, chartId = chartId, layerId = "main")
 }

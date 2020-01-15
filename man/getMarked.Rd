@@ -4,23 +4,28 @@
 \alias{getMarked}
 \title{Get currently marked elements}
 \usage{
-getMarked(chartId = NULL, layerId = NULL)
+getMarked(chartId = NULL, layerId = NULL, sessionId = NULL)
 }
 \arguments{
-\item{chartId}{An ID of the chart.}
+\item{chartId}{An ID of the chart. This argument is optional, if there is only one chart.}
 
-\item{layerId}{An ID of the layer. This argument is required, if the chart has more
+\item{layerId}{An ID of the layer. This argument is optional, if there is only one chart.
 than one layer.}
+
+\item{sessionId}{An ID of the session from which to get the marked elements. Can be \code{NULL}
+if there is only one active session. Otherwise must be a valid session ID. Check \code{\link[jrc]{Session}}
+for more information on client sessions. If a call to this function was triggered from an opened web page, ID of
+the corresponding session will be used automatically.}
 }
 \value{
 a vector of indices or, in case of heatmaps, an \emph{n x 2} matrix were first and
-second columns contain, respectively, row and column indices of the marked cells.
+second columns contain row and column indices of the marked cells, respectively.
 }
 \description{
 \code{getMarked} returns indices of the chart's elements that are currently
-marked. To mark elements select them with you mouse while pressing the \emph{Shift} key.
-Double click on the chart while pressing the \emph{Shift} key will unmark all the
-elements.
+marked. To mark elements select them with your mouse while holding the \emph{Shift} key.
+Double click on the chart with the \emph{Shift} key pressed will deselect all the
+elements. This function is a wrapper of method \code{getMarked} of class \code{\link{LCApp}}.
 }
 \examples{
 \donttest{data(iris)

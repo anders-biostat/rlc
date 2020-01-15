@@ -4,24 +4,25 @@
 \alias{lc_html}
 \title{Add HTML code to the page}
 \usage{
-lc_html(data = list(), place = NULL, ..., id = NULL)
+lc_html(data = list(), place = NULL, ..., chartId = NULL)
 }
 \arguments{
 \item{data}{Name value pairs of properties, passed through the \code{\link{dat}} function. These
 properties will be reevaluated on each \code{\link{updateCharts}} call.}
 
-\item{place}{An ID of a container, where to place the chart. Will be ignored if the chart already
-exists. If not defined, the chart will be placed directly in the body of the opened page.}
+\item{place}{ID of a container, where to place new chart. Will be ignored if the chart already
+exists. If not defined, the chart will be appended to the body of the web pages.}
 
-\item{...}{Name value pairs of properties that can be evaluated only once and then will remain
-constant. These properties can still be changed later using the \code{\link{setProperties}} function}
+\item{...}{Name-value pairs of properties that will be evaluated only once and then will remain
+constant. These properties can still be changed later using the \code{\link{setProperties}} function.}
 
-\item{id}{An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
-exists, a new layer will be added to it. If you want to replace one chart with another, use \code{\link{removeChart}}
-first. If not defined, the ID will be set to \code{ChartN}, where \code{N - 1} is the number of currently existing charts.}
+\item{chartId}{ID for the chart. All charts must have unique IDs. If a chart with the same ID already
+exists, it will be replaced. If ID is not defined, it will be the same as
+value of the \code{place} argument. And if both are not defined, the ID will be set to \code{ChartN},
+where \code{N - 1} is the number of existing charts.}
 }
 \description{
-\code{lc_html} adds a block with HTML code. It uses \code{\link[hwriter]{hwrite}} function
+\code{lc_html} adds a block of HTML code. It uses \code{\link[hwriter]{hwrite}} function
 to transform some data structures (e.g. data frames) to HTML tables.
 }
 \section{Available properties}{
@@ -31,16 +32,16 @@ You can read more about different properties
 
 \itemize{
 \item \code{content} - HTML code to display on the page. Can also be a vector, data.frame or
-any other structure, that can be transformed by \code{\link[hwriter]{hwrite}}. }
+any other structure, that can be transformed to HTML by \code{\link[hwriter]{hwrite}}. }
 
 Global chart settings
 \itemize{
-\item \code{width} - width of the chart in pixels. By default, the entire content will be displayed.
+\item \code{width} - width of the chart in pixels. By default, width will be set to fit the content.
 If width is defined and it's smaller than content's width, scrolling will be possible.
-\item \code{heigth} - height of the chart in pixels. By default, the entire content will be displayed.
+\item \code{heigth} - height of the chart in pixels. By default, height will be set to fit the content.
 If height is defined and it's smaller than content's height, scrolling will be possible.
-\item \code{paddings} - paddings size in pixels. Must be a list with all the following fields:
-\code{"top", "bottom", "left", "right"}. }
+\item \code{paddings} - padding sizes in pixels. Must be a list with all the following fields:
+\code{"top", "bottom", "left", "right"}.}
 }
 
 \examples{

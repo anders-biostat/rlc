@@ -2,12 +2,13 @@
 % Please edit documentation in R/lc.R
 \name{closePage}
 \alias{closePage}
-\title{Close page}
+\title{Stop server}
 \usage{
 closePage()
 }
 \description{
-Close an opened web page and clear the list of charts.
+Stops the server and closes all currently opened pages (if any). This function is a
+wrapper of \code{stopServer} method inherited by the \code{\link{LCApp}} class from the \code{\link[jrc]{App}} class.
 }
 \examples{
 \donttest{openPage(useViewer = FALSE)
