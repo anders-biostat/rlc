@@ -664,13 +664,14 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
   chartEvent = function(d, chartId, layerId = "main", event, sessionId = NULL) {
 
     #lame. This also must go to jrc with the nearest update
-    d <- type.convert(d, as.is = TRUE)
+    if(!is.null(d))
+      d <- type.convert(d, as.is = TRUE)
     if(is.numeric(d)) d <- d + 1
     # should we move that to jrc? And add some parameter, like 'flatten'?
     if(is.list(d))
       if(all(sapply(d, function(el) length(el) == 1)))
         d <- unlist(d)
-  
+
     chart <- private$getChart(chartId)
     if(is.null(chart))
       stop(str_interp("Chart with ID ${id} is not defined"))
@@ -687,7 +688,11 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
     
     f <- layer[[paste0("on_", event)]]
     environment(f) <- env
-    do.call(f, list(d))
+    if(is.null(d)) {
+      do.call(f, list())
+    } else {
+      do.call(f, list(d))
+    }
 
     invisible(self)  
   },
@@ -730,7 +735,7 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
       if(chart$nLayers() == 0)
         layerId <- "main"
       if(chart$nLayers() == 1)
-        layerId <- names(chart$layers)[2]
+        layerId <- chart$getLayerIds()[2]
       if(chart$nLayers() > 1)
         stop(str_c("There is more than one layer in this chart. 'layerId' must be specified. ",
                    "Use 'listCharts()' to get IDs of all existing charts and their layers."))
@@ -754,7 +759,7 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
     session <- super$getSession(sessionId)
     if(is.null(session))
       stop("Can't retreive the session")
-    
+
     if(is.null(chartId))
       if(length(private$charts) == 1) {
         chartId <- private$charts[[1]]$id
@@ -766,12 +771,12 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
     chart <- private$getChart(chartId)
     if(is.null(chart))
       stop(str_c("Chart ", chartId, " is not defined."))
-    
+
     if(is.null(layerId)) {
       if(chart$nLayers() == 0)
         layerId <- "main"
       if(chart$nLayers() == 1)
-        layerId <- names(chart$layers)[2]
+        layerId <- chart$getLayerIds()[2]
       if(chart$nLayers() > 1)
         stop(str_c("There is more than one layer in this chart. 'layerId' must be specified. ",
                    "Use 'listCharts()' to get IDs of all existing charts and their layers."))
@@ -791,7 +796,7 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
       elements <- elements - 1
     }
     
-    session$sendData("markElements", elements)
+    session$sendData("markElements", elements, keepAsVector = TRUE)
     session$sendCommand(str_c("rlc.mark('", chartId, "', '", layerId, "', ", preventEvent, ");"))    
   },
   
@@ -868,7 +873,7 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
                         allowedVariables = NULL, allowedFunctions = NULL, ...){
     
     allowedFunctions <- c("chartEvent", allowedFunctions)
-    allowedVariables <- c("marked", "s1", "s2", allowedVariables)
+    allowedVariables <- c(".marked", "s1", "s2", allowedVariables)
     
     onStart_lc <- function(session) {
       srcDir <- "http_root_rlc"
@@ -1245,9 +1250,16 @@ openPage <- function(useViewer = TRUE, rootDirectory = NULL, startPage = NULL, l
 }
 
 getAppAndSession <- function(sessionId = NULL, app = NULL, all = TRUE) {
-
+  
+  if(identical(parent.frame(n = 2), .GlobalEnv)){
+    env <- .GlobalEnv
+  } else {
+    env <- parent.env(parent.frame(n = 2))
+  }
+    
+  
   if(is.null(app))
-    tryCatch(app <- get(".app", parent.env(parent.frame(n = 2)), inherits = FALSE), 
+    tryCatch(app <- get(".app", env, inherits = FALSE), 
            error = function(e) {
              if(is.null(pkg.env$app))
                stop("There is no opened page. Please, use 'openPage()' function to create one.") 
@@ -1255,7 +1267,7 @@ getAppAndSession <- function(sessionId = NULL, app = NULL, all = TRUE) {
            })
   
   if(is.null(sessionId))
-    tryCatch(sessionId <- get(".id", parent.env(parent.frame(n = 2)), inherits = FALSE), 
+    tryCatch(sessionId <- get(".id", env, inherits = FALSE), 
       error = function(e) {
         if(!all & length(app$getSessionIds()) != 1)
           stop("There are several active sessions. Please, specify the session ID")
@@ -1331,7 +1343,6 @@ removeLayer <- function(chartId, layerId) {
 #' @importFrom plyr rename
 setProperties <- function(data, chartId, layerId = NULL) {
   workWith <- getAppAndSession()
-  print(workWith$sessionId)
   workWith$app$setProperties(data, chartId, layerId)
 }
 
@@ -1545,7 +1556,7 @@ listCharts <- function() {
 getMarked <- function(chartId = NULL, layerId = NULL, sessionId = NULL) {
   workWith <- getAppAndSession(sessionId = sessionId, all = FALSE)
   
-  workWith$getMarked(chartId, layerId, workWith$sessionId)
+  workWith$app$getMarked(chartId, layerId, workWith$sessionId)
 }
 
 #' Mark elements of a chart
@@ -1595,7 +1606,7 @@ getMarked <- function(chartId = NULL, layerId = NULL, sessionId = NULL) {
 #' @export
 mark <- function(elements, chartId = NULL, layerId = NULL, preventEvent = TRUE, sessionId = NULL) {
   workWith <- getAppAndSession(sessionId)
-  
+
   workWith$app$mark(elements, chartId, layerId, preventEvent, workWith$sessionId)
 }
 

@@ -1,6 +1,6 @@
 library(rlc)
 
-load("test4.RData")
+load("barplots.RData")
 
 fitPvals <- apply(fitPvals, 2, p.adjust, method = "BH")
 

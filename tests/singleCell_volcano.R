@@ -4,7 +4,7 @@ library(rlc)
 #https://www.biorxiv.org/content/early/2017/12/20/237446
 #`test1.RData` contains 
 
-load("test1.RData")
+load("volcano.RData")
 
 pvals <- apply(counts, 1, function(row) {
   wilcox.test(row ~ cellType)$p.value
@@ -22,6 +22,6 @@ lc_scatter(dat(x = log2Fold, y = -log10(pvals), colourValue = (padjs < 0.1),
                  selGene <<- rownames(counts)[i]
                  updateCharts("beeswarm")
               }), place = "A1")
-lc_beeswarm(dat(x = cellType, y = counts[selGene, ], size = 3, label = names(cellType)), id = "beeswarm", place = "A2")
+lc_beeswarm(dat(x = cellType, y = counts[selGene, ], size = 3, label = names(cellType)), chartId = "beeswarm", place = "A2")
 
 closePage()

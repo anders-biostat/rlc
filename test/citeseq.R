@@ -56,17 +56,18 @@ lc_scatter(dat(x = means, y = vars / means / mean(1/countsums), logScaleX = 10, 
                  updateCharts("expression")
                  updateCharts("tsne")
                 }), place = "A1")
-lc_hLine(dat(h = 1, colour = "red"), id = "A1")
+lc_hLine(dat(h = 1, colour = "red"), chartId = "A1", addLayer = TRUE)
 
 #expression, coloured by one of the ADTs
 lc_scatter(dat(y = rawCounts_RNA[selGene,]/countsums, 
                colourValue = rawCounts_ADT["CD3", ], size = 3, title = selGene,
-               palette = brewer.pal(9, "YlOrRd")), place = "A2", id = "expression")
+               palette = brewer.pal(9, "YlOrRd")), place = "A2", chartId = "expression")
 
 #tsne
 lc_scatter(dat(x = tsne_res$Y[, 1], y = tsne_res$Y[, 2], 
                colourValue = rawCounts_RNA[selGene,]/countsums * 100000, size = 2,
-               palette = brewer.pal(9, "YlOrRd"), markedUpdated = function() print(getMarked("tsne"))), id = "tsne", place = "B1")
+               palette = brewer.pal(9, "YlOrRd"), on_marked = function() print(getMarked("tsne"))), chartId = "tsne", 
+           place = "B1")
 
 
 ####compare UMAP to TSNE
