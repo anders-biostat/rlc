@@ -11,8 +11,6 @@ openPage(
   layout = NULL,
   port = NULL,
   browser = NULL,
-  allowedFunctions = NULL,
-  allowedVariables = NULL,
   ...
 )
 }
@@ -41,14 +39,6 @@ will be used (see \code{\link[httpuv]{randomPort}}).}
 \item{browser}{A browser in which to open a new web page.
 If not defined, default browser will be used. For more information check \code{\link[utils]{browseURL}}.
 If this argument is specified, \code{useViewer} will be ignored.}
-
-\item{allowedFunctions}{List of functions that can be called from a web page without any additional actions
-on the R side. All other functions will require authorization in the current R session before they are called.
-This argument should be a vector of R function names.}
-
-\item{allowedVariables}{List of variables that can be modified from a web page without any additional actions
-on the R side. All other variable reassignments must be confirmed in the current R session.
-This argument should be a vector of variable names.}
 
 \item{...}{Further arguments passed to \code{\link[jrc]{openPage}}. Check details for more information.}
 }
