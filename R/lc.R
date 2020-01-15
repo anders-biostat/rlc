@@ -580,8 +580,8 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
   },
   
   setLayout = function(layout) {
-    if(grepl("^table", layoutName)){
-      size <- as.numeric(str_extract_all(layoutName, "\\d", simplify = TRUE))
+    if(grepl("^table", layout)){
+      size <- as.numeric(str_extract_all(layout, "\\d", simplify = TRUE))
       if(length(size) != 2) stop("Size of the table is specified incorrectly")
       private$layout <- c("Table", size)
     } else {
@@ -795,10 +795,10 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
     session$sendCommand(str_c("rlc.mark('", chartId, "', '", layerId, "', ", preventEvent, ");"))    
   },
   
-  setChart = function(chartType, data, ..., place = NULL, chartId = NULL, layerId = NULL, addLayer = FALSE, pacerStep = 50) {
-    if(is.null(private$serverHandle)){
+  setChart = function(chartType, data = list(), ..., place = NULL, chartId = NULL, layerId = NULL, addLayer = FALSE, pacerStep = 50) {
+    if(is.null(super$serverHandle)){
       super$startServer()
-      super$openPage()
+#      super$openPage()
     }
     
     if(length(chartType) > 1){
@@ -864,9 +864,13 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
     invisible(self)
   },  
   
-  initialize = function(layout = NULL, beforeLoad = function(session) {}, afterLoad = function(session) {}, ...){
+  initialize = function(layout = NULL, beforeLoad = function(session) {}, afterLoad = function(session) {}, 
+                        allowedVariables = NULL, allowedFunctions = NULL, ...){
+    
+    allowedFunctions <- c("chartEvent", allowedFunctions)
+    allowedVariables <- c("marked", "s1", "s2", allowedVariables)
+    
     onStart_lc <- function(session) {
-
       srcDir <- "http_root_rlc"
       reqPage <- system.file( "/http_root/linked-charts.css", package = "rlc" )
       
@@ -905,7 +909,7 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
       afterLoad(session)
     }
 
-    super$initialize(..., onStart = onStart_lc)
+    super$initialize(..., onStart = onStart_lc, allowedFunctions = allowedFunctions, allowedVariables = allowedVariables)
     if(!is.null(layout))
       self$setLayout(layout)
     
@@ -949,7 +953,7 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
 
   addLayout = function(session) {
     if(!is.null(private$layout)) {
-      pars <- str_c(private$layout[-1], sep = ", ")
+      pars <- str_c(private$layout[-1], collapse = ", ")
       session$sendCommand(str_interp("rlc.add${private$layout[1]}(${pars});"))
     }
     invisible(self)
@@ -1215,12 +1219,6 @@ Chart <- R6Class("Chart", public = list(
 #' @param browser A browser in which to open a new web page.
 #' If not defined, default browser will be used. For more information check \code{\link[utils]{browseURL}}.
 #' If this argument is specified, \code{useViewer} will be ignored.
-#' @param allowedFunctions List of functions that can be called from a web page without any additional actions 
-#' on the R side. All other functions will require authorization in the current R session before they are called. 
-#' This argument should be a vector of R function names. 
-#' @param allowedVariables List of variables that can be modified from a web page without any additional actions 
-#' on the R side. All other variable reassignments must be confirmed in the current R session. 
-#' This argument should be a vector of variable names.
 #' @param ... Further arguments passed to \code{\link[jrc]{openPage}}. Check details for more information.
 #' 
 #' @return A new instance of class \code{\link{LCApp}}.
@@ -1232,15 +1230,11 @@ Chart <- R6Class("Chart", public = list(
 #' 
 #' @export
 openPage <- function(useViewer = TRUE, rootDirectory = NULL, startPage = NULL, layout = NULL, port = NULL, 
-                     browser = NULL, allowedFunctions = NULL, allowedVariables = NULL, ...) {
+                     browser = NULL, ...) {
   if(!is.null(pkg.env$app)) 
     closePage()
   
-  allowedFunctions <- c("chartEvent", allowedFunctions)
-  allowedVariables <- c("marked", "s1", "s2", allowedVariables)
-  
-  app <- LCApp$new(rootDirectory = rootDirectory, startPage = startPage, layout = layout, 
-                   allowedFunctions = allowedFunctions, allowedVariables = allowedVariables, ...)
+  app <- LCApp$new(rootDirectory = rootDirectory, startPage = startPage, layout = layout, ...)
   app$startServer(port)
   app$openPage(useViewer, browser)
   app$setEnvironment(parent.frame())
