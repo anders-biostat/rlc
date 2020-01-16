@@ -3,6 +3,7 @@
 # ftp://ftp.ncbi.nlm.nih.gov/geo/series/GSE100nnn/GSE100866/suppl/GSE100866_CBMC_8K_13AB_10X-RNA_umi.csv.gz
 library(rlc)
 library(RColorBrewer)
+library(uwot)
 
 rawCounts_RNA <- as.matrix( read.csv( "~/Downloads/GSE100866_CBMC_8K_13AB_10X-RNA_umi.csv.gz", header=TRUE, row.names=1 ) )
 rawCounts_ADT <- as.matrix( read.csv( "~/Downloads/GSE100866_CBMC_8K_13AB_10X-ADT_umi.csv.gz", header=TRUE, row.names=1 ) )
@@ -86,12 +87,12 @@ lc_scatter(dat(x = tsne_res$Y[, 1], y = tsne_res$Y[, 2], title = "TSNE",
                on_mouseover = function(k) {
                  activeCell <<- k
                  updateCharts(c("tsne", "umap"))
-               }), id = "tsne", place = "A1", parcerStep = 200)
+               }), chartId = "tsne", place = "A1", parcerStep = 200)
 
-lc_scatter(dat(x = umap_res$layout[, 1], y = umap_res$layout[, 2], title = "UMAP", 
+lc_scatter(dat(x = umap_res[, 1], y = umap_res[, 2], title = "UMAP", 
                colourValue = distsFrom(activeCell), opacity = 0.2, size = 3,
                colourDomain = c(0, 0.5),
                on_mouseover = function(k) {
                  activeCell <<- k
                  updateCharts(c("tsne", "umap"))
-               }), id = "umap", place = "A2", parcerStep = 300)
+               }), chartId = "umap", place = "A2", parcerStep = 300)

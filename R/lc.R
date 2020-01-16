@@ -326,14 +326,16 @@ pkg.env$dataFun <- list(
   colourSlider = function(l) {
     if(!is.null(l$chart)) {
       l$linkedChart <- str_c("charts.", l$chart)
-      if(is.null(l$layer) && getChart(l$chart)$nLayers() == 1) 
-        l$layer <- names(getChart(l$chart)$layers)[2]
+      
+      if(is.null(l$layer) && l$app$getChart(l$chart)$nLayers() == 1) 
+        l$layer <- l$app$getChart(l$chart)$getLayerIds()[2]
       if(!is.null(l$layer))
         l$linkedChart <- str_c(l$linkedChart, ".layers.", l$layer)
       
     }
     l$chart <- NULL
     l$layer <- NULL
+    l$app <- NULL
     l
   },
   
@@ -573,7 +575,7 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
   },
   
   removeLayer = function(chartId, layerId) {
-    chart <- private$getChart(chartId)
+    chart <- self$getChart(chartId)
     chart$removeLayer(layerId)
     
     invisible(self)
@@ -591,7 +593,7 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
   },
 
   setProperties = function(data, chartId, layerId = NULL){
-    chart <- private$getChart(chartId)
+    chart <- self$getChart(chartId)
     if(is.null(chart))
       stop(str_c("Chart with ID ", chartId, " is not defined."))
     
@@ -652,13 +654,24 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
       sessionId <- names(private$sessions)
 
     for(i in 1:length(chartId)) {
-      chart <- private$getChart(chartId[i])
+      chart <- self$getChart(chartId[i])
       if(!is.null(chart)) {
         chart$update(sessionId, layerId[i], updateOnly[i])
       } else {
         warning(str_c("There is no chart with ID ", chartId[i]))
       }
     }
+  },
+  
+  getChart = function(id) {
+    if(!is.character(id))
+      stop("Chart ID must be a character")
+    if(length(id) > 1) {
+      warning("Attempt to supply several chart IDs at once. Only the first one will be used.")
+      id <- id[1]
+    }
+    
+    private$charts[[id]]
   },
   
   chartEvent = function(d, chartId, layerId = "main", event, sessionId = NULL) {
@@ -672,7 +685,7 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
       if(all(sapply(d, function(el) length(el) == 1)))
         d <- unlist(d)
 
-    chart <- private$getChart(chartId)
+    chart <- self$getChart(chartId)
     if(is.null(chart))
       stop(str_interp("Chart with ID ${id} is not defined"))
  
@@ -700,7 +713,7 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
   listCharts = function() {
     for(chartId in names(private$charts)) {
       print(str_interp("Chart: ${chartId}"))
-      chart <- private$getChart(chartId)
+      chart <- self$getChart(chartId)
       if(chart$nLayers() > 1) {
         print("- Layers:")
         for(layerId in names(chart$layers)){
@@ -727,7 +740,7 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
                    "specified. Use 'listCharts()' to get IDs of all existing charts."))
       }
     
-    chart <- private$getChart(chartId)
+    chart <- self$getChart(chartId)
     if(is.null(chart))
       stop(str_c("Chart ", chartId, " is not defined."))
     
@@ -768,7 +781,7 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
                    "specified. Use 'listCharts()' to get IDs of all existing charts."))
       }
     
-    chart <- private$getChart(chartId)
+    chart <- self$getChart(chartId)
     if(is.null(chart))
       stop(str_c("Chart ", chartId, " is not defined."))
 
@@ -814,6 +827,9 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
     if(!(chartType %in% names(private$jsTypes)))
       stop("Unknown chart type")
     
+    if(chartType == "colourSlider")
+      data$app <- expression(.app)
+    
     if(is.null(place) && is.null(chartId))
       place <- str_c("Chart", length(private$charts) + 1)
     
@@ -822,11 +838,11 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
     if(is.null(place))
       place <- chartId
     
-    chart <- private$getChart(chartId)
+    chart <- self$getChart(chartId)
     if(!is.null(chart) && ((!is.null(layerId) && layerId == "main") || 
                            chart$nLayers() == 0)) {
       self$removeChart(chart$id)
-      chart <- private$getChart(chartId)
+      chart <- self$getChart(chartId)
     }
     
     if(is.null(chart)) {
@@ -939,7 +955,7 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
                        "showLegend", "showPanel", "transitionDuration", "value", "rowLabel", "colLabel", "showDendogramRow",
                        "clusterRows", "clusterCols", "mode", "heatmapRow", "heatmapCol", "showValue", "rowTitle", 
                        "colTitle", "palette", "colourDomain", "on_click", "on_change", "on_mouseover", "on_mouseout", "on_marked", 
-                       "chart", "layer", "content", "type", "domainX", "domainY", "apectRatio", "axisTitleX", "axisTitleY",
+                       "chart", "app", "layer", "content", "type", "domainX", "domainY", "apectRatio", "axisTitleX", "axisTitleY",
                        "logScaleX", "logScaleY", "ticksRotateX", "ticksRotateY", "globalColourScale", "aspectRatio",
                        "rankRows", "rankCols", "ticksX", "ticksY", "showDendogramCol", "on_labelClickCol", "on_labelClickRow",
                        "axisTitlePos")),
@@ -962,17 +978,6 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
       session$sendCommand(str_interp("rlc.add${private$layout[1]}(${pars});"))
     }
     invisible(self)
-  },
-
-  getChart = function(id) {
-    if(!is.character(id))
-      stop("Chart ID must be a character")
-    if(length(id) > 1) {
-      warning("Attempt to supply several chart IDs at once. Only the first one will be used.")
-      id <- id[1]
-    }
-    
-    private$charts[[id]]
   },
   
   addChart = function(chartId, place) {
@@ -2355,8 +2360,8 @@ lc_colourSlider <- function(data = list(), place = NULL, ..., chartId = NULL) {
     openPage()
     pkg.env$app$setEnvironment(parent.frame())
   }
-  
-  pkg.env$app$setChart("colourSlider", data, ..., place = place, chartId = chartId, layerId = "main")
+
+  pkg.env$app$setChart(chartType = "colourSlider", data = data, ..., place = place, chartId = chartId, layerId = "main")
 }
 
 #' @describeIn lc_line creates straight lines by intercept and slope values

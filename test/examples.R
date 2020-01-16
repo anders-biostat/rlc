@@ -8,14 +8,14 @@ height <- 300
 colour <- iris$Sepal.Width
 #create a chart
 lc_scatter(dat(x = iris$Sepal.Length, y = iris$Petal.Length, colorValues = colour,
-               width = width, height = height), id = "iris")
+               width = width, height = height), chartId = "iris")
 
 
 x <- as.factor(iris$Species)
 x <- relevel(x,"virginica") 
 
 lc_scatter(dat(x = x, y = iris$Petal.Length, colorValues = colour,
-               width = width, height = height), id = "iris")
+               width = width, height = height), chartId = "iris")
 
 #change the variables
 height <- 400
@@ -31,9 +31,11 @@ setProperties(dat(symbolValue = iris$Species), "iris")
 #this will change only colour and symbols
 updateCharts("iris", updateOnly = "ElementStyle")
 
+lc_scatter(dat(x = iris$Sepal.Length, y = iris$Petal.Length, colorValues = colour,
+               width = width, height = height), chartId = "iris")
 a <- 1
 b <- 0
-lc_abLine(dat(a = a, b = b), id = "iris")
+lc_abLine(dat(a = a, b = b), chartId = "iris", addLayer = TRUE)
 
 b <- -2
 updateCharts("iris", "Layer2")
@@ -42,7 +44,7 @@ updateCharts("iris", "Layer2")
 lc_scatter(dat(x = 1:10, y = 1:10, colourValue = 1:10 * 10^-20))
 
 lc_scatter(dat(x = iris$Sepal.Length), y = iris$Petal.Length, colourValue = colour,
-               width = width, height = height, id = "iris")
+               width = width, height = height, chartId = "iris")
 
 lc_scatter(dat(x = rnorm(30)), y = rnorm(30))
 #note that the Y values remain the same after each updateCharts call
@@ -59,7 +61,7 @@ lc_scatter(dat(x = iris$Sepal.Length,
            colourLegendTitle = "Petal Width",
            symbolLegendTitle = "Species",
            showLegend = F,
-           id = "scatter")
+           chartId = "scatter")
 
 lc_colourSlider(chart = "scatter")
 
@@ -109,8 +111,8 @@ pred <- predict(fit, data.frame(x = x), se.fit = T)
 lc_ribbon(dat(ymin = y - 1.96 * pred$se.fit,
               ymax = y + 1.96 * pred$se.fit,
               x = x,
-              colour = "#555555"), id = "ribbonTest")
-lc_scatter(dat(x = x, y = y), id = "ribbonTest")
+              colour = "#555555"), chartId = "ribbonTest")
+lc_scatter(dat(x = x, y = y), chartId = "ribbonTest")
 
 
 data("esoph")
@@ -164,8 +166,8 @@ lc_heatmap(dat(value = cor(test),
                palette = RColorBrewer::brewer.pal(11, "RdYlBu")))
 
 
-lc_hLine(dat(h = seq(1, 9, 1), domainX = c(0, 10), domainY = c(0, 10)), id = "grid")
-lc_vLine(dat(v = seq(1, 9, 1)), id = "grid")
+lc_hLine(dat(h = seq(1, 9, 1), domainX = c(0, 10), domainY = c(0, 10)), chartId = "grid")
+lc_vLine(dat(v = seq(1, 9, 1)), chartId = "grid")
 
 
 noise <- rnorm(30)
@@ -173,8 +175,8 @@ x <- seq(-4, 4, length.out = 30)
 
 lc_scatter(dat(x = x,
                y = sin(x) + noise,
-               colourValue = noise), id = "plot", layerId = "points")
-lc_line(dat(x = x, y = sin(x)), id = "plot")
+               colourValue = noise), chartId = "plot", layerId = "points")
+lc_line(dat(x = x, y = sin(x)), chartId = "plot")
 lc_colourSlider(chart = "plot", layer = "points")
 
 listCharts()
