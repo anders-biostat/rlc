@@ -46,18 +46,7 @@ pkg.env$dataFun <- list(
       l$shiftY <- runif(length(l$y), -l$jitterY, l$jitterY)
       l$jitterY <- NULL
     }
-    
-    if(!is.null(l$axisTitlePosX)){
-      l$axisTitlePos <- list()
-      l$axisTitlePos$x <- l$axisTitlePosX
-      l$axisTitlePosX <- NULL
-    }
-    if(!is.null(l$axisTitlePosY)) {
-      if(is.null(l$axisTitlePos))
-        l$axisTitlePos <- list()
-      l$axisTitlePos$y <- l$axisTitlePosY
-      l$axisTitlePosY <- NULL
-    }
+
     l
   },
   beeswarm = function(l) {
@@ -115,17 +104,6 @@ pkg.env$dataFun <- list(
       l$nelements <- ncol(l$x)
       l$nsteps <- nrow(l$x)      
     }
-    if(!is.null(l$axisTitlePosX)){
-      l$axisTitlePos <- list()
-      l$axisTitlePos$x <- l$axisTitlePosX
-      l$axisTitlePosX <- NULL
-    }
-    if(!is.null(l$axisTitlePosY)) {
-      if(is.null(l$axisTitlePos))
-        l$axisTitlePos <- list()
-      l$axisTitlePos$y <- l$axisTitlePosY
-      l$axisTitlePosY <- NULL
-    }
     
     l
   },
@@ -173,17 +151,6 @@ pkg.env$dataFun <- list(
         l$nelements <- 1
         l$nsteps <- length(l$x)
       }
-    }
-    if(!is.null(l$axisTitlePosX)){
-      l$axisTitlePos <- list()
-      l$axisTitlePos$x <- l$axisTitlePosX
-      l$axisTitlePosX <- NULL
-    }
-    if(!is.null(l$axisTitlePosY)) {
-      if(is.null(l$axisTitlePos))
-        l$axisTitlePos <- list()
-      l$axisTitlePos$y <- l$axisTitlePosY
-      l$axisTitlePosY <- NULL
     }
     
     l
@@ -250,18 +217,6 @@ pkg.env$dataFun <- list(
     l$groupIds <- unique(l$groupIds)
     l$barIds <- unique(l$barIds)
     l$stackIds <- unique(l$stackIds)
-    
-    if(!is.null(l$axisTitlePosX)){
-      l$axisTitlePos <- list()
-      l$axisTitlePos$x <- l$axisTitlePosX
-      l$axisTitlePosX <- NULL
-    }
-    if(!is.null(l$axisTitlePosY)) {
-      if(is.null(l$axisTitlePos))
-        l$axisTitlePos <- list()
-      l$axisTitlePos$y <- l$axisTitlePosY
-      l$axisTitlePosY <- NULL
-    }
     
     l
   },
@@ -355,18 +310,6 @@ pkg.env$dataFun <- list(
     l$a <- NULL
     l$b <- NULL
     
-    if(!is.null(l$axisTitlePosX)){
-      l$axisTitlePos <- list()
-      l$axisTitlePos$x <- l$axisTitlePosX
-      l$axisTitlePosX <- NULL
-    }
-    if(!is.null(l$axisTitlePosY)) {
-      if(is.null(l$axisTitlePos))
-        l$axisTitlePos <- list()
-      l$axisTitlePos$y <- l$axisTitlePosY
-      l$axisTitlePosY <- NULL
-    }
-    
     l
   },
   
@@ -381,18 +324,6 @@ pkg.env$dataFun <- list(
                        "return h[d]; }")
     l$h <- NULL
     
-    if(!is.null(l$axisTitlePosX)){
-      l$axisTitlePos <- list()
-      l$axisTitlePos$x <- l$axisTitlePosX
-      l$axisTitlePosX <- NULL
-    }
-    if(!is.null(l$axisTitlePosY)) {
-      if(is.null(l$axisTitlePos))
-        l$axisTitlePos <- list()
-      l$axisTitlePos$y <- l$axisTitlePosY
-      l$axisTitlePosY <- NULL
-    }
-    
     l
   },
   
@@ -406,17 +337,6 @@ pkg.env$dataFun <- list(
     l$lineFun <- str_c("function(x, d) { v = ", toJSON(l$v, digits = NA), ";",
                        "return v[d]; }")
     l$v <- NULL
-    if(!is.null(l$axisTitlePosX)){
-      l$axisTitlePos <- list()
-      l$axisTitlePos$x <- l$axisTitlePosX
-      l$axisTitlePosX <- NULL
-    }
-    if(!is.null(l$axisTitlePosY)) {
-      if(is.null(l$axisTitlePos))
-        l$axisTitlePos <- list()
-      l$axisTitlePos$y <- l$axisTitlePosY
-      l$axisTitlePosY <- NULL
-    }
     
     l
   },
@@ -474,6 +394,21 @@ pkg.env$dataFun <- list(
       l$on_click <- l$on_change
       l$on_change <- NULL
     }
+    l
+  },
+  axesChart = function(l) {
+    if(!is.null(l$axisTitlePosX)){
+      l$axisTitlePos <- list()
+      l$axisTitlePos$x <- l$axisTitlePosX
+      l$axisTitlePosX <- NULL
+    }
+    if(!is.null(l$axisTitlePosY)) {
+      if(is.null(l$axisTitlePos))
+        l$axisTitlePos <- list()
+      l$axisTitlePos$y <- l$axisTitlePosY
+      l$axisTitlePosY <- NULL
+    }
+    
     l
   }
 )
@@ -848,7 +783,8 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
     if(is.null(chart)) {
       chart <- private$addChart(chartId, place)
       if(is.null(layerId) || layerId != "main")
-        chart$addLayer("main", "axesChart")
+        layer <- chart$addLayer("main", "axesChart")
+        layer$dataFun <- pkg.env$dataFun$axesChart
     }
 
     if(is.null(layerId)){
@@ -874,7 +810,7 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
     }
 
     layer$pacerStep <- pacerStep
-
+    
     self$setProperties(c(data, list(...)), chartId, layerId)
     
     for(session in private$sessions){
@@ -882,7 +818,9 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
       chart$update(session)
     }
     
+    print(self$getChart(chartId)$getLayer("main")$dataFun)     
     invisible(self)
+ 
   },  
   
   initialize = function(layout = NULL, beforeLoad = function(session) {}, afterLoad = function(session) {}, 
@@ -958,14 +896,14 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
                        "chart", "app", "layer", "content", "type", "domainX", "domainY", "apectRatio", "axisTitleX", "axisTitleY",
                        "logScaleX", "logScaleY", "ticksRotateX", "ticksRotateY", "globalColourScale", "aspectRatio",
                        "rankRows", "rankCols", "ticksX", "ticksY", "showDendogramCol", "on_labelClickCol", "on_labelClickRow",
-                       "axisTitlePos")),
+                       "axisTitlePosX", "axisTitlePosY")),
   nameList = c("labels" = "label", "color" = "colour", "colorValue" = "colourValue",
                "colourValues" = "colourValue", "colorValues" = "colourValue", "colorDomain" = "colourDomain",
                "colorLegendTitle" = "colourLegendTitle", "addColorScaleToLegend" = "addColourScaleToLegend",
                "symbols" = "symbol", "symbolValues" = "symbolValue", "strokes" = "stroke", "values" = "value",
                "heatmapRows" = "heatmapRow", "heatmapCols" = "heatmapCol", "showValues" = "showValue",
                "globalColorScale" = "globalColourScale", "steps" = "step"),
-  jsTypes = c(scatter = "scatter", beeswarm = "beeswarm", line = "pointLine", path = "poinLine",
+  jsTypes = c(scatter = "scatter", beeswarm = "beeswarm", line = "pointLine", path = "pointLine",
               ribbon = "pointRibbon", bars = "barchart", hist = "barchart", dens = "pointLine",
               heatmap = "heatmap", colourSlider = "colourSlider", abLine = "xLine", hLine = "xLine",
               vLine = "yLine", html = "html", input = "input"),
@@ -1030,7 +968,7 @@ Chart <- R6Class("Chart", public = list(
       stop(str_c("Layer with ID ", layerId, " already exists in chart ", self$id, ".", 
                  " Use 'chart$removeLayer(layerId)' to remove it."))
     
-    private$layers[[layerId]] <<- Layer$new(type, layerId)
+    private$layers[[layerId]] <- Layer$new(type, layerId)
     invisible(private$layers[[layerId]])    
   },
   
