@@ -133,14 +133,6 @@ rlc.setProperty = function(name) {
     charts[id].activeLayer(charts[id].get_layer(spl[1]));
   for(pr in window[name]) {
     if(pr == "paddings"){
-      if(window[name][pr].top)
-        window[name][pr].top = window[name][pr].top[0];
-      if(window[name][pr].bottom)
-        window[name][pr].bottom = window[name][pr].bottom[0];
-      if(window[name][pr].left)
-        window[name][pr].left = window[name][pr].left[0];
-      if(window[name][pr].right)
-        window[name][pr].right = window[name][pr].right[0];
       charts[id].set_paddings(window[name][pr]);
     } else if(pr == "rankRows") {
       orderRow = window[name][pr];

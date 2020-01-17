@@ -120,7 +120,8 @@ changes happen to the chart.}
 lc_bars(dat(value = tapply(esoph$ncases, esoph$agegp, sum), 
             title = "Number of cases per age group",
             axisTitleX = "Age group", 
-            axisTitleY = "Number of esophageal cases"))
+            axisTitleY = "Number of esophageal cases",
+            axisTitlePosX = "down"))
 
 lc_bars(dat(value = c(tapply(esoph$ncases, esoph$agegp, sum), 
                       tapply(esoph$ncontrols, esoph$agegp, sum)),

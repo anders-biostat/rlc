@@ -782,9 +782,10 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
     
     if(is.null(chart)) {
       chart <- private$addChart(chartId, place)
-      if(is.null(layerId) || layerId != "main")
+      if(is.null(layerId) || layerId != "main"){
         layer <- chart$addLayer("main", "axesChart")
         layer$dataFun <- pkg.env$dataFun$axesChart
+      }
     }
 
     if(is.null(layerId)){
@@ -1121,7 +1122,6 @@ Chart <- R6Class("Chart", public = list(
           
           session$sendData(name, d)
           session$sendCommand(str_interp("rlc.setProperty('${name}')"))
-          
         }
       }
     }
