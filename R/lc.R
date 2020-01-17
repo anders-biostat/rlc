@@ -651,7 +651,7 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
       chart <- self$getChart(chartId)
       if(chart$nLayers() > 1) {
         print("- Layers:")
-        for(layerId in names(chart$layers)){
+        for(layerId in chart$getLayerIds()){
           layer <- chart$getLayer(layerId)
           if(layer$id != "main")
             print(str_interp("-- ${layer$id} - ${layer$type}"))
@@ -1228,7 +1228,7 @@ getAppAndSession <- function(sessionId = NULL, app = NULL, all = TRUE) {
 #' @param chartId A vector of IDs of the charts to be removed.
 #' 
 #' @examples 
-#' \donttest{lc_scatter(dat(x = 1:10, y = 1:10 * 2), id = "scatter")
+#' \donttest{lc_scatter(dat(x = 1:10, y = 1:10 * 2), chartId = "scatter")
 #' removeChart("scatter")}
 #' 
 #' @export
@@ -1248,8 +1248,8 @@ removeChart <- function(chartId) {
 #' @param layerId ID of the layer to remove.
 #' 
 #' @examples 
-#' \donttest{lc_scatter(dat(x = 1:10, y = 1:10 * 2), id = "scatter")
-#' lc_abLine(a = 2, b = 0, id = "scatter", addLayer = TRUE)
+#' \donttest{lc_scatter(dat(x = 1:10, y = 1:10 * 2), chartId = "scatter")
+#' lc_abLine(a = 2, b = 0, chartId = "scatter", addLayer = TRUE)
 #' removeLayer("scatter", "Layer1")}
 #' 
 #' @export
@@ -1273,12 +1273,12 @@ removeLayer <- function(chartId, layerId) {
 #' 
 #' @examples
 #' \donttest{data("iris")
-#' lc_scatter(dat(x = iris$Sepal.Length, y = iris$Sepal.Width), id = "irisScatter")
-#' setProperties(dat(symbolValue = iris$Species, y = iris$Petal.Length), id = "irisScatter")
+#' lc_scatter(dat(x = iris$Sepal.Length, y = iris$Sepal.Width), chartId = "irisScatter")
+#' setProperties(dat(symbolValue = iris$Species, y = iris$Petal.Length), chartId = "irisScatter")
 #' updateCharts("irisScatter")
 #' 
-#' lc_line(dat(x = iris$Sepal.Length, y = iris$Petal.Length), id = "irisScatter", layerId = "line")
-#' setProperties(dat(colour = "red"), id = "irisScatter", layerId = "line")
+#' lc_line(dat(x = iris$Sepal.Length, y = iris$Petal.Length), chartId = "irisScatter", layerId = "line")
+#' setProperties(dat(colour = "red"), chartId = "irisScatter", layerId = "line")
 #' updateCharts("irisScatter")}
 #' 
 #' @export
@@ -1374,7 +1374,7 @@ setProperties <- function(data, chartId, layerId = NULL) {
 #' colour <- iris$Sepal.Width
 #' #create a chart
 #' lc_scatter(dat(x = iris$Sepal.Length, y = iris$Petal.Length, colourValue = colour,
-#'                width = width, height = height), id = "iris")
+#'                width = width, height = height), chartId = "iris")
 #' 
 #' #change the variables
 #' height <- 400
@@ -1455,8 +1455,8 @@ chartEvent <- function(d, chartId, layerId = "main", event, sessionId = .id, app
 #' lc_scatter(dat(x = x,
 #'                y = sin(x) + noise,
 #'                colourValue = noise), 
-#'            id = "plot", layerId = "points")
-#' lc_line(dat(x = x, y = sin(x)), id = "plot", addLayer = TRUE)
+#'            chartId = "plot", layerId = "points")
+#' lc_line(dat(x = x, y = sin(x)), chartId = "plot", addLayer = TRUE)
 #' lc_colourSlider(chart = "plot", layer = "points")
 #' 
 #' listCharts()}
@@ -1895,12 +1895,12 @@ lc_beeswarm <- function(data = list(), place = NULL, ..., chartId = NULL, layerI
 #' lc_ribbon(dat(ymin = pred$fit - 1.96 * pred$se.fit,
 #'               ymax = pred$fit + 1.96 * pred$se.fit,
 #'               x = x,
-#'               colour = "#555555"), id = "ribbonTest")
-#' lc_scatter(dat(x = x, y = y), size = 2, id = "ribbonTest", addLayer = TRUE)
-#' lc_abLine(dat(a = fit$coefficients[2], b = fit$coefficients[1]), id = "ribbonTest", addLayer = TRUE)
+#'               colour = "#555555"), chartId = "ribbonTest")
+#' lc_scatter(dat(x = x, y = y), size = 2, chartId = "ribbonTest", addLayer = TRUE)
+#' lc_abLine(dat(a = fit$coefficients[2], b = fit$coefficients[1]), chartId = "ribbonTest", addLayer = TRUE)
 #' 
-#' lc_hLine(dat(h = seq(1, 9, 1), domainX = c(0, 10), domainY = c(0, 10)), id = "grid")
-#' lc_vLine(dat(v = seq(1, 9, 1)), id = "grid", addLayer = TRUE)}
+#' lc_hLine(dat(h = seq(1, 9, 1), domainX = c(0, 10), domainY = c(0, 10)), chartId = "grid")
+#' lc_vLine(dat(v = seq(1, 9, 1)), chartId = "grid", addLayer = TRUE)}
 #' 
 #' @export
 lc_line <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, addLayer = FALSE) {

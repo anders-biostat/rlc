@@ -210,11 +210,11 @@ pred <- predict(fit, data.frame(x = x), se.fit = TRUE)
 lc_ribbon(dat(ymin = pred$fit - 1.96 * pred$se.fit,
               ymax = pred$fit + 1.96 * pred$se.fit,
               x = x,
-              colour = "#555555"), id = "ribbonTest")
-lc_scatter(dat(x = x, y = y), size = 2, id = "ribbonTest", addLayer = TRUE)
-lc_abLine(dat(a = fit$coefficients[2], b = fit$coefficients[1]), id = "ribbonTest", addLayer = TRUE)
+              colour = "#555555"), chartId = "ribbonTest")
+lc_scatter(dat(x = x, y = y), size = 2, chartId = "ribbonTest", addLayer = TRUE)
+lc_abLine(dat(a = fit$coefficients[2], b = fit$coefficients[1]), chartId = "ribbonTest", addLayer = TRUE)
 
-lc_hLine(dat(h = seq(1, 9, 1), domainX = c(0, 10), domainY = c(0, 10)), id = "grid")
-lc_vLine(dat(v = seq(1, 9, 1)), id = "grid", addLayer = TRUE)}
+lc_hLine(dat(h = seq(1, 9, 1), domainX = c(0, 10), domainY = c(0, 10)), chartId = "grid")
+lc_vLine(dat(v = seq(1, 9, 1)), chartId = "grid", addLayer = TRUE)}
 
 }

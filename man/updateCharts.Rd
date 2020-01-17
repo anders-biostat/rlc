@@ -94,7 +94,7 @@ height <- 300
 colour <- iris$Sepal.Width
 #create a chart
 lc_scatter(dat(x = iris$Sepal.Length, y = iris$Petal.Length, colourValue = colour,
-               width = width, height = height), id = "iris")
+               width = width, height = height), chartId = "iris")
 
 #change the variables
 height <- 400

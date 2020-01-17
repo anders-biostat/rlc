@@ -22,12 +22,12 @@ This function is a wrapper around method \code{setProperties} of class \code{\li
 }
 \examples{
 \donttest{data("iris")
-lc_scatter(dat(x = iris$Sepal.Length, y = iris$Sepal.Width), id = "irisScatter")
-setProperties(dat(symbolValue = iris$Species, y = iris$Petal.Length), id = "irisScatter")
+lc_scatter(dat(x = iris$Sepal.Length, y = iris$Sepal.Width), chartId = "irisScatter")
+setProperties(dat(symbolValue = iris$Species, y = iris$Petal.Length), chartId = "irisScatter")
 updateCharts("irisScatter")
 
-lc_line(dat(x = iris$Sepal.Length, y = iris$Petal.Length), id = "irisScatter", layerId = "line")
-setProperties(dat(colour = "red"), id = "irisScatter", layerId = "line")
+lc_line(dat(x = iris$Sepal.Length, y = iris$Petal.Length), chartId = "irisScatter", layerId = "line")
+setProperties(dat(colour = "red"), chartId = "irisScatter", layerId = "line")
 updateCharts("irisScatter")}
 
 }

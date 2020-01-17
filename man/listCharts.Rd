@@ -17,8 +17,8 @@ x <- seq(-4, 4, length.out = 30)
 lc_scatter(dat(x = x,
                y = sin(x) + noise,
                colourValue = noise), 
-           id = "plot", layerId = "points")
-lc_line(dat(x = x, y = sin(x)), id = "plot", addLayer = TRUE)
+           chartId = "plot", layerId = "points")
+lc_line(dat(x = x, y = sin(x)), chartId = "plot", addLayer = TRUE)
 lc_colourSlider(chart = "plot", layer = "points")
 
 listCharts()}
