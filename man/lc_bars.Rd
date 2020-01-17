@@ -77,10 +77,10 @@ is automatically set to include all layer domains.
 \item \code{aspectRatio} - aspect ratio.
 \item \code{axisTitleX, axisTitleY} - axes titles.
 \item \code{axisTitlePosX, axisTitlePosY} - position of axes titles. For each axis one can specify title position
-\code{across} or \code{along} the corresponding axis. Possible options are \code{"up"} (for title inside the plotting area)
-or \code{"down"} (outside the plottting area, under the axis) for \code{across}, and
-\code{"start"}, \code{"middle"}, \code{"end"} for \code{along}. This properties must be a list with one or two fields
-named \code{"across"} and/or \code{"along"}.
+across or along the corresponding axis. Possible options are \code{"up"} (for title inside the plotting area)
+or \code{"down"} (outside the plottting area, under the axis), and
+\code{"start"}, \code{"middle"}, \code{"end"}. This property must be a string with one or two of the abovementioned options
+(e.g. \code{"middle down"}, \code{"start"}, etc.).
 \item \code{ticksRotateX, ticksRotateY} - angle by which to rotate ticks (in degrees). Must be between
 0 (horizontal ticks, default) and 90 (vertical ticks).
 \item \code{ticksX, ticksY} - set of ticks for the axes.}

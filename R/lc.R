@@ -818,7 +818,6 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
       chart$update(session)
     }
     
-    print(self$getChart(chartId)$getLayer("main")$dataFun)     
     invisible(self)
  
   },  
@@ -1690,10 +1689,10 @@ closePage <- function() {
 #'  \item \code{aspectRatio} - aspect ratio.
 #'  \item \code{axisTitleX, axisTitleY} - axes titles.
 #'  \item \code{axisTitlePosX, axisTitlePosY} - position of axes titles. For each axis one can specify title position
-#'  \code{across} or \code{along} the corresponding axis. Possible options are \code{"up"} (for title inside the plotting area)
-#'  or \code{"down"} (outside the plottting area, under the axis) for \code{across}, and
-#'  \code{"start"}, \code{"middle"}, \code{"end"} for \code{along}. This properties must be a list with one or two fields
-#'  named \code{"across"} and/or \code{"along"}.
+#'  across or along the corresponding axis. Possible options are \code{"up"} (for title inside the plotting area)
+#'  or \code{"down"} (outside the plottting area, under the axis), and
+#'  \code{"start"}, \code{"middle"}, \code{"end"}. This property must be a string with one or two of the abovementioned options
+#'  (e.g. \code{"middle down"}, \code{"start"}, etc.).
 #'  \item \code{ticksRotateX, ticksRotateY} - angle by which to rotate ticks (in degrees). Must be between 
 #'  0 (horizontal ticks, default) and 90 (vertical ticks).
 #'  \item \code{ticksX, ticksY} - set of ticks for the axes.} 
@@ -1837,10 +1836,10 @@ lc_beeswarm <- function(data = list(), place = NULL, ..., chartId = NULL, layerI
 #'  \item \code{aspectRatio} - aspect ratio.
 #'  \item \code{axisTitleX, axisTitleY} - axes titles.
 #'  \item \code{axisTitlePosX, axisTitlePosY} - position of axes titles. For each axis one can specify title position
-#'  \code{across} or \code{along} the corresponding axis. Possible options are \code{"up"} (for title inside the plotting area)
-#'  or \code{"down"} (outside the plottting area, under the axis) for \code{across}, and
-#'  \code{"start"}, \code{"middle"}, \code{"end"} for \code{along}. This properties must be a list with one or two fields
-#'  named \code{"across"} and/or \code{"along"}.
+#'  across or along the corresponding axis. Possible options are \code{"up"} (for title inside the plotting area)
+#'  or \code{"down"} (outside the plottting area, under the axis), and
+#'  \code{"start"}, \code{"middle"}, \code{"end"}. This property must be a string with one or two of the abovementioned options
+#'  (e.g. \code{"middle down"}, \code{"start"}, etc.).
 #'  \item \code{ticksRotateX, ticksRotateY} - angle by which to rotate ticks (in degrees). Must be between 
 #'  0 (horizontal ticks, default) and 90 (vertical ticks).
 #'  \item \code{ticksX, ticksY} - set of ticks for the axes.} 
@@ -1993,10 +1992,10 @@ lc_ribbon <- function(data = list(), place = NULL, ..., chartId = NULL, layerId 
 #'  \item \code{aspectRatio} - aspect ratio.
 #'  \item \code{axisTitleX, axisTitleY} - axes titles.
 #'  \item \code{axisTitlePosX, axisTitlePosY} - position of axes titles. For each axis one can specify title position
-#'  \code{across} or \code{along} the corresponding axis. Possible options are \code{"up"} (for title inside the plotting area)
-#'  or \code{"down"} (outside the plottting area, under the axis) for \code{across}, and
-#'  \code{"start"}, \code{"middle"}, \code{"end"} for \code{along}. This properties must be a list with one or two fields
-#'  named \code{"across"} and/or \code{"along"}.
+#'  across or along the corresponding axis. Possible options are \code{"up"} (for title inside the plotting area)
+#'  or \code{"down"} (outside the plottting area, under the axis), and
+#'  \code{"start"}, \code{"middle"}, \code{"end"}. This property must be a string with one or two of the abovementioned options
+#'  (e.g. \code{"middle down"}, \code{"start"}, etc.).
 #'  \item \code{ticksRotateX, ticksRotateY} - angle by which to rotate ticks (in degrees). Must be between 
 #'  0 (horizontal ticks, default) and 90 (vertical ticks).
 #'  \item \code{ticksX, ticksY} - set of ticks for the axes.}
@@ -2036,7 +2035,8 @@ lc_ribbon <- function(data = list(), place = NULL, ..., chartId = NULL, layerId 
 #' lc_bars(dat(value = tapply(esoph$ncases, esoph$agegp, sum), 
 #'             title = "Number of cases per age group",
 #'             axisTitleX = "Age group", 
-#'             axisTitleY = "Number of esophageal cases"))
+#'             axisTitleY = "Number of esophageal cases",
+#'             axisTitlePosX = "down"))
 #' 
 #' lc_bars(dat(value = c(tapply(esoph$ncases, esoph$agegp, sum), 
 #'                       tapply(esoph$ncontrols, esoph$agegp, sum)),
