@@ -5,7 +5,7 @@ writeLines(c("---",
              "usePrism: true",
              "title: 'R/LinkedCharts API'",
              "hideTOC: 'true'",
-             "api: true",
+             "api: 'rlc'",
              "---"), "api.md")
 
 for(file in list.files("man")){

@@ -1,3 +1,22 @@
+## Resubmission
+
+This is a new version of the package that follows the update of `jrc` package. `rlc` can now utilize new functionality of
+`jrc` and produce server app that can be used by multiple clients simultaneously. The package has also been restrunctured
+so that the entire app is now contained within a single `R6` object, which inherits from `jrc::App`.
+
+## Reverse dependencies
+
+There are none.
+
+## Test environments
+* local ubuntu 18.04 LST, R 3.6.2
+* win-builder: R-devel
+* ubuntu 16.04.6 LTS, R-devel, R 3.6.2, R 3.5.3 (travis ci)
+
+## R CMD check results
+
+There were no ERRORS, WARNINGS or NOTES
+
 ## Test environments
 * local ubuntu 18.04 LST, R 3.6.1
 * win-builder: R-devel

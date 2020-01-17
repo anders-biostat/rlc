@@ -78,7 +78,7 @@ is automatically set to include all layer domains.
 \item \code{axisTitleX, axisTitleY} - axes titles.
 \item \code{axisTitlePosX, axisTitlePosY} - position of axes titles. For each axis one can specify title position
 across or along the corresponding axis. Possible options are \code{"up"} (for title inside the plotting area)
-or \code{"down"} (outside the plottting area, under the axis), and
+or \code{"down"} (outside the plotting area, under the axis), and
 \code{"start"}, \code{"middle"}, \code{"end"}. This property must be a string with one or two of the abovementioned options
 (e.g. \code{"middle down"}, \code{"start"}, etc.).
 \item \code{ticksRotateX, ticksRotateY} - angle by which to rotate ticks (in degrees). Must be between

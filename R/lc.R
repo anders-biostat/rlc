@@ -1277,7 +1277,8 @@ removeLayer <- function(chartId, layerId) {
 #' setProperties(dat(symbolValue = iris$Species, y = iris$Petal.Length), chartId = "irisScatter")
 #' updateCharts("irisScatter")
 #' 
-#' lc_line(dat(x = iris$Sepal.Length, y = iris$Petal.Length), chartId = "irisScatter", layerId = "line")
+#' lc_line(dat(x = iris$Sepal.Length, y = iris$Petal.Length), chartId = "irisScatter", 
+#'         layerId = "line")
 #' setProperties(dat(colour = "red"), chartId = "irisScatter", layerId = "line")
 #' updateCharts("irisScatter")}
 #' 
@@ -1690,7 +1691,7 @@ closePage <- function() {
 #'  \item \code{axisTitleX, axisTitleY} - axes titles.
 #'  \item \code{axisTitlePosX, axisTitlePosY} - position of axes titles. For each axis one can specify title position
 #'  across or along the corresponding axis. Possible options are \code{"up"} (for title inside the plotting area)
-#'  or \code{"down"} (outside the plottting area, under the axis), and
+#'  or \code{"down"} (outside the plotting area, under the axis), and
 #'  \code{"start"}, \code{"middle"}, \code{"end"}. This property must be a string with one or two of the abovementioned options
 #'  (e.g. \code{"middle down"}, \code{"start"}, etc.).
 #'  \item \code{ticksRotateX, ticksRotateY} - angle by which to rotate ticks (in degrees). Must be between 
@@ -1837,7 +1838,7 @@ lc_beeswarm <- function(data = list(), place = NULL, ..., chartId = NULL, layerI
 #'  \item \code{axisTitleX, axisTitleY} - axes titles.
 #'  \item \code{axisTitlePosX, axisTitlePosY} - position of axes titles. For each axis one can specify title position
 #'  across or along the corresponding axis. Possible options are \code{"up"} (for title inside the plotting area)
-#'  or \code{"down"} (outside the plottting area, under the axis), and
+#'  or \code{"down"} (outside the plotting area, under the axis), and
 #'  \code{"start"}, \code{"middle"}, \code{"end"}. This property must be a string with one or two of the abovementioned options
 #'  (e.g. \code{"middle down"}, \code{"start"}, etc.).
 #'  \item \code{ticksRotateX, ticksRotateY} - angle by which to rotate ticks (in degrees). Must be between 
@@ -1897,7 +1898,8 @@ lc_beeswarm <- function(data = list(), place = NULL, ..., chartId = NULL, layerI
 #'               x = x,
 #'               colour = "#555555"), chartId = "ribbonTest")
 #' lc_scatter(dat(x = x, y = y), size = 2, chartId = "ribbonTest", addLayer = TRUE)
-#' lc_abLine(dat(a = fit$coefficients[2], b = fit$coefficients[1]), chartId = "ribbonTest", addLayer = TRUE)
+#' lc_abLine(dat(a = fit$coefficients[2], b = fit$coefficients[1]), 
+#'           chartId = "ribbonTest", addLayer = TRUE)
 #' 
 #' lc_hLine(dat(h = seq(1, 9, 1), domainX = c(0, 10), domainY = c(0, 10)), chartId = "grid")
 #' lc_vLine(dat(v = seq(1, 9, 1)), chartId = "grid", addLayer = TRUE)}
@@ -1993,7 +1995,7 @@ lc_ribbon <- function(data = list(), place = NULL, ..., chartId = NULL, layerId 
 #'  \item \code{axisTitleX, axisTitleY} - axes titles.
 #'  \item \code{axisTitlePosX, axisTitlePosY} - position of axes titles. For each axis one can specify title position
 #'  across or along the corresponding axis. Possible options are \code{"up"} (for title inside the plotting area)
-#'  or \code{"down"} (outside the plottting area, under the axis), and
+#'  or \code{"down"} (outside the plotting area, under the axis), and
 #'  \code{"start"}, \code{"middle"}, \code{"end"}. This property must be a string with one or two of the abovementioned options
 #'  (e.g. \code{"middle down"}, \code{"start"}, etc.).
 #'  \item \code{ticksRotateX, ticksRotateY} - angle by which to rotate ticks (in degrees). Must be between 

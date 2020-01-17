@@ -26,7 +26,8 @@ lc_scatter(dat(x = iris$Sepal.Length, y = iris$Sepal.Width), chartId = "irisScat
 setProperties(dat(symbolValue = iris$Species, y = iris$Petal.Length), chartId = "irisScatter")
 updateCharts("irisScatter")
 
-lc_line(dat(x = iris$Sepal.Length, y = iris$Petal.Length), chartId = "irisScatter", layerId = "line")
+lc_line(dat(x = iris$Sepal.Length, y = iris$Petal.Length), chartId = "irisScatter", 
+        layerId = "line")
 setProperties(dat(colour = "red"), chartId = "irisScatter", layerId = "line")
 updateCharts("irisScatter")}
 
