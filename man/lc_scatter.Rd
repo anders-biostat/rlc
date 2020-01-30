@@ -161,7 +161,7 @@ changes happen to the chart.}
 lc_scatter(dat(x = Sepal.Length, 
                y = Petal.Length,
                colourValue = Petal.Width,
-               symbolValue = $Species),
+               symbolValue = Species),
            with = iris,
            title = "Iris dataset",
            axisTitleY = "Petal Length",
