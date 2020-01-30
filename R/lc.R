@@ -46,6 +46,9 @@ pkg.env$dataFun <- list(
       l$shiftY <- runif(length(l$y), -l$jitterY, l$jitterY)
       l$jitterY <- NULL
     }
+    
+    if(is.null(l$symbolLegendTitle)) 
+      l$symbolLegendTitle <- ""
 
     l
   },
@@ -65,6 +68,9 @@ pkg.env$dataFun <- list(
         l$label <- names(l$x)
     }
 
+    if(is.null(l$symbolLegendTitle)) 
+      l$symbolLegendTitle <- ""
+    
     l   
   },
   
@@ -409,6 +415,9 @@ pkg.env$dataFun <- list(
       l$axisTitlePosY <- NULL
     }
     
+    if(is.null(l$colourLegendTitle))
+      l$colourLegendTitle <- ""
+
     l
   }
 )
@@ -1083,14 +1092,15 @@ Chart <- R6Class("Chart", public = list(
 
           env <- session$sessionVariables()
           
-          
           data <- data.frame()
           if(!is.null(self$data.frame))
             tryCatch({data <- eval(self$data.frame, env)},
                      error = function(e) {
                        warning("Data table hasn't been found and will be ignored")
                      })
-
+          
+          stopifnot(is.list(data))
+          
           tryCatch({
             d <- lapply(layer$properties, function(expr) eval(expr, data, enclos = env))
             d <- layer$dataFun(d)
