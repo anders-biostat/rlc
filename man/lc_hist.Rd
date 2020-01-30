@@ -11,6 +11,7 @@ lc_hist(
   ...,
   chartId = NULL,
   layerId = NULL,
+  with = NULL,
   addLayer = FALSE
 )
 
@@ -20,6 +21,7 @@ lc_dens(
   ...,
   chartId = NULL,
   layerId = NULL,
+  with = NULL,
   addLayer = FALSE
 )
 }
@@ -41,6 +43,10 @@ where \code{N - 1} is the number of existing charts.}
 \item{layerId}{An ID for the new layer. All layers within one chart must have different IDs. If a layer with the same
 ID already exists, it will be replaced. If not defined, will be set to \code{LayerN}, where \code{N - 1}
 is the number of currently existing layers in this chart.}
+
+\item{with}{A data set from which other properties should be taken. If the data set doesn't have a
+column with the requested name, the variable will be searched for outside of the data set. Must be
+a data.frame or a list.}
 
 \item{addLayer}{if there is already a chart with the same ID, this argument defines whether to replace it or to add a
 new layer to it. This argument is ignored if both \code{place} and \code{chartId} are \code{NULL} or if there is no

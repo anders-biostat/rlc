@@ -4,7 +4,7 @@
 \alias{lc_colourSlider}
 \title{Add a colour slider}
 \usage{
-lc_colourSlider(data = list(), place = NULL, ..., chartId = NULL)
+lc_colourSlider(data = list(), place = NULL, ..., chartId = NULL, with = NULL)
 }
 \arguments{
 \item{data}{Name value pairs of properties, passed through the \code{\link{dat}} function. These
@@ -19,7 +19,11 @@ constant. These properties can still be changed later using the \code{\link{setP
 \item{chartId}{ID for the chart. All charts must have unique IDs. If a chart with the same ID already
 exists, it will be replaced. If ID is not defined, it will be the same as
 value of the \code{place} argument. And if both are not defined, the ID will be set to \code{ChartN},
-where \code{N - 1} is the number of existing charts..}
+where \code{N - 1} is the number of existing charts.}
+
+\item{with}{A data set from which other properties should be taken. If the data set doesn't have a
+column with the requested name, the variable will be searched for outside of the data set. Must be
+a data.frame or a list.}
 }
 \description{
 Colour slider provides an easy way to change any continuous colour scale
@@ -50,10 +54,11 @@ Global chart settings
 
 \examples{
 \donttest{data("iris")
-lc_scatter(dat(x = iris$Sepal.Length, 
-               y = iris$Petal.Length,
-               colourValue = iris$Petal.Width,
-               symbolValue = iris$Species),
+lc_scatter(dat(x = Sepal.Length, 
+               y = Petal.Length,
+               colourValue = Petal.Width,
+               symbolValue = Species),
+           with = iris,
            title = "Iris dataset",
            axisTitleY = "Petal Length",
            axisTitleX = "Sepal Length",

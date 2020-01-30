@@ -4,7 +4,7 @@
 \alias{lc_input}
 \title{Add input forms to the page}
 \usage{
-lc_input(data = list(), place = NULL, ..., chartId = NULL)
+lc_input(data = list(), place = NULL, ..., chartId = NULL, with = NULL)
 }
 \arguments{
 \item{data}{Name value pairs of properties, passed through the \code{\link{dat}} function. These
@@ -20,6 +20,10 @@ constant. These properties can still be changed later using the \code{\link{setP
 exists, it will be replaced. If ID is not defined, it will be the same as
 value of the \code{place} argument. And if both are not defined, the ID will be set to \code{ChartN},
 where \code{N - 1} is the number of existing charts.}
+
+\item{with}{A data set from which other properties should be taken. If the data set doesn't have a
+column with the requested name, the variable will be searched for outside of the data set. Must be
+a data.frame or a list.}
 }
 \description{
 \code{lc_input} adds an input form. This function is an rlc wrapper for an

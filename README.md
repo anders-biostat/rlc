@@ -35,6 +35,7 @@ Currently supported types of charts are:
 - ```lc_scatter``` - scatter plot
 - ```lc_beeswarm``` - bee swarm plot (either vertical or horizontal)
 - ```lc_line``` - lines, defined by sets of X and Y coordinates
+- ```lc_path``` - lines, defined by sets of X and Y coordinates in a given order
 - ```lc_abLine``` - lines, defined by slope (a) and intercept (b) values
 - ```lc_vLine``` - vertical lines
 - ```lc_hLine``` - horizontal lines

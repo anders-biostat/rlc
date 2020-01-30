@@ -4,7 +4,14 @@
 \alias{lc_heatmap}
 \title{Create a heatmap}
 \usage{
-lc_heatmap(data = list(), place = NULL, ..., chartId = NULL, pacerStep = 50)
+lc_heatmap(
+  data = list(),
+  place = NULL,
+  ...,
+  chartId = NULL,
+  with = NULL,
+  pacerStep = 50
+)
 }
 \arguments{
 \item{data}{Name value pairs of properties, passed through the \code{\link{dat}} function. These
@@ -20,6 +27,10 @@ constant. These properties can still be changed later using the \code{\link{setP
 exists, it will be replaced. If ID is not defined, it will be the same as
 value of the \code{place} argument. And if both are not defined, the ID will be set to \code{ChartN},
 where \code{N - 1} is the number of existing charts.}
+
+\item{with}{A data set from which other properties should be taken. If the data set doesn't have a
+column with the requested name, the variable will be searched for outside of the data set. Must be
+a data.frame or a list.}
 
 \item{pacerStep}{Time in ms between two consecutive calls of an \code{onmouseover} event. Prevents overqueuing in case
 of cumbersome computations. May be important when the chart works in canvas mode.}

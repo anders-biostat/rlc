@@ -1,3 +1,10 @@
+# rlc 0.2.1
+
+* New argument `with` in all the plotting functions. This argument allows to provide a data
+table, that will be used to evaluate properties.
+
+* Bug with mispositioning a click in newest versions of Firefox fixed... again.
+
 # rlc 0.2.0
 
 * It is possible now to create server apps that can be accessed by multiple users simultaneously. To this end, one should use arguments 

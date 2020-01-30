@@ -4,7 +4,7 @@
 \alias{setProperties}
 \title{Set properties of the chart}
 \usage{
-setProperties(data, chartId, layerId = NULL)
+setProperties(data, chartId, layerId = NULL, with = NULL)
 }
 \arguments{
 \item{data}{List of properties to be redefined for this layer or chart. Created by the \code{\link{dat}}
@@ -14,6 +14,10 @@ function.}
 
 \item{layerId}{ID of the layer, for which to redefine properties. If the chart has a single
 layer or doesn't have layers, default value (which is NULL) can be used.}
+
+\item{with}{A data set from which other properties should be taken. If the data set doesn't have a
+column with the requested name, the variable will be searched for outside of the data set. Must be
+a data.frame or a list.}
 }
 \description{
 Sets or resets properties for an

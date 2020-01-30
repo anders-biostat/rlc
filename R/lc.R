@@ -527,10 +527,13 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
     invisible(self)
   },
 
-  setProperties = function(data, chartId, layerId = NULL){
+  setProperties = function(data, chartId, layerId = NULL, with = NULL){
+    if(!is.null(with) && !is.language(with)) with <- substitute(with)
+    
     chart <- self$getChart(chartId)
     if(is.null(chart))
       stop(str_c("Chart with ID ", chartId, " is not defined."))
+    chart$data.frame <- with
     
     if(is.null(layerId))
       if(chart$getLayer("main")$type != "axesChart") {
@@ -748,11 +751,13 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
     session$sendCommand(str_c("rlc.mark('", chartId, "', '", layerId, "', ", preventEvent, ");"))    
   },
   
-  setChart = function(chartType, data = list(), ..., place = NULL, chartId = NULL, layerId = NULL, addLayer = FALSE, pacerStep = 50) {
+  setChart = function(chartType, data = list(), ..., place = NULL, chartId = NULL, layerId = NULL, addLayer = FALSE, with = NULL, pacerStep = 50) {
     if(is.null(super$serverHandle)){
       super$startServer()
 #      super$openPage()
     }
+
+    if(!is.null(with) && !is.language(with)) with <- substitute(with)
     
     if(length(chartType) > 1){
       warning("Attempt supply several types for one chart. Only the first one will be used.")
@@ -812,7 +817,7 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
 
     layer$pacerStep <- pacerStep
     
-    self$setProperties(c(data, list(...)), chartId, layerId)
+    self$setProperties(c(data, list(...)), chartId, layerId, with)
     
     for(session in private$sessions){
       chart$JSInitialize(session)
@@ -830,6 +835,7 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
     allowedVariables <- c(".marked", "s1", "s2", allowedVariables)
     
     onStart_lc <- function(session) {
+
       srcDir <- "http_root_rlc"
       reqPage <- system.file( "/http_root/linked-charts.css", package = "rlc" )
       
@@ -963,6 +969,7 @@ Layer <- R6Class("Layer", public = list(
 Chart <- R6Class("Chart", public = list(
   id = NULL,
   place = NULL,
+  data.frame = NULL,
   addLayer = function(layerId, type){
     if(layerId %in% names(private$layers))
       stop(str_c("Layer with ID ", layerId, " already exists in chart ", self$id, ".", 
@@ -1075,9 +1082,17 @@ Chart <- R6Class("Chart", public = list(
         if(!is.null(session)) {
 
           env <- session$sessionVariables()
+          
+          
+          data <- data.frame()
+          if(!is.null(self$data.frame))
+            tryCatch({data <- eval(self$data.frame, env)},
+                     error = function(e) {
+                       warning("Data table hasn't been found and will be ignored")
+                     })
 
           tryCatch({
-            d <- lapply(layer$properties, function(expr) eval(expr, env))
+            d <- lapply(layer$properties, function(expr) eval(expr, data, enclos = env))
             d <- layer$dataFun(d)
           },
           error = function(e) 
@@ -1270,6 +1285,9 @@ removeLayer <- function(chartId, layerId) {
 #' @param chartId ID of the chart, for which to redefine properties.
 #' @param layerId ID of the layer, for which to redefine properties. If the chart has a single
 #' layer or doesn't have layers, default value (which is NULL) can be used.
+#' @param with A data set from which other properties should be taken. If the data set doesn't have a 
+#' column with the requested name, the variable will be searched for outside of the data set. Must be
+#' a data.frame or a list.
 #' 
 #' @examples
 #' \donttest{data("iris")
@@ -1284,9 +1302,9 @@ removeLayer <- function(chartId, layerId) {
 #' 
 #' @export
 #' @importFrom plyr rename
-setProperties <- function(data, chartId, layerId = NULL) {
+setProperties <- function(data, chartId, layerId = NULL, with = NULL) {
   workWith <- getAppAndSession()
-  workWith$app$setProperties(data, chartId, layerId)
+  workWith$app$setProperties(data, chartId, layerId, substitute(with))
 }
 
 #' Update a chart
@@ -1636,6 +1654,9 @@ closePage <- function() {
 #' @param layerId An ID for the new layer. All layers within one chart must have different IDs. If a layer with the same
 #' ID already exists, it will be replaced. If not defined, will be set to \code{LayerN}, where \code{N - 1} 
 #' is the number of currently existing layers in this chart.
+#' @param with A data set from which other properties should be taken. If the data set doesn't have a 
+#' column with the requested name, the variable will be searched for outside of the data set. Must be
+#' a data.frame or a list.
 #' @param addLayer if there is already a chart with the same ID, this argument defines whether to replace it or to add a
 #' new layer to it. This argument is ignored if both \code{place} and \code{chartId} are \code{NULL} or if there is no
 #' chart with the given ID. 
@@ -1728,10 +1749,11 @@ closePage <- function() {
 #' 
 #' @examples
 #' \donttest{data("iris")
-#' lc_scatter(dat(x = iris$Sepal.Length, 
-#'                y = iris$Petal.Length,
-#'                colourValue = iris$Petal.Width,
-#'                symbolValue = iris$Species),
+#' lc_scatter(dat(x = Sepal.Length, 
+#'                y = Petal.Length,
+#'                colourValue = Petal.Width,
+#'                symbolValue = $Species),
+#'            with = iris,
 #'            title = "Iris dataset",
 #'            axisTitleY = "Petal Length",
 #'            axisTitleX = "Sepal Length",
@@ -1746,27 +1768,28 @@ closePage <- function() {
 #'             axisTitleX = "Species",
 #'             colourLegendTitle = "Sepal Width")}
 #' @export
-lc_scatter <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, addLayer = FALSE, pacerStep = 50) {
+lc_scatter <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, with = NULL, addLayer = FALSE, pacerStep = 50) {
   if(is.null(pkg.env$app)){
     openPage()
     pkg.env$app$setEnvironment(parent.frame())
   }
   
   pkg.env$app$setChart("scatter", data, ...,  place = place, chartId = chartId, layerId = layerId, addLayer = addLayer,
-           pacerStep = pacerStep)
+           with = substitute(with), pacerStep = pacerStep)
 }
 
 #' @describeIn lc_scatter creates a special kind of scatterplot, where the points are spread along one of 
 #' the axes to avoid overlapping.
 #' 
 #' @export
-lc_beeswarm <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, addLayer = FALSE, pacerStep = 50) {
+lc_beeswarm <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, with = NULL, addLayer = FALSE, pacerStep = 50) {
   if(is.null(pkg.env$app)){
     openPage()
     pkg.env$app$setEnvironment(parent.frame())
   }
   
-  pkg.env$app$setChart("beeswarm", data, ..., place = place, chartId = chartId, layerId = layerId, addLayer = addLayer, pacerStep = pacerStep)
+  pkg.env$app$setChart("beeswarm", data, ..., place = place, chartId = chartId, layerId = layerId, with = substitute(with),
+                       addLayer = addLayer, pacerStep = pacerStep)
 }
 
 #' Lines and ribbons
@@ -1789,6 +1812,9 @@ lc_beeswarm <- function(data = list(), place = NULL, ..., chartId = NULL, layerI
 #' @param layerId An ID for the new layer. All layers within one chart must have different IDs. If a layer with the same
 #' ID already exists, it will be replaced. If not defined, will be set to \code{LayerN}, where \code{N - 1} 
 #' is the number of currently existing layers in this chart.
+#' @param with A data set from which other properties should be taken. If the data set doesn't have a 
+#' column with the requested name, the variable will be searched for outside of the data set. Must be
+#' a data.frame or a list.
 #' @param addLayer if there is already a chart with the same ID, this argument defines whether to replace it or to add a
 #' new layer to it. This argument is ignored if both \code{place} and \code{chartId} are \code{NULL} or if there is no
 #' chart with the given ID. 
@@ -1905,35 +1931,35 @@ lc_beeswarm <- function(data = list(), place = NULL, ..., chartId = NULL, layerI
 #' lc_vLine(dat(v = seq(1, 9, 1)), chartId = "grid", addLayer = TRUE)}
 #' 
 #' @export
-lc_line <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, addLayer = FALSE) {
+lc_line <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, with = NULL, addLayer = FALSE) {
   if(is.null(pkg.env$app)){
     openPage()
     pkg.env$app$setEnvironment(parent.frame())
   }
   
-  pkg.env$app$setChart("line", data, ..., place = place, chartId = chartId, layerId = layerId, addLayer = addLayer)
+  pkg.env$app$setChart("line", data, ..., place = place, chartId = chartId, layerId = layerId, with = substitute(with), addLayer = addLayer)
 }
 
 #' @describeIn lc_line connects points in the order they are given.
 #' @export
-lc_path <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, addLayer = FALSE) {
+lc_path <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, with = NULL, addLayer = FALSE) {
   if(is.null(pkg.env$app)){
     openPage()
     pkg.env$app$setEnvironment(parent.frame())
   }
   
-  pkg.env$app$setChart("path", data, ..., place = place, chartId = chartId, layerId = layerId, addLayer = addLayer)
+  pkg.env$app$setChart("path", data, ..., place = place, chartId = chartId, layerId = layerId, with = substitute(with), addLayer = addLayer)
 }
 
 #' @describeIn lc_line displays a filled area, defined by \code{ymax} and \code{ymin} values.
 #' @export
-lc_ribbon <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, addLayer = FALSE) {
+lc_ribbon <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, with = NULL, addLayer = FALSE) {
   if(is.null(pkg.env$app)){
     openPage()
     pkg.env$app$setEnvironment(parent.frame())
   }
   
-  pkg.env$app$setChart("ribbon", data, ...,  place = place, chartId = chartId, layerId = layerId, addLayer = addLayer)
+  pkg.env$app$setChart("ribbon", data, ...,  place = place, chartId = chartId, layerId = layerId, with = substitute(with), addLayer = addLayer)
 }
 
 #' Create a barplot
@@ -1954,6 +1980,9 @@ lc_ribbon <- function(data = list(), place = NULL, ..., chartId = NULL, layerId 
 #' @param layerId An ID for the new layer. All layers within one chart must have different IDs. If a layer with the same
 #' ID already exists, it will be replaced. If not defined, will be set to \code{LayerN}, where \code{N - 1} 
 #' is the number of currently existing layers in this chart.
+#' @param with A data set from which other properties should be taken. If the data set doesn't have a 
+#' column with the requested name, the variable will be searched for outside of the data set. Must be
+#' a data.frame or a list.
 #' @param addLayer if there is already a chart with the same ID, this argument defines whether to replace it or to add a
 #' new layer to it. This argument is ignored if both \code{place} and \code{chartId} are \code{NULL} or if there is no
 #' chart with the given ID.
@@ -2062,13 +2091,13 @@ lc_ribbon <- function(data = list(), place = NULL, ..., chartId = NULL, layerId 
 #'             groupIds = newData$agegp))}
 #' 
 #' @export
-lc_bars <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, addLayer = FALSE) {
+lc_bars <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, with = NULL, addLayer = FALSE) {
   if(is.null(pkg.env$app)){
     openPage()
     pkg.env$app$setEnvironment(parent.frame())
   }
   
-  pkg.env$app$setChart("bars", data, ..., place = place, chartId = chartId, layerId = layerId, addLayer = addLayer)
+  pkg.env$app$setChart("bars", data, ..., place = place, chartId = chartId, layerId = layerId, with = substitute(with), addLayer = addLayer)
 }
 
 #' Histograms and density plots
@@ -2089,6 +2118,9 @@ lc_bars <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = 
 #' @param layerId An ID for the new layer. All layers within one chart must have different IDs. If a layer with the same
 #' ID already exists, it will be replaced. If not defined, will be set to \code{LayerN}, where \code{N - 1} 
 #' is the number of currently existing layers in this chart.
+#' @param with A data set from which other properties should be taken. If the data set doesn't have a 
+#' column with the requested name, the variable will be searched for outside of the data set. Must be
+#' a data.frame or a list.
 #' @param addLayer if there is already a chart with the same ID, this argument defines whether to replace it or to add a
 #' new layer to it. This argument is ignored if both \code{place} and \code{chartId} are \code{NULL} or if there is no
 #' chart with the given ID. 
@@ -2112,26 +2144,26 @@ lc_bars <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = 
 #' lc_dens(dat(value = rnorm(1000), height = 300)) }
 #' 
 #' @export 
-lc_hist <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, addLayer = FALSE) {
+lc_hist <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, with = NULL, addLayer = FALSE) {
   # has a nbins property. Not implemented in JS
   if(is.null(pkg.env$app)){
     openPage()
     pkg.env$app$setEnvironment(parent.frame())
   }
   
-  pkg.env$app$setChart("hist", data, ..., place = place, chartId = chartId, layerId = layerId, addLayer = addLayer)
+  pkg.env$app$setChart("hist", data, ..., place = place, chartId = chartId, layerId = layerId, with = substitute(with), addLayer = addLayer)
 }
 
 #' @describeIn lc_hist makes a density plot. Is an extension of \code{\link{lc_line}}.
 #' @export
 #' @importFrom stats density.default
-lc_dens <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, addLayer = FALSE) {
+lc_dens <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, with = NULL, addLayer = FALSE) {
   if(is.null(pkg.env$app)){
     openPage()
     pkg.env$app$setEnvironment(parent.frame())
   }
   
-  pkg.env$app$setChart("dens", data, ..., place = place, chartId = chartId, layerId = layerId, addLayer = addLayer)
+  pkg.env$app$setChart("dens", data, ..., place = place, chartId = chartId, layerId = layerId, with = substitute(with), addLayer = addLayer)
 }
 
 #' Create a heatmap
@@ -2149,6 +2181,9 @@ lc_dens <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = 
 #' exists, it will be replaced. If ID is not defined, it will be the same as
 #' value of the \code{place} argument. And if both are not defined, the ID will be set to \code{ChartN}, 
 #' where \code{N - 1} is the number of existing charts.
+#' @param with A data set from which other properties should be taken. If the data set doesn't have a 
+#' column with the requested name, the variable will be searched for outside of the data set. Must be
+#' a data.frame or a list.
 #' @param pacerStep Time in ms between two consecutive calls of an \code{onmouseover} event. Prevents overqueuing in case
 #' of cumbersome computations. May be important when the chart works in canvas mode.
 #' 
@@ -2232,13 +2267,13 @@ lc_dens <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = 
 #'                colourDomain = c(-1, 1),
 #'                palette = brewer.pal(11, "RdYlBu")))}
 #' @export
-lc_heatmap <- function(data = list(), place = NULL, ..., chartId = NULL, pacerStep = 50) {
+lc_heatmap <- function(data = list(), place = NULL, ..., chartId = NULL, with = NULL, pacerStep = 50) {
   if(is.null(pkg.env$app)){
     openPage()
     pkg.env$app$setEnvironment(parent.frame())
   }
   
-  pkg.env$app$setChart("heatmap", data, ..., place = place, chartId = chartId, layerId = "main", pacerStep = pacerStep)
+  pkg.env$app$setChart("heatmap", data, ..., place = place, chartId = chartId, layerId = "main", with = substitute(with), pacerStep = pacerStep)
 }
 
 #' Add a colour slider
@@ -2257,7 +2292,10 @@ lc_heatmap <- function(data = list(), place = NULL, ..., chartId = NULL, pacerSt
 #' @param chartId ID for the chart. All charts must have unique IDs. If a chart with the same ID already
 #' exists, it will be replaced. If ID is not defined, it will be the same as
 #' value of the \code{place} argument. And if both are not defined, the ID will be set to \code{ChartN}, 
-#' where \code{N - 1} is the number of existing charts..
+#' where \code{N - 1} is the number of existing charts.
+#' @param with A data set from which other properties should be taken. If the data set doesn't have a 
+#' column with the requested name, the variable will be searched for outside of the data set. Must be
+#' a data.frame or a list.
 #' 
 #' @section Available properties: 
 #' You can read more about different properties
@@ -2280,10 +2318,11 @@ lc_heatmap <- function(data = list(), place = NULL, ..., chartId = NULL, pacerSt
 #' 
 #' @examples 
 #' \donttest{data("iris")
-#' lc_scatter(dat(x = iris$Sepal.Length, 
-#'                y = iris$Petal.Length,
-#'                colourValue = iris$Petal.Width,
-#'                symbolValue = iris$Species),
+#' lc_scatter(dat(x = Sepal.Length, 
+#'                y = Petal.Length,
+#'                colourValue = Petal.Width,
+#'                symbolValue = Species),
+#'            with = iris,
 #'            title = "Iris dataset",
 #'            axisTitleY = "Petal Length",
 #'            axisTitleX = "Sepal Length",
@@ -2295,47 +2334,47 @@ lc_heatmap <- function(data = list(), place = NULL, ..., chartId = NULL, pacerSt
 #' lc_colourSlider(chart = "scatter")}
 #' 
 #' @export
-lc_colourSlider <- function(data = list(), place = NULL, ..., chartId = NULL) {
+lc_colourSlider <- function(data = list(), place = NULL, ..., chartId = NULL, with = NULL) {
   if(is.null(pkg.env$app)){
     openPage()
     pkg.env$app$setEnvironment(parent.frame())
   }
 
-  pkg.env$app$setChart(chartType = "colourSlider", data = data, ..., place = place, chartId = chartId, layerId = "main")
+  pkg.env$app$setChart(chartType = "colourSlider", data = data, ..., place = place, chartId = chartId, layerId = "main", with = substitute(with))
 }
 
 #' @describeIn lc_line creates straight lines by intercept and slope values
 #' @export
 #' @importFrom jsonlite toJSON
-lc_abLine <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, addLayer = FALSE) {
+lc_abLine <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, with = NULL, addLayer = FALSE) {
   if(is.null(pkg.env$app)){
     openPage()
     pkg.env$app$setEnvironment(parent.frame())
   }
   
-  pkg.env$app$setChart("abLine", data, ..., place = place, chartId = chartId, layerId = layerId, addLayer = addLayer)
+  pkg.env$app$setChart("abLine", data, ..., place = place, chartId = chartId, layerId = layerId, with = substitute(with), addLayer = addLayer)
 }
 
 #' @describeIn lc_line creates horizontal lines by y-intercept values
 #' @export
-lc_hLine <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, addLayer = FALSE) {
+lc_hLine <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, with = NULL, addLayer = FALSE) {
   if(is.null(pkg.env$app)){
     openPage()
     pkg.env$app$setEnvironment(parent.frame())
   }
   
-  pkg.env$app$setChart("hLine", data, ..., place = place, chartId = chartId, layerId = layerId, addLayer = addLayer)
+  pkg.env$app$setChart("hLine", data, ..., place = place, chartId = chartId, layerId = layerId, with = substitute(with), addLayer = addLayer)
 }
 
 #' @describeIn lc_line creates vertical lines by x-intercept values
 #' @export
-lc_vLine <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, addLayer = FALSE) {
+lc_vLine <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, with = NULL, addLayer = FALSE) {
   if(is.null(pkg.env$app)){
     openPage()
     pkg.env$app$setEnvironment(parent.frame())
   }
   
-  pkg.env$app$setChart("vLine", data, ..., place = place, chartId = chartId, layerId = layerId, addLayer = addLayer)
+  pkg.env$app$setChart("vLine", data, ..., place = place, chartId = chartId, layerId = layerId, with = substitute(with), addLayer = addLayer)
 }
 
 #' Add HTML code to the page
@@ -2353,6 +2392,9 @@ lc_vLine <- function(data = list(), place = NULL, ..., chartId = NULL, layerId =
 #' exists, it will be replaced. If ID is not defined, it will be the same as
 #' value of the \code{place} argument. And if both are not defined, the ID will be set to \code{ChartN}, 
 #' where \code{N - 1} is the number of existing charts.
+#' @param with A data set from which other properties should be taken. If the data set doesn't have a 
+#' column with the requested name, the variable will be searched for outside of the data set. Must be
+#' a data.frame or a list.
 #'
 #' @section Available properties: 
 #' You can read more about different properties 
@@ -2379,13 +2421,13 @@ lc_vLine <- function(data = list(), place = NULL, ..., chartId = NULL, layerId =
 #' 
 #' @export
 #' @importFrom hwriter hwrite
-lc_html <- function(data = list(), place = NULL, ..., chartId = NULL) {
+lc_html <- function(data = list(), place = NULL, ..., chartId = NULL, with = NULL) {
   if(is.null(pkg.env$app)){
     openPage()
     pkg.env$app$setEnvironment(parent.frame())
   }
   
-  pkg.env$app$setChart("html", data, ..., place = place, chartId = chartId, layerId = "main")
+  pkg.env$app$setChart("html", data, ..., place = place, chartId = chartId, layerId = "main", with = substitute(with))
 }
 
 #' Add input forms to the page
@@ -2404,6 +2446,9 @@ lc_html <- function(data = list(), place = NULL, ..., chartId = NULL) {
 #' exists, it will be replaced. If ID is not defined, it will be the same as
 #' value of the \code{place} argument. And if both are not defined, the ID will be set to \code{ChartN}, 
 #' where \code{N - 1} is the number of existing charts.
+#' @param with A data set from which other properties should be taken. If the data set doesn't have a 
+#' column with the requested name, the variable will be searched for outside of the data set. Must be
+#' a data.frame or a list.
 #' 
 #' @section Available properties: 
 #' You can read more about different properties 
@@ -2449,11 +2494,11 @@ lc_html <- function(data = list(), place = NULL, ..., chartId = NULL) {
 #' lc_input(type = "button", labels = paste0("el", 1:5), on_click = function(value) print(value))}
 #'
 #' @export
-lc_input <- function(data = list(), place = NULL, ..., chartId = NULL) {
+lc_input <- function(data = list(), place = NULL, ..., chartId = NULL, with = NULL) {
   if(is.null(pkg.env$app)){
     openPage()
     pkg.env$app$setEnvironment(parent.frame())
   }
   
-  pkg.env$app$setChart("input", data, ..., place = place, chartId = chartId, layerId = "main")
+  pkg.env$app$setChart("input", data, ..., place = place, chartId = chartId, layerId = "main", with = substitute(with))
 }
