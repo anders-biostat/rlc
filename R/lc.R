@@ -1084,7 +1084,7 @@ Chart <- R6Class("Chart", public = list(
       if(is.null(layer))
         stop(str_c("There is no layer ", layerName, " in the chart ", self$id))
 
-      name <- str_c(self$id, layer$id, sep = "_")
+      name <- str_c(self$id, layer$id, sep = "_sep_")
 
       for(id in sessionId){
         session <- private$app$getSession(id)

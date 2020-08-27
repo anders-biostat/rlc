@@ -127,7 +127,7 @@ rlc.setCustomClickLabel = function(id, type) {
 }
 
 rlc.setProperty = function(name) {
-  var spl = name.split("_");
+  var spl = name.split("_sep_");
   var id = spl[0];
   if(spl[1] != "main")
     charts[id].activeLayer(charts[id].get_layer(spl[1]));
