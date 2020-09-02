@@ -11,7 +11,7 @@ listCharts()
 This function is wrapper around method \code{listCharts} of class \code{\link{LCApp}}.
 }
 \examples{
-\donttest{noise <- rnorm(30)
+\dontrun{noise <- rnorm(30)
 x <- seq(-4, 4, length.out = 30)
 
 lc_scatter(dat(x = x,

@@ -39,7 +39,7 @@ even those triggered by non-existing elements. This function is a wrapper around
 \code{chartEvent} of class \code{\link{LCApp}}.
 }
 \examples{
-\donttest{x <- rnorm(50)
+\dontrun{x <- rnorm(50)
 lc_scatter(x = x, y = 2*x + rnorm(50, 0.1), on_click = function(d) print(d))
 chartEvent(51, "Chart1", "Layer1", "click")}
 

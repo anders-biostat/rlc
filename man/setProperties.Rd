@@ -25,7 +25,7 @@ existing chart. Changes will be applied to all currently opened and future pages
 This function is a wrapper around method \code{setProperties} of class \code{\link{LCApp}}.
 }
 \examples{
-\donttest{data("iris")
+\dontrun{data("iris")
 lc_scatter(dat(x = iris$Sepal.Length, y = iris$Sepal.Width), chartId = "irisScatter")
 setProperties(dat(symbolValue = iris$Species, y = iris$Petal.Length), chartId = "irisScatter")
 updateCharts("irisScatter")

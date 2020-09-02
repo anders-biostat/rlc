@@ -86,7 +86,7 @@ of the layer.
 }
 
 \examples{
-\donttest{data(iris)
+\dontrun{data(iris)
 
 #store some properties in global variables
 width <- 300

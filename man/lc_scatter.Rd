@@ -157,7 +157,7 @@ changes happen to the chart.}
 }
 
 \examples{
-\donttest{data("iris")
+\dontrun{data("iris")
 lc_scatter(dat(x = Sepal.Length, 
                y = Petal.Length,
                colourValue = Petal.Width,

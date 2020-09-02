@@ -28,7 +28,7 @@ Double click on the chart with the \emph{Shift} key pressed will deselect all th
 elements. This function is a wrapper of method \code{getMarked} of class \code{\link{LCApp}}.
 }
 \examples{
-\donttest{data(iris)
+\dontrun{data(iris)
 
 lc_scatter(dat(x = iris$Sepal.Length, y = iris$Petal.Length))
 
