@@ -66,6 +66,14 @@ rlc.addChart = function(id, type, place, layerId) {
     )
 }
 
+rlc.setCustomClickPosition = function(id) {
+  if(charts[id].clickPosition) {
+    charts[id].on_clickPosition(function(x, y) {
+      jrc.callFunction("chartEvent", {d: [x, y], chartId: id, layerId: "main", event: "clickPosition", sessionId: jrc.id}, null, "rlc");
+    })
+  }
+}
+
 rlc.setCustomMouseOver = function(id, layerId, pacerStep) {
   if(!charts[id].customMouseOver){
     var pacer = lc.call_pacer(pacerStep); 

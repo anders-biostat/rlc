@@ -927,7 +927,7 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
                pointRibbon = c("lineWidth", "dasharray", "x", "ymax", "ymin", "nsteps"),
                layer = c("nelements", "elementIds", "label", "layerDomainX", "layerDomainY", "contScaleX", "contScaleY",
                          "colour", "colourValue", "palette", "colourDomain", "colourLegendTitle", "addColourScaleToLegend", "opacity", "on_click",
-                         "informText", "on_mouseover", "on_mouseout", "on_marked"),
+                         "informText", "on_mouseover", "on_mouseout", "on_marked", "on_clickPosition"),
                input = c("step", "min", "max"),
                image = c("img", "src"),
                all = c("width", "height", "plotWidth", "plotHeight", "paddings", "title", "titleX", "titleY", "titleSize",
@@ -997,7 +997,8 @@ Layer <- R6Class("Layer", public = list(
   on_mouseout = NULL,
   on_marked = NULL,
   on_labelClickRow  = NULL,
-  on_labelClickCol = NULL
+  on_labelClickCol = NULL,
+  on_clickPosition = NULL
 ))
 
 
@@ -1170,6 +1171,13 @@ Chart <- R6Class("Chart", public = list(
             d$on_labelClickCol <- NULL
             session$sendCommand(str_interp("rlc.setCustomClickLabel('${self$id}', 'Col');"))
           }    
+          
+          if(!is.null(d$on_clickPosition)) {
+            mLayer <- self$getLayer("main")
+            mLayer$on_clickPosition <- d$on_clickPosition
+            d$on_clickPosition <- NULL
+            session$sendCommand(str_interp("rlc.setCustomClickPosition('${self$id}')"))
+          }
           
           session$sendData(name, d)
           session$sendCommand(str_interp("rlc.setProperty('${name}')"))
