@@ -419,6 +419,31 @@ pkg.env$dataFun <- list(
       l$colourLegendTitle <- ""
 
     l
+  },
+  image = function(l) {
+    if(is.null(l$img) & is.null(l$src))
+      stop("At least one of 'img' or 'src' must be specified")
+    
+    if(!is.null(l$img) & !is.null(l$src))
+      warning("Both 'img' and 'src' are given. 'src' will be ignored.")
+    
+    if(!is.null(l$img)) {
+      l$src = tempfile(fileext = ".png")
+      
+      if(is.null(l$width)) l$width <- 500
+      if(is.null(l$height)) l$height <- 500
+      if(is.null(l$paddings)) l$paddings <- list(top = 35, right = 10,
+                                                 bottom = 10, left = 10)
+      
+      png(filename = l$src, 
+          width = l$width - l$paddings$left - l$paddings$right, 
+          height = l$height - l$paddings$top - l$paddings$bottom)
+        print(l$img)
+      dev.off()
+      l$img <- NULL
+    }
+    l$src <- normalizePath(l$src)
+    l
   }
 )
 
@@ -904,6 +929,7 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
                          "colour", "colourValue", "palette", "colourDomain", "colourLegendTitle", "addColourScaleToLegend", "opacity", "on_click",
                          "informText", "on_mouseover", "on_mouseout", "on_marked"),
                input = c("step", "min", "max"),
+               image = c("img", "src"),
                all = c("width", "height", "plotWidth", "plotHeight", "paddings", "title", "titleX", "titleY", "titleSize",
                        "showLegend", "showPanel", "transitionDuration", "value", "rowLabel", "colLabel", "showDendogramRow",
                        "clusterRows", "clusterCols", "mode", "heatmapRow", "heatmapCol", "showValue", "rowTitle", 
@@ -921,7 +947,7 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
   jsTypes = c(scatter = "scatter", beeswarm = "beeswarm", line = "pointLine", path = "pointLine",
               ribbon = "pointRibbon", bars = "barchart", hist = "barchart", dens = "pointLine",
               heatmap = "heatmap", colourSlider = "colourSlider", abLine = "xLine", hLine = "xLine",
-              vLine = "yLine", html = "html", input = "input"),
+              vLine = "yLine", html = "html", input = "input", image = "image"),
   charts = list(),
   layout = NULL,
 
@@ -2512,3 +2538,65 @@ lc_input <- function(data = list(), place = NULL, ..., chartId = NULL, with = NU
   
   pkg.env$app$setChart("input", data, ..., place = place, chartId = chartId, layerId = "main", with = substitute(with))
 }
+
+#' Add static plot or custom image to the page
+#'
+#' \code{lc_image} adds a graphical object to the page. It can be any graphical R object (for example,
+#' objects of class 'ggplot') or image that is stored locally. Note: currently works only on Linux and iOS. 
+#' 
+#' @param data Name value pairs of properties, passed through the \code{\link{dat}} function. These
+#' properties will be reevaluated on each \code{\link{updateCharts}} call. 
+#' @param place ID of a container, where to place new chart. Will be ignored if the chart already
+#' exists. If not defined, the chart will be appended to the body of the web pages.
+#' @param ... Name-value pairs of properties that will be evaluated only once and then will remain 
+#' constant. These properties can still be changed later using the \code{\link{setProperties}} function.
+#' @param chartId ID for the chart. All charts must have unique IDs. If a chart with the same ID already
+#' exists, it will be replaced. If ID is not defined, it will be the same as
+#' value of the \code{place} argument. And if both are not defined, the ID will be set to \code{ChartN}, 
+#' where \code{N - 1} is the number of existing charts.
+#' @param with A data set from which other properties should be taken. If the data set doesn't have a 
+#' column with the requested name, the variable will be searched for outside of the data set. Must be
+#' a data.frame or a list.
+#' 
+#' @section Available properties: 
+#' You can read more about different properties 
+#' \href{https://anders-biostat.github.io/linked-charts/rlc/tutorials/props.html}{here}.
+#' 
+#' One of \code{img} and \code{src} properties is required.
+#' \itemize{
+#'  \item \code{img} - static plot to display. Anything that can be saved as png can be used here. .png image fill be saved to
+#'  a temporary directory (see \code{\link[base]{tempdir}}).
+#'  \item \code{src} - path to an already saved image. Can be an asolute path or a path relative to the current working directory. 
+#'  If \code{img} is defined, this property will be ignored.
+#'  }
+#'  
+#' Global chart settings
+#' \itemize{
+#'  \item \code{title} - title of the input block.
+#'  \item \code{width} - width of the chart in pixels. By default, width will be set to fit the content.
+#'  If width is defined and it's smaller than content's width, scrolling will be possible.
+#'  \item \code{heigth} - height of the chart in pixels. By default, height will be set to fit the content.
+#'  If height is defined and it's smaller than content's height, scrolling will be possible.
+#'  \item \code{paddings} - padding sizes in pixels. Must be a list with all the following fields: 
+#'  \code{"top", "bottom", "left", "right"}.}
+#'
+#'@examples
+#' \dontrun{
+#' library(ggplot)
+#' pl <- ggplot() + geom_point(aes(1:10, 1:10))
+#' 
+#' lc_image(dat(img = pl, 
+#'    title = "Some plot", 
+#'    paddings = list(top = 100, bottom = 100, left = 10, right = 10)))
+#' }
+#'
+#' @export
+lc_image <- function(data = list(), place = NULL, ..., chartId = NULL, with = NULL) {
+  if(is.null(pkg.env$app)){
+    openPage()
+    pkg.env$app$setEnvironment(parent.frame())
+  }
+  
+  pkg.env$app$setChart("image", data, ..., place = place, chartId = chartId, layerId = "main", with = substitute(with))
+}
+

@@ -17,6 +17,7 @@ Suggests:
     dplyr,
     tidyr,
     RColorBrewer,
+    ggplot,
     testthat (>= 2.1.0)
 NeedsCompilation: no
 RoxygenNote: 7.1.1
