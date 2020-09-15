@@ -112,7 +112,7 @@ lc_ribbon(dat(ymin = y - 1.96 * pred$se.fit,
               ymax = y + 1.96 * pred$se.fit,
               x = x,
               colour = "#555555"), chartId = "ribbonTest")
-lc_scatter(dat(x = x, y = y), chartId = "ribbonTest")
+lc_scatter(dat(x = x, y = y), chartId = "ribbonTest", addLayer = TRUE)
 
 
 data("esoph")
@@ -167,7 +167,7 @@ lc_heatmap(dat(value = cor(test),
 
 
 lc_hLine(dat(h = seq(1, 9, 1), domainX = c(0, 10), domainY = c(0, 10)), chartId = "grid")
-lc_vLine(dat(v = seq(1, 9, 1)), chartId = "grid")
+lc_vLine(dat(v = seq(1, 9, 1)), chartId = "grid", addLayer = TRUE)
 
 
 noise <- rnorm(30)
@@ -176,7 +176,7 @@ x <- seq(-4, 4, length.out = 30)
 lc_scatter(dat(x = x,
                y = sin(x) + noise,
                colourValue = noise), chartId = "plot", layerId = "points")
-lc_line(dat(x = x, y = sin(x)), chartId = "plot")
+lc_line(dat(x = x, y = sin(x)), chartId = "plot", addLayer = TRUE)
 lc_colourSlider(chart = "plot", layer = "points")
 
 listCharts()

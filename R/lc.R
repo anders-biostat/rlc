@@ -421,6 +421,7 @@ pkg.env$dataFun <- list(
     l
   },
   image = function(l) {
+
     if(is.null(l$img) & is.null(l$src))
       stop("At least one of 'img' or 'src' must be specified")
     
@@ -428,7 +429,7 @@ pkg.env$dataFun <- list(
       warning("Both 'img' and 'src' are given. 'src' will be ignored.")
     
     if(!is.null(l$img)) {
-      l$src = tempfile(fileext = ".png")
+      l$src <- tempfile(fileext = ".png")
       
       if(is.null(l$width)) l$width <- 500
       if(is.null(l$height)) l$height <- 500
@@ -442,7 +443,16 @@ pkg.env$dataFun <- list(
       dev.off()
       l$img <- NULL
     }
+    
     l$src <- normalizePath(l$src)
+    for(p in l$paths) 
+      if(str_detect(p, l$src))
+        l$src <- str_remove(l$src, p)
+
+    
+    l$paths <- NULL
+    l$src <- str_replace_all(l$src, '\\\\', '/')
+    
     l
   }
 )
@@ -804,6 +814,10 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
     if(chartType == "colourSlider")
       data$app <- expression(.app)
     
+    if(chartType == "image")
+      data$paths <- self$allowDirectories()
+      
+    
     if(is.null(place) && is.null(chartId))
       place <- str_c("Chart", length(private$charts) + 1)
     
@@ -863,10 +877,12 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
   },  
   
   initialize = function(layout = NULL, beforeLoad = function(session) {}, afterLoad = function(session) {}, 
-                        allowedVariables = NULL, allowedFunctions = NULL, ...){
+                        allowedVariables = NULL, allowedFunctions = NULL, 
+                        allowedDirectories = getwd(), ...){
     
     allowedFunctions <- c("chartEvent", allowedFunctions)
     allowedVariables <- c(".marked", "s1", "s2", allowedVariables)
+    allowedDirectories <- c(tempdir(), allowedDirectories)
     
     onStart_lc <- function(session) {
 
@@ -908,7 +924,10 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
       afterLoad(session)
     }
 
-    super$initialize(..., onStart = onStart_lc, allowedFunctions = allowedFunctions, allowedVariables = allowedVariables)
+    super$initialize(..., onStart = onStart_lc, 
+                     allowedFunctions = allowedFunctions, 
+                     allowedVariables = allowedVariables,
+                     allowedDirectories = allowedDirectories)
     if(!is.null(layout))
       self$setLayout(layout)
     
@@ -929,7 +948,7 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
                          "colour", "colourValue", "palette", "colourDomain", "colourLegendTitle", "addColourScaleToLegend", "opacity", "on_click",
                          "informText", "on_mouseover", "on_mouseout", "on_marked", "on_clickPosition"),
                input = c("step", "min", "max"),
-               image = c("img", "src"),
+               image = c("img", "src", "paths"),
                all = c("width", "height", "plotWidth", "plotHeight", "paddings", "title", "titleX", "titleY", "titleSize",
                        "showLegend", "showPanel", "transitionDuration", "value", "rowLabel", "colLabel", "showDendogramRow",
                        "clusterRows", "clusterCols", "mode", "heatmapRow", "heatmapCol", "showValue", "rowTitle", 
