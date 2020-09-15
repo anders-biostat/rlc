@@ -444,14 +444,12 @@ pkg.env$dataFun <- list(
       l$img <- NULL
     }
     
-    l$src <- normalizePath(l$src)
+    l$src <- normalizePath(l$src, winslash = "/")
     for(p in l$paths) 
-      if(str_detect(p, l$src))
+      if(grepl(p, l$src, fixed = TRUE))
         l$src <- str_remove(l$src, p)
-
     
     l$paths <- NULL
-    l$src <- str_replace_all(l$src, '\\\\', '/')
     
     l
   }
