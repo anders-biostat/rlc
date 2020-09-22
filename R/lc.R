@@ -950,7 +950,7 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
                all = c("width", "height", "plotWidth", "plotHeight", "paddings", "title", "titleX", "titleY", "titleSize",
                        "showLegend", "showPanel", "transitionDuration", "value", "rowLabel", "colLabel", "showDendogramRow",
                        "clusterRows", "clusterCols", "mode", "heatmapRow", "heatmapCol", "showValue", "rowTitle", 
-                       "colTitle", "palette", "colourDomain", "on_click", "on_change", "on_mouseover", "on_mouseout", "on_marked", 
+                       "colTitle", "palette", "colourDomain", "on_click", "on_change", "on_", "on_mouseout", "on_marked", 
                        "chart", "app", "layer", "content", "type", "domainX", "domainY", "apectRatio", "axisTitleX", "axisTitleY",
                        "logScaleX", "logScaleY", "ticksRotateX", "ticksRotateY", "globalColourScale", "aspectRatio",
                        "rankRows", "rankCols", "ticksX", "ticksY", "showDendogramCol", "on_labelClickCol", "on_labelClickRow",
@@ -1176,7 +1176,7 @@ Chart <- R6Class("Chart", public = list(
           if(!is.null(d$on_mouseout)) {
             layer$on_mouseout <- d$on_mouseout
             d$on_mouseout <- NULL
-            session$sendCommand(str_interp("rlc.setCustomMouseOut('${self$id}', '${layerName}');"))
+            session$sendCommand(str_interp("rlc.setCustomMouseOut('${self$id}', '${layerName}', ${layer$pacerStep});"))
           }    
           if(!is.null(d$on_labelClickRow)) {
             layer$on_labelClickRow <- d$on_labelClickRow
@@ -1878,7 +1878,9 @@ lc_beeswarm <- function(data = list(), place = NULL, ..., chartId = NULL, layerI
 #' a data.frame or a list.
 #' @param addLayer if there is already a chart with the same ID, this argument defines whether to replace it or to add a
 #' new layer to it. This argument is ignored if both \code{place} and \code{chartId} are \code{NULL} or if there is no
-#' chart with the given ID. 
+#' chart with the given ID.
+#' @param pacerStep Time in ms between two consecutive calls of an \code{on_mouseover} event. Prevents overqueuing in case
+#' of cumbersome computations. May be important when the chart works in canvas mode. 
 #' 
 #' @section Available properties: 
 #' You can read more about different properties
@@ -1992,13 +1994,13 @@ lc_beeswarm <- function(data = list(), place = NULL, ..., chartId = NULL, layerI
 #' lc_vLine(dat(v = seq(1, 9, 1)), chartId = "grid", addLayer = TRUE)}
 #' 
 #' @export
-lc_line <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, with = NULL, addLayer = FALSE) {
+lc_line <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, with = NULL, addLayer = FALSE, pacerStep = 50) {
   if(is.null(pkg.env$app)){
     openPage()
     pkg.env$app$setEnvironment(parent.frame())
   }
   
-  pkg.env$app$setChart("line", data, ..., place = place, chartId = chartId, layerId = layerId, with = substitute(with), addLayer = addLayer)
+  pkg.env$app$setChart("line", data, ..., place = place, chartId = chartId, layerId = layerId, with = substitute(with), addLayer = addLayer, pacerStep = pacerStep)
 }
 
 #' @describeIn lc_line connects points in the order they are given.

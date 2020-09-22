@@ -92,19 +92,22 @@ rlc.setCustomMouseOver = function(id, layerId, pacerStep) {
   }
 }
 
-rlc.setCustomMouseOut = function(id, layerId) {
+rlc.setCustomMouseOut = function(id, layerId, pacerStep) {
   if(!charts[id].customMouseOut){
-    if(layerId != "main")
-      charts[id].get_layer(layerId)
-        .on_mouseout(function() {
-          jrc.callFunction("chartEvent", {d: "NULL", chartId: id, layerId: layerId, event: "mouseout", sessionId: jrc.id}, null, "rlc");
-        })
-    else
-      charts[id]
-        .on_mouseout(function() {
-          jrc.callFunction("chartEvent", {d: "NULL", chartId: id, layerId: layerId, event: "mouseout", sessionId: jrc.id}, null, "rlc");
-        });      
-    charts[id].customMouseOut = true;
+    var pacer = lc.call_pacer(pacerStep); 
+
+    if(!charts[id].customMouseOut)
+      if(layerId != "main")
+        charts[id].get_layer(layerId)
+          .on_mouseout(function() {
+            pacer.do(function() {jrc.callFunction("chartEvent", {d: "NULL", chartId: id, layerId: layerId, event: "mouseout", sessionId: jrc.id}, null, "rlc")});
+          })
+      else
+        charts[id]
+          .on_mouseout(function() {
+            pacer.do(function() {jrc.callFunction("chartEvent", {d: "NULL", chartId: id, layerId: layerId, event: "mouseout", sessionId: jrc.id}, null, "rlc")});
+          });      
+      charts[id].customMouseOut = true;
   }
 }
 

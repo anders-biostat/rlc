@@ -16,7 +16,8 @@ lc_line(
   chartId = NULL,
   layerId = NULL,
   with = NULL,
-  addLayer = FALSE
+  addLayer = FALSE,
+  pacerStep = 50
 )
 
 lc_path(
@@ -95,6 +96,9 @@ a data.frame or a list.}
 \item{addLayer}{if there is already a chart with the same ID, this argument defines whether to replace it or to add a
 new layer to it. This argument is ignored if both \code{place} and \code{chartId} are \code{NULL} or if there is no
 chart with the given ID.}
+
+\item{pacerStep}{Time in ms between two consecutive calls of an \code{onmouseover} event. Prevents overqueuing in case
+of cumbersome computations. May be important when the chart works in canvas mode.}
 }
 \description{
 These functions create various kinds of lines. They connect observations or
