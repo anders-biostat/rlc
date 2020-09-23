@@ -9,6 +9,7 @@ mark(
   chartId = NULL,
   layerId = NULL,
   preventEvent = TRUE,
+  clear = FALSE,
   sessionId = NULL
 )
 }
@@ -23,6 +24,9 @@ the chart has only one layer).}
 
 \item{preventEvent}{if \code{TRUE}, \code{on_marked} callback function will not be
 called. Can be used to prevent endless stacks of calls.}
+
+\item{clear}{if \code{TRUE}, all previously marked elements will be unmarked,
+otherwise new elements will be added to a set of currently marked ones.}
 
 \item{sessionId}{An ID of the session for which to mark elements. Can be \code{NULL}
 if there is only one active session. Otherwise must be a valid session ID. Check \code{\link[jrc]{Session}}

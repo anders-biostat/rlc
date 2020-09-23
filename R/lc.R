@@ -748,7 +748,8 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
     marked
   },
   
-  mark = function(elements, chartId = NULL, layerId = NULL, preventEvent = TRUE, sessionId = NULL){
+  mark = function(elements, chartId = NULL, layerId = NULL, 
+                  preventEvent = TRUE, clear = FALSE, sessionId = NULL) {
     session <- super$getSession(sessionId)
     if(is.null(session))
       stop("Can't retreive the session")
@@ -775,8 +776,21 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
                    "Use 'listCharts()' to get IDs of all existing charts and their layers."))
     }
     
-    if(length(elements) != 0 & !is.vector(elements))
-      stop("'elements' must be a vector of indices.")
+    if(chart$getLayer(layerId)$type == "heatmap") {
+      if(length(elements) != 0) {
+        elements <- as.matrix(elements)
+        if(!is.matrix(elements))
+          stop("'elements' must be a matrix with 2 columns or a vector of length 2")
+        if(length(elements) == 2) 
+          elements <- matrix(elements, ncol = 2)
+        if(ncol(elements) != 2)
+          stop("'elements' must have two columns (row and column indices)")
+      }
+    } else {
+      if(length(elements) != 0 & !is.vector(elements))
+        stop("'elements' must be a vector of indices.")
+    }
+    
     if(preventEvent) {
       preventEvent = "true"
     } else {
@@ -787,6 +801,11 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
       elements <- "__clear__"
     } else {
       elements <- elements - 1
+    }
+    
+    if(clear) {
+      session$sendData("markElements", "__clear__", keepAsVector = TRUE)
+      session$sendCommand(str_c("rlc.mark('", chartId, "', '", layerId, "', ", preventEvent, ");"))    
     }
     
     session$sendData("markElements", elements, keepAsVector = TRUE)
@@ -1589,6 +1608,8 @@ getMarked <- function(chartId = NULL, layerId = NULL, sessionId = NULL) {
 #' class \code{\link{LCApp}}.
 #' 
 #' @param elements numeric vector of indices of the elements to select.
+#' @param clear if \code{TRUE}, all previously marked elements will be unmarked,
+#' otherwise new elements will be added to a set of currently marked ones.
 #' @param chartId ID of the chart where to select elements (can be omitted if 
 #' there is only one chart).
 #' @param layerId ID of the layer where to select elements (can be omitted if
@@ -1626,10 +1647,11 @@ getMarked <- function(chartId = NULL, layerId = NULL, sessionId = NULL) {
 #' ), "A2")}
 #'
 #' @export
-mark <- function(elements, chartId = NULL, layerId = NULL, preventEvent = TRUE, sessionId = NULL) {
+mark <- function(elements, chartId = NULL, layerId = NULL, 
+                 preventEvent = TRUE, clear = FALSE, sessionId = NULL) {
   workWith <- getAppAndSession(sessionId)
 
-  workWith$app$mark(elements, chartId, layerId, preventEvent, workWith$sessionId)
+  workWith$app$mark(elements, chartId, layerId, preventEvent, clear, workWith$sessionId)
 }
 
 #' Get the currently running app

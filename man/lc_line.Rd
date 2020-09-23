@@ -97,7 +97,7 @@ a data.frame or a list.}
 new layer to it. This argument is ignored if both \code{place} and \code{chartId} are \code{NULL} or if there is no
 chart with the given ID.}
 
-\item{pacerStep}{Time in ms between two consecutive calls of an \code{onmouseover} event. Prevents overqueuing in case
+\item{pacerStep}{Time in ms between two consecutive calls of an \code{on_mouseover} event. Prevents overqueuing in case
 of cumbersome computations. May be important when the chart works in canvas mode.}
 }
 \description{
