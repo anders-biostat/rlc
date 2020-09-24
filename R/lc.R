@@ -678,6 +678,8 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
       stop("Can't retreive the session")
     
     env <- session$sessionVariables()
+    env$.chartId <- chartId
+    env$.layerId <- layerId
     
     f <- layer[[paste0("on_", event)]]
     environment(f) <- env
