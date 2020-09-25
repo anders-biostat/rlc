@@ -49,7 +49,10 @@ pkg.env$dataFun <- list(
     
     if(is.null(l$symbolLegendTitle)) 
       l$symbolLegendTitle <- ""
-
+    
+    if(is.null(l$colourLegendTitle))
+      l$colourLegendTitle <- ""
+    
     l
   },
   beeswarm = function(l) {
@@ -70,6 +73,9 @@ pkg.env$dataFun <- list(
 
     if(is.null(l$symbolLegendTitle)) 
       l$symbolLegendTitle <- ""
+  
+    if(is.null(l$colourLegendTitle))
+      l$colourLegendTitle <- ""    
     
     l   
   },
@@ -110,6 +116,9 @@ pkg.env$dataFun <- list(
       l$nelements <- ncol(l$x)
       l$nsteps <- nrow(l$x)      
     }
+    
+    if(is.null(l$colourLegendTitle))
+      l$colourLegendTitle <- ""
     
     l
   },
@@ -158,6 +167,9 @@ pkg.env$dataFun <- list(
         l$nsteps <- length(l$x)
       }
     }
+    
+    if(is.null(l$colourLegendTitle))
+      l$colourLegendTitle <- ""    
     
     l
   },
@@ -218,11 +230,13 @@ pkg.env$dataFun <- list(
       l$groupIds <- inds
     }
     
-    
     l$value <- vals
     l$groupIds <- unique(l$groupIds)
     l$barIds <- unique(l$barIds)
     l$stackIds <- unique(l$stackIds)
+    
+    if(is.null(l$colourLegendTitle))
+      l$colourLegendTitle <- ""    
     
     l
   },
@@ -255,6 +269,10 @@ pkg.env$dataFun <- list(
       l$groupIds <- groupIds
       l$value <- value
     }
+    
+    if(is.null(l$colourLegendTitle))
+      l$colourLegendTitle <- ""
+    
     pkg.env$dataFun$bars(l)
   },
   
@@ -280,6 +298,9 @@ pkg.env$dataFun <- list(
       if(is.null(l$colLabel) & !is.null(colnames(l$value)))
         l$colLabel <- colnames(l$value)
     }
+    
+    if(is.null(l$colourLegendTitle))
+      l$colourLegendTitle <- ""    
     
     l
   },
@@ -315,6 +336,9 @@ pkg.env$dataFun <- list(
                        "return a[d] * x + b[d]; }")
     l$a <- NULL
     l$b <- NULL
+
+    if(is.null(l$colourLegendTitle))
+      l$colourLegendTitle <- ""
     
     l
   },
@@ -330,6 +354,9 @@ pkg.env$dataFun <- list(
                        "return h[d]; }")
     l$h <- NULL
     
+    if(is.null(l$colourLegendTitle))
+      l$colourLegendTitle <- ""    
+    
     l
   },
   
@@ -343,6 +370,9 @@ pkg.env$dataFun <- list(
     l$lineFun <- str_c("function(x, d) { v = ", toJSON(l$v, digits = NA), ";",
                        "return v[d]; }")
     l$v <- NULL
+    
+    if(is.null(l$colourLegendTitle))
+      l$colourLegendTitle <- ""
     
     l
   },
@@ -414,9 +444,6 @@ pkg.env$dataFun <- list(
       l$axisTitlePos$y <- l$axisTitlePosY
       l$axisTitlePosY <- NULL
     }
-    
-    if(is.null(l$colourLegendTitle))
-      l$colourLegendTitle <- ""
 
     l
   },
@@ -1171,7 +1198,7 @@ Chart <- R6Class("Chart", public = list(
             d <- layer$dataFun(d)
           },
           error = function(e) 
-            stop( str_interp( "in data expression for chart '${self$id}': ${e$message}." ), call.=FALSE ) ) 
+            stop( str_interp( "in data expression for chart '${self$id}': ${e$message}." ), call.=FALSE ) )
           
           if(!is.null(d$ticksX) & !is.vector(d$ticksX))
             d$ticksX <- t(d$ticksX)

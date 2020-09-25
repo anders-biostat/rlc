@@ -159,7 +159,7 @@ lc_heatmap(dat(value = test))
 lc_heatmap(dat(value = test),
            clusterRows = T,
            clusterCols = T,
-           margins = list(top = 50, left = 30, bottom = 75, right = 75))
+           paddings = list(top = 50, left = 30, bottom = 75, right = 75))
 
 lc_heatmap(dat(value = cor(test), 
                colourDomain = c(-1, 1),

@@ -44,9 +44,10 @@ Currently supported types of charts are:
 - ```lc_bars``` - bar chart
 
 ### Other elements
-- ```lc_colourSlider``` - an additional element to interactively change a continuous colour scale of any other chart
-- ```lc_html``` - customary HTML code to be inserted in the web page
+- ```lc_colourSlider``` - an additional element to interactively change a continuous colour scale of any other chart.
+- ```lc_html``` - customary HTML code to be inserted in the web page.
 - ```lc_input``` - five types of HTML ```<input>``` tag: text, radio, checkbox, range and button.
+- ```lc_image``` - adds a static plot or any image to the web page.
 
 ## Examples
 To see how it works, have a look at these [tutorials](https://anders-biostat.github.io/linked-charts/rlc/).
