@@ -25,3 +25,4 @@ lc_scatter(dat(
   }
 ), "A2", width = 300, height = 300)
 
+lc_scatter(data = dat(x=1:6, y=6:1, colourValue = c(NA, 0, NA, 1, 1, 0)))
