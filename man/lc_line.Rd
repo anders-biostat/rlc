@@ -27,7 +27,8 @@ lc_path(
   chartId = NULL,
   layerId = NULL,
   with = NULL,
-  addLayer = FALSE
+  addLayer = FALSE,
+  pacerStep = 50
 )
 
 lc_ribbon(
@@ -47,7 +48,8 @@ lc_abLine(
   chartId = NULL,
   layerId = NULL,
   with = NULL,
-  addLayer = FALSE
+  addLayer = FALSE,
+  pacerStep = 50
 )
 
 lc_hLine(
@@ -57,7 +59,8 @@ lc_hLine(
   chartId = NULL,
   layerId = NULL,
   with = NULL,
-  addLayer = FALSE
+  addLayer = FALSE,
+  pacerStep = 50
 )
 
 lc_vLine(
@@ -67,7 +70,8 @@ lc_vLine(
   chartId = NULL,
   layerId = NULL,
   with = NULL,
-  addLayer = FALSE
+  addLayer = FALSE,
+  pacerStep = 50
 )
 }
 \arguments{

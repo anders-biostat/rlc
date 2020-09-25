@@ -2055,24 +2055,28 @@ lc_beeswarm <- function(data = list(), place = NULL, ..., chartId = NULL, layerI
 #' lc_vLine(dat(v = seq(1, 9, 1)), chartId = "grid", addLayer = TRUE)}
 #' 
 #' @export
-lc_line <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, with = NULL, addLayer = FALSE, pacerStep = 50) {
+lc_line <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, 
+                    with = NULL, addLayer = FALSE, pacerStep = 50) {
   if(is.null(pkg.env$app)){
     openPage()
     pkg.env$app$setEnvironment(parent.frame())
   }
   
-  pkg.env$app$setChart("line", data, ..., place = place, chartId = chartId, layerId = layerId, with = substitute(with), addLayer = addLayer, pacerStep = pacerStep)
+  pkg.env$app$setChart("line", data, ..., place = place, chartId = chartId, layerId = layerId, 
+                       with = substitute(with), addLayer = addLayer, pacerStep = pacerStep)
 }
 
 #' @describeIn lc_line connects points in the order they are given.
 #' @export
-lc_path <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, with = NULL, addLayer = FALSE) {
+lc_path <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, 
+                    with = NULL, addLayer = FALSE, pacerStep = 50) {
   if(is.null(pkg.env$app)){
     openPage()
     pkg.env$app$setEnvironment(parent.frame())
   }
   
-  pkg.env$app$setChart("path", data, ..., place = place, chartId = chartId, layerId = layerId, with = substitute(with), addLayer = addLayer)
+  pkg.env$app$setChart("path", data, ..., place = place, chartId = chartId, layerId = layerId, 
+                       with = substitute(with), addLayer = addLayer, pacerStep = pacerStep)
 }
 
 #' @describeIn lc_line displays a filled area, defined by \code{ymax} and \code{ymin} values.
@@ -2475,35 +2479,41 @@ lc_colourSlider <- function(data = list(), place = NULL, ..., chartId = NULL, wi
 #' @describeIn lc_line creates straight lines by intercept and slope values
 #' @export
 #' @importFrom jsonlite toJSON
-lc_abLine <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, with = NULL, addLayer = FALSE) {
+lc_abLine <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, 
+                      with = NULL, addLayer = FALSE, pacerStep = 50) {
   if(is.null(pkg.env$app)){
     openPage()
     pkg.env$app$setEnvironment(parent.frame())
   }
   
-  pkg.env$app$setChart("abLine", data, ..., place = place, chartId = chartId, layerId = layerId, with = substitute(with), addLayer = addLayer)
+  pkg.env$app$setChart("abLine", data, ..., place = place, chartId = chartId, 
+                       layerId = layerId, with = substitute(with), addLayer = addLayer, pacerStep = pacerStep)
 }
 
 #' @describeIn lc_line creates horizontal lines by y-intercept values
 #' @export
-lc_hLine <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, with = NULL, addLayer = FALSE) {
+lc_hLine <- function(data = list(), place = NULL, ..., chartId = NULL, 
+                     layerId = NULL, with = NULL, addLayer = FALSE, pacerStep = 50) {
   if(is.null(pkg.env$app)){
     openPage()
     pkg.env$app$setEnvironment(parent.frame())
   }
   
-  pkg.env$app$setChart("hLine", data, ..., place = place, chartId = chartId, layerId = layerId, with = substitute(with), addLayer = addLayer)
+  pkg.env$app$setChart("hLine", data, ..., place = place, chartId = chartId, layerId = layerId, 
+                       with = substitute(with), addLayer = addLayer, pacerStep = pacerStep)
 }
 
 #' @describeIn lc_line creates vertical lines by x-intercept values
 #' @export
-lc_vLine <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, with = NULL, addLayer = FALSE) {
+lc_vLine <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = NULL, 
+                     with = NULL, addLayer = FALSE, pacerStep = 50) {
   if(is.null(pkg.env$app)){
     openPage()
     pkg.env$app$setEnvironment(parent.frame())
   }
   
-  pkg.env$app$setChart("vLine", data, ..., place = place, chartId = chartId, layerId = layerId, with = substitute(with), addLayer = addLayer)
+  pkg.env$app$setChart("vLine", data, ..., place = place, chartId = chartId, 
+                       layerId = layerId, with = substitute(with), addLayer = addLayer, pacerStep = pacerStep)
 }
 
 #' Add HTML code to the page
