@@ -9,6 +9,8 @@ relative to current axes scales.
 
 * function `mark` now has `clear` argument which, if `TRUE` unmarks all previously marked elements.
 
+* `pacerStep` argument now is also added to lines.
+
 * Legends no longer have default titles.
 
 * Now callback functions can access varaibles .chartId and .layerId
