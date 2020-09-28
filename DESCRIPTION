@@ -18,7 +18,8 @@ Suggests:
     tidyr,
     RColorBrewer,
     ggplot2,
-    testthat (>= 2.1.0)
+    testthat (>= 2.1.0),
+    httpuv
 NeedsCompilation: no
 RoxygenNote: 7.1.1
 Roxygen: list(markdown = TRUE)

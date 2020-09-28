@@ -5,7 +5,7 @@
 # rlc
 
 This package is an R wrapper for the JavaScript 
-[linked-charts](https://kloivenn.github.io/linked-charts) library.
+[linked-charts](https://kloivenn.github.io/linked-charts/) library.
 **rlc** is an easy to use instrument for interactive data visualisation.
 It allows to open interactive charts either in the RStudio Viewer or
 in the default browser window and on the fly process information about user's
