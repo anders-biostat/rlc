@@ -38,7 +38,7 @@ One of \code{img} and \code{src} properties is required.
 \itemize{
 \item \code{img} - static plot to display. Anything that can be saved as png can be used here. .png image fill be saved to
 a temporary directory (see \code{\link[base]{tempdir}}).
-\item \code{src} - path to an already saved image. Can be an asolute path or a path relative to the current working directory.
+\item \code{src} - path to an already saved image. Can be an absolute path or a path relative to the current working directory.
 If \code{img} is defined, this property will be ignored.
 }
 
@@ -54,8 +54,8 @@ If height is defined and it's smaller than content's height, scrolling will be p
 }
 
 \examples{
-\dontrun{
-library(ggplot)
+\donttest{
+library(ggplot2)
 pl <- ggplot() + geom_point(aes(1:10, 1:10))
 
 lc_image(dat(img = pl, 

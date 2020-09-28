@@ -88,14 +88,14 @@ Global chart settings
 \item \code{titleX, titleY} - coordinates of the chart title.
 \item \code{titleSize} - font-size of the chart title.
 \item \code{showLegend} - whether or not to show the legend.
-\item \code{showPanel} - whether of not to show the instrument panel (grey triangle in the upper-left corner of the chart).
+\item \code{showPanel} - whether of not to show the instrument panel (gray triangle in the upper-left corner of the chart).
 \item \code{transitionDuration} - duration of the transitions between any two states of the chart. If 0,
 no animated transition is shown. It can be useful to turn the transition off, when lots of frequent
 changes happen to the chart.}
 }
 
 \examples{
-\dontrun{
+\donttest{
 library(RColorBrewer)
 #create a test matrix
 test <- cbind(sapply(1:10, function(i) c(rnorm(10, mean = 1, sd = 3), 

@@ -13,7 +13,7 @@ relative to current axes scales.
 
 * Legends no longer have default titles.
 
-* Now callback functions can access varaibles .chartId and .layerId
+* Now callback functions can access variables `.chartId` and `.layerId`
 
 * Some changes in stylesheet.
 
@@ -27,7 +27,7 @@ relative to current axes scales.
 * New argument `with` in all the plotting functions. This argument allows to provide a data
 table, that will be used to evaluate properties.
 
-* Mose legened titles are omitted if not defined.
+* Most legend titles are omitted if not defined.
 
 * Bug with mispositioning a click in newest versions of Firefox fixed... again.
 

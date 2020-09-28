@@ -170,7 +170,7 @@ is automatically set to include all layer domains.
 \item \code{axisTitlePosX, axisTitlePosY} - position of axes titles. For each axis one can specify title position
 across or along the corresponding axis. Possible options are \code{"up"} (for title inside the plotting area)
 or \code{"down"} (outside the plotting area, under the axis), and
-\code{"start"}, \code{"middle"}, \code{"end"}. This property must be a string with one or two of the abovementioned options
+\code{"start"}, \code{"middle"}, \code{"end"}. This property must be a string with one or two of the aforementioned options
 (e.g. \code{"middle down"}, \code{"start"}, etc.).
 \item \code{ticksRotateX, ticksRotateY} - angle by which to rotate ticks (in degrees). Must be between
 0 (horizontal ticks, default) and 90 (vertical ticks).
@@ -204,7 +204,7 @@ Global chart settings
 \item \code{titleX, titleY} - coordinates of the chart title.
 \item \code{titleSize} - font-size of the chart title.
 \item \code{showLegend} - whether or not to show the legend.
-\item \code{showPanel} - whether of not to show the instrument panel (grey triangle in the upper-left corner of the chart).
+\item \code{showPanel} - whether of not to show the instrument panel (gray triangle in the upper-left corner of the chart).
 \item \code{transitionDuration} - duration of the transitions between any two states of the chart. If 0,
 no animated transition is shown. It can be useful to turn the transition off, when lots of frequent
 changes happen to the chart.
@@ -212,7 +212,7 @@ changes happen to the chart.
 }
 
 \examples{
-\dontrun{x <- seq(0, 8, 0.2)
+\donttest{x <- seq(0, 8, 0.2)
 lc_line(dat(x = x, y = cbind(cos(x), sin(x)),
             aspectRatio = 1,
             colour = c("blue", "red"),

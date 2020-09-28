@@ -11,7 +11,7 @@ Stops the server and closes all currently opened pages (if any). This function i
 wrapper of \code{stopServer} method inherited by the \code{\link{LCApp}} class from the \code{\link[jrc]{App}} class.
 }
 \examples{
-\dontrun{openPage(useViewer = FALSE)
+\donttest{openPage(useViewer = FALSE)
 closePage()}
 
 }

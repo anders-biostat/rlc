@@ -53,7 +53,7 @@ Global chart settings
 }
 
 \examples{
-\dontrun{data("iris")
+\donttest{data("iris")
 lc_scatter(dat(x = Sepal.Length, 
                y = Petal.Length,
                colourValue = Petal.Width,

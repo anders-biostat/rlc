@@ -1295,7 +1295,7 @@ Chart <- R6Class("Chart", public = list(
 #' @return A new instance of class \code{\link{LCApp}}.
 #' 
 #' @examples
-#' \dontrun{openPage()
+#' \donttest{openPage()
 #' 
 #' openPage(useViewer = FALSE, layout = "table2x3")}
 #' 
@@ -1352,7 +1352,7 @@ getAppAndSession <- function(sessionId = NULL, app = NULL, all = TRUE) {
 #' @param chartId A vector of IDs of the charts to be removed.
 #' 
 #' @examples 
-#' \dontrun{lc_scatter(dat(x = 1:10, y = 1:10 * 2), chartId = "scatter")
+#' \donttest{lc_scatter(dat(x = 1:10, y = 1:10 * 2), chartId = "scatter")
 #' removeChart("scatter")}
 #' 
 #' @export
@@ -1372,7 +1372,7 @@ removeChart <- function(chartId) {
 #' @param layerId ID of the layer to remove.
 #' 
 #' @examples 
-#' \dontrun{lc_scatter(dat(x = 1:10, y = 1:10 * 2), chartId = "scatter")
+#' \donttest{lc_scatter(dat(x = 1:10, y = 1:10 * 2), chartId = "scatter")
 #' lc_abLine(a = 2, b = 0, chartId = "scatter", addLayer = TRUE)
 #' removeLayer("scatter", "Layer1")}
 #' 
@@ -1399,7 +1399,7 @@ removeLayer <- function(chartId, layerId) {
 #' a data.frame or a list.
 #' 
 #' @examples
-#' \dontrun{data("iris")
+#' \donttest{data("iris")
 #' lc_scatter(dat(x = iris$Sepal.Length, y = iris$Sepal.Width), chartId = "irisScatter")
 #' setProperties(dat(symbolValue = iris$Species, y = iris$Petal.Length), chartId = "irisScatter")
 #' updateCharts("irisScatter")
@@ -1494,7 +1494,7 @@ setProperties <- function(data, chartId, layerId = NULL, with = NULL) {
 #' \code{Canvas}, \code{Size}. See details for more information.
 #' 
 #' @examples
-#' \dontrun{data(iris)
+#' \donttest{data(iris)
 #'
 #' #store some properties in global variables
 #' width <- 300
@@ -1552,7 +1552,7 @@ updateCharts <- function(chartId = NULL, layerId = NULL, updateOnly = NULL) {
 #' internal use and its default value is a variable, stored in each session locally. If you are not using wrapper functions, 
 #' it is preferred to call method \code{chartEvent} of an object of class \code{\link{LCApp}}.
 #' @examples 
-#' \dontrun{x <- rnorm(50)
+#' \donttest{x <- rnorm(50)
 #' lc_scatter(x = x, y = 2*x + rnorm(50, 0.1), on_click = function(d) print(d))
 #' chartEvent(51, "Chart1", "Layer1", "click")}
 #' 
@@ -1577,7 +1577,7 @@ chartEvent <- function(d, chartId, layerId = "main", event, sessionId = .id, app
 #' This function is wrapper around method \code{listCharts} of class \code{\link{LCApp}}.
 #' 
 #' @examples 
-#' \dontrun{noise <- rnorm(30)
+#' \donttest{noise <- rnorm(30)
 #' x <- seq(-4, 4, length.out = 30)
 #' 
 #' lc_scatter(dat(x = x,
@@ -1614,7 +1614,7 @@ listCharts <- function() {
 #' second columns contain row and column indices of the marked cells, respectively.
 #' 
 #' @examples
-#' \dontrun{data(iris)
+#' \donttest{data(iris)
 #' 
 #' lc_scatter(dat(x = iris$Sepal.Length, y = iris$Petal.Length))
 #' 
@@ -1651,7 +1651,7 @@ getMarked <- function(chartId = NULL, layerId = NULL, sessionId = NULL) {
 #' the corresponding session will be used automatically.
 #'
 #' @examples 
-#' \dontrun{data("iris")
+#' \donttest{data("iris")
 #' openPage(FALSE, layout = "table1x2")
 #' 
 #' #brushing example
@@ -1717,7 +1717,7 @@ getPage <- function(){
 #' @param ... List of name-value pairs to define the properties. 
 #' 
 #' @examples 
-#' \dontrun{lc_scatter(dat(x = rnorm(30)), y = rnorm(30))
+#' \donttest{lc_scatter(dat(x = rnorm(30)), y = rnorm(30))
 #' #note that the Y values remain the same after each updateCharts call
 #' updateCharts()}
 #' 
@@ -1732,7 +1732,7 @@ dat <- function( ... ) {
 #' wrapper of \code{stopServer} method inherited by the \code{\link{LCApp}} class from the \code{\link[jrc]{App}} class.
 #' 
 #' @examples 
-#' \dontrun{openPage(useViewer = FALSE)
+#' \donttest{openPage(useViewer = FALSE)
 #' closePage()}
 #' 
 #' @export
@@ -1825,7 +1825,7 @@ closePage <- function() {
 #'  \item \code{axisTitlePosX, axisTitlePosY} - position of axes titles. For each axis one can specify title position
 #'  across or along the corresponding axis. Possible options are \code{"up"} (for title inside the plotting area)
 #'  or \code{"down"} (outside the plotting area, under the axis), and
-#'  \code{"start"}, \code{"middle"}, \code{"end"}. This property must be a string with one or two of the abovementioned options
+#'  \code{"start"}, \code{"middle"}, \code{"end"}. This property must be a string with one or two of the aforementioned options
 #'  (e.g. \code{"middle down"}, \code{"start"}, etc.).
 #'  \item \code{ticksRotateX, ticksRotateY} - angle by which to rotate ticks (in degrees). Must be between 
 #'  0 (horizontal ticks, default) and 90 (vertical ticks).
@@ -1859,13 +1859,13 @@ closePage <- function() {
 #'  \item \code{titleX, titleY} - coordinates of the chart title.
 #'  \item \code{titleSize} - font-size of the chart title.
 #'  \item \code{showLegend} - whether or not to show the legend.
-#'  \item \code{showPanel} - whether of not to show the instrument panel (grey triangle in the upper-left corner of the chart).
+#'  \item \code{showPanel} - whether of not to show the instrument panel (gray triangle in the upper-left corner of the chart).
 #'  \item \code{transitionDuration} - duration of the transitions between any two states of the chart. If 0,
 #'  no animated transition is shown. It can be useful to turn the transition off, when lots of frequent 
 #'  changes happen to the chart.} 
 #' 
 #' @examples
-#' \dontrun{data("iris")
+#' \donttest{data("iris")
 #' lc_scatter(dat(x = Sepal.Length, 
 #'                y = Petal.Length,
 #'                colourValue = Petal.Width,
@@ -1984,7 +1984,7 @@ lc_beeswarm <- function(data = list(), place = NULL, ..., chartId = NULL, layerI
 #'  \item \code{axisTitlePosX, axisTitlePosY} - position of axes titles. For each axis one can specify title position
 #'  across or along the corresponding axis. Possible options are \code{"up"} (for title inside the plotting area)
 #'  or \code{"down"} (outside the plotting area, under the axis), and
-#'  \code{"start"}, \code{"middle"}, \code{"end"}. This property must be a string with one or two of the abovementioned options
+#'  \code{"start"}, \code{"middle"}, \code{"end"}. This property must be a string with one or two of the aforementioned options
 #'  (e.g. \code{"middle down"}, \code{"start"}, etc.).
 #'  \item \code{ticksRotateX, ticksRotateY} - angle by which to rotate ticks (in degrees). Must be between 
 #'  0 (horizontal ticks, default) and 90 (vertical ticks).
@@ -2018,14 +2018,14 @@ lc_beeswarm <- function(data = list(), place = NULL, ..., chartId = NULL, layerI
 #'  \item \code{titleX, titleY} - coordinates of the chart title.
 #'  \item \code{titleSize} - font-size of the chart title.
 #'  \item \code{showLegend} - whether or not to show the legend.
-#'  \item \code{showPanel} - whether of not to show the instrument panel (grey triangle in the upper-left corner of the chart).
+#'  \item \code{showPanel} - whether of not to show the instrument panel (gray triangle in the upper-left corner of the chart).
 #'  \item \code{transitionDuration} - duration of the transitions between any two states of the chart. If 0,
 #'  no animated transition is shown. It can be useful to turn the transition off, when lots of frequent 
 #'  changes happen to the chart.
 #' } 
 #' 
 #' @examples 
-#' \dontrun{x <- seq(0, 8, 0.2)
+#' \donttest{x <- seq(0, 8, 0.2)
 #' lc_line(dat(x = x, y = cbind(cos(x), sin(x)),
 #'             aspectRatio = 1,
 #'             colour = c("blue", "red"),
@@ -2153,7 +2153,7 @@ lc_ribbon <- function(data = list(), place = NULL, ..., chartId = NULL, layerId 
 #'  \item \code{axisTitlePosX, axisTitlePosY} - position of axes titles. For each axis one can specify title position
 #'  across or along the corresponding axis. Possible options are \code{"up"} (for title inside the plotting area)
 #'  or \code{"down"} (outside the plotting area, under the axis), and
-#'  \code{"start"}, \code{"middle"}, \code{"end"}. This property must be a string with one or two of the abovementioned options
+#'  \code{"start"}, \code{"middle"}, \code{"end"}. This property must be a string with one or two of the aforementioned options
 #'  (e.g. \code{"middle down"}, \code{"start"}, etc.).
 #'  \item \code{ticksRotateX, ticksRotateY} - angle by which to rotate ticks (in degrees). Must be between 
 #'  0 (horizontal ticks, default) and 90 (vertical ticks).
@@ -2188,13 +2188,13 @@ lc_ribbon <- function(data = list(), place = NULL, ..., chartId = NULL, layerId 
 #'  \item \code{titleX, titleY} - coordinates of the chart title.
 #'  \item \code{titleSize} - font-size of the chart title.
 #'  \item \code{showLegend} - whether or not to show the legend. 
-#'  \item \code{showPanel} - whether of not to show the instrument panel (grey triangle in the upper-left corner of the chart).
+#'  \item \code{showPanel} - whether of not to show the instrument panel (gray triangle in the upper-left corner of the chart).
 #'  \item \code{transitionDuration} - duration of the transitions between any two states of the chart. If 0,
 #'  no animated transition is shown. It can be useful to turn the transition off, when lots of frequent 
 #'  changes happen to the chart.} 
 #'   
 #' @examples 
-#' \dontrun{data("esoph")
+#' \donttest{data("esoph")
 #' 
 #' lc_bars(dat(value = tapply(esoph$ncases, esoph$agegp, sum), 
 #'             title = "Number of cases per age group",
@@ -2272,7 +2272,7 @@ lc_bars <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = 
 #' @describeIn lc_hist makes a histogram. It is an extension of \code{\link{lc_bars}}.
 #' 
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' lc_hist(dat(value = rnorm(1000), nbins = 30, height = 300))
 #' lc_dens(dat(value = rnorm(1000), height = 300)) }
 #' 
@@ -2368,12 +2368,12 @@ lc_dens <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = 
 #'  \item \code{titleX, titleY} - coordinates of the chart title.
 #'  \item \code{titleSize} - font-size of the chart title.
 #'  \item \code{showLegend} - whether or not to show the legend.
-#'  \item \code{showPanel} - whether of not to show the instrument panel (grey triangle in the upper-left corner of the chart).
+#'  \item \code{showPanel} - whether of not to show the instrument panel (gray triangle in the upper-left corner of the chart).
 #'  \item \code{transitionDuration} - duration of the transitions between any two states of the chart. If 0,
 #'  no animated transition is shown. It can be useful to turn the transition off, when lots of frequent 
 #'  changes happen to the chart.} 
 #' @examples 
-#' \dontrun{
+#' \donttest{
 #' library(RColorBrewer)
 #' #create a test matrix
 #' test <- cbind(sapply(1:10, function(i) c(rnorm(10, mean = 1, sd = 3), 
@@ -2450,7 +2450,7 @@ lc_heatmap <- function(data = list(), place = NULL, ..., chartId = NULL, with = 
 #'  \item \code{titleSize} - font-size of the chart title.} 
 #' 
 #' @examples 
-#' \dontrun{data("iris")
+#' \donttest{data("iris")
 #' lc_scatter(dat(x = Sepal.Length, 
 #'                y = Petal.Length,
 #'                colourValue = Petal.Width,
@@ -2553,7 +2553,7 @@ lc_vLine <- function(data = list(), place = NULL, ..., chartId = NULL, layerId =
 #'  \code{"top", "bottom", "left", "right"}.}
 #'  
 #' @examples
-#' \dontrun{lc_html(content = "Some <b>HTML</b> <br> <i>code</i>.")
+#' \donttest{lc_html(content = "Some <b>HTML</b> <br> <i>code</i>.")
 #' lc_html(dat(content = matrix(1:12, nrow = 4)))
 #' data(iris)
 #' lc_html(content = iris, height = 200)}
@@ -2622,7 +2622,7 @@ lc_html <- function(data = list(), place = NULL, ..., chartId = NULL, with = NUL
 #'  \code{"top", "bottom", "left", "right"}.}
 #'
 #'@examples
-#' \dontrun{lc_input(type = "checkbox", labels = paste0("el", 1:5), on_click = function(value) print(value),
+#' \donttest{lc_input(type = "checkbox", labels = paste0("el", 1:5), on_click = function(value) print(value),
 #' value = TRUE)
 #' lc_input(type = "radio", labels = paste0("el", 1:5), on_click = function(value) print(value),
 #'          value = 1)
@@ -2669,7 +2669,7 @@ lc_input <- function(data = list(), place = NULL, ..., chartId = NULL, with = NU
 #' \itemize{
 #'  \item \code{img} - static plot to display. Anything that can be saved as png can be used here. .png image fill be saved to
 #'  a temporary directory (see \code{\link[base]{tempdir}}).
-#'  \item \code{src} - path to an already saved image. Can be an asolute path or a path relative to the current working directory. 
+#'  \item \code{src} - path to an already saved image. Can be an absolute path or a path relative to the current working directory. 
 #'  If \code{img} is defined, this property will be ignored.
 #'  }
 #'  
@@ -2684,8 +2684,8 @@ lc_input <- function(data = list(), place = NULL, ..., chartId = NULL, with = NU
 #'  \code{"top", "bottom", "left", "right"}.}
 #'
 #'@examples
-#' \dontrun{
-#' library(ggplot)
+#' \donttest{
+#' library(ggplot2)
 #' pl <- ggplot() + geom_point(aes(1:10, 1:10))
 #' 
 #' lc_image(dat(img = pl, 

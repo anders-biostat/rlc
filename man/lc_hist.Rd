@@ -77,7 +77,7 @@ These functions are extensions of \code{\link{lc_line}} (\code{lc_dens}) or \cod
 }
 
 \examples{
-\dontrun{
+\donttest{
 lc_hist(dat(value = rnorm(1000), nbins = 30, height = 300))
 lc_dens(dat(value = rnorm(1000), height = 300)) }
 
