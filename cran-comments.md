@@ -1,5 +1,26 @@
 ## Resubmission
 
+This is a new version of the package. It introduces a new function `lc_image`, and some addional arguments (`clear` in `mark`, 
+`on_positionClick` in all charts with axes), fixes styling and some known issues. For more details, please, check `NEWS.md`.
+
+All the examples were checked locally by both R CMD check --run-donttest and running them manually in RStudio. 
+However, all other checks were performed with _R_CHECK_DONTTEST_EXAMPLES_=FALSE.
+Examples, wrapped in donttest{}, are functional and don't produce errors, but require some browser to be installed. 
+I would rather not change `donttest` to `dontrun`, since it can confuse users.
+
+## Test environments
+* local ubuntu 20.04 LST, R 4.0.2
+* win-builder: R-devel
+* ubuntu 16.04.6 LTS, R-devel, R 4.0.2, R 3.6.3 (travis ci)
+
+## R CMD check results
+
+There were no ERRORS, WARNINGS or NOTES
+
+#Previous cran-comments
+
+## Resubmission
+
 This is a new version of the package that follows the update of `jrc` package. `rlc` can now utilize new functionality of
 `jrc` and produce server app that can be used by multiple clients simultaneously. The package has also been restrunctured
 so that the entire app is now contained within a single `R6` object, which inherits from `jrc::App`.
