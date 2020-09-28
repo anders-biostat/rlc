@@ -18,12 +18,8 @@ Found the following (possibly) invalid URLs:
     From: README.md
     Status: 200
     Message: OK
-  URL: https://kloivenn.github.io/linked-charts (moved to https://kloivenn.github.io/linked-charts/)
-    From: README.md
-    Status: 200
-    Message: OK
 
-However, all mentioned URLs are valid.
+However, the URL seems to be valid. 
 
 * ubuntu 16.04.6 LTS, R-devel, R 4.0.2, R 3.6.3 (travis ci)
 
