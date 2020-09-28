@@ -11,6 +11,20 @@ I would rather not change `donttest` to `dontrun`, since it can confuse users.
 ## Test environments
 * local ubuntu 20.04 LST, R 4.0.2
 * win-builder: R-devel
+produces the following NOTE
+
+Found the following (possibly) invalid URLs:
+  URL: http://www.r-pkg.org/pkg/rlc (moved to https://www.r-pkg.org:443/pkg/rlc)
+    From: README.md
+    Status: 200
+    Message: OK
+  URL: https://kloivenn.github.io/linked-charts (moved to https://kloivenn.github.io/linked-charts/)
+    From: README.md
+    Status: 200
+    Message: OK
+
+However, all mentioned URLs are valid.
+
 * ubuntu 16.04.6 LTS, R-devel, R 4.0.2, R 3.6.3 (travis ci)
 
 ## R CMD check results
