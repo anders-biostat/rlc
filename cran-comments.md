@@ -6,6 +6,16 @@
 
 Done.
 
+## Test environments
+
+* local ubuntu 20.04 LST, R 4.0.2
+* win-builder: R-devel
+* ubuntu 16.04.6 LTS, R-devel, R 4.0.2, R 3.6.3 (travis ci)
+
+## R CMD check results
+
+There were no ERRORS, WARNINGS or NOTES
+
 
 #Previous cran-comments
 
