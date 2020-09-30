@@ -1,5 +1,16 @@
 ## Resubmission
 
+> Please change http --> https, add trailing slashes, or follow moved content as appropriate.
+
+> Please fix and resubmit.
+
+Done.
+
+
+#Previous cran-comments
+
+## Resubmission
+
 This is a new version of the package. It introduces a new function `lc_image`, and some addional arguments (`clear` in `mark`, 
 `on_positionClick` in all charts with axes), fixes styling and some known issues. For more details, please, check `NEWS.md`.
 
@@ -11,6 +22,7 @@ I would rather not change `donttest` to `dontrun`, since it can confuse users.
 ## Test environments
 * local ubuntu 20.04 LST, R 4.0.2
 * win-builder: R-devel
+
 produces the following NOTE
 
 Found the following (possibly) invalid URLs:
@@ -26,8 +38,6 @@ However, the URL seems to be valid.
 ## R CMD check results
 
 There were no ERRORS, WARNINGS or NOTES
-
-#Previous cran-comments
 
 ## Resubmission
 
