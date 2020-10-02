@@ -50,24 +50,24 @@ Adds a new chart (or replaces an existing one) to the app. This is the main meth
 allows to define any chart and all its properties. There are multiple wrappers for this method - one for each type of
 chart. Here is a full list:
 \itemize{
-\item{\code{\link{lc_scatter}}}
-\item{\code{\link{lc_beeswarm}}}
-\item{\code{\link{lc_line}}}
-\item{\code{\link{lc_path}}}
-\item{\code{\link{lc_ribbon}}}
-\item{\code{\link{lc_bars}}}
-\item{\code{\link{lc_hist}}}
-\item{\code{\link{lc_dens}}}
-\item{\code{\link{lc_heatmap}}}
-\item{\code{\link{lc_colourSlider}}}
-\item{\code{\link{lc_abLine}}}
-\item{\code{\link{lc_vLine}}}
-\item{\code{\link{lc_html}}}
-\item{\code{\link{lc_input}}}
+\item \code{\link{lc_scatter}}
+\item \code{\link{lc_beeswarm}}
+\item \code{\link{lc_line}}
+\item \code{\link{lc_path}}
+\item \code{\link{lc_ribbon}}
+\item \code{\link{lc_bars}}
+\item \code{\link{lc_hist}}
+\item \code{\link{lc_dens}}
+\item \code{\link{lc_heatmap}}
+\item \code{\link{lc_colourSlider}}
+\item \code{\link{lc_abLine}}
+\item \code{\link{lc_vLine}}
+\item \code{\link{lc_html}}
+\item \code{\link{lc_input}}
 }
 You can check the wrapper functions for information about arguments and available properties. Compared to them, this
 method gets additional argument \code{chartType}, which is always the same as the second part of the name of a
-corresponding wrapper function (\code{lc_`chartType`}). In all other aspects, wrapper functions and the \code{setChart}
+corresponding wrapper function (\code{lc_'chartType'}). In all other aspects, wrapper functions and the \code{setChart}
 method are the same.
 }
 \item{\code{new(layout = NULL, beforeLoad = function(s) {}, afterLoad = function(s) {}, ...)}}{
