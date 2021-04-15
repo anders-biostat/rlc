@@ -94,7 +94,7 @@ Interactivity settings
 \itemize{
 \item \code{on_click} - function, to be called, when one of the bars is clicked. Gets an
 index of the clicked bar as an argument.
-\item \code{on_positionClick} - function, to be called, when any point of the chart is clicked. Unlike
+\item \code{on_clickPosition} - function, to be called, when any point of the chart is clicked. Unlike
 \code{on_click} which is called only when an element of the chart (point, line, etc.) is clicked, this
 function reacts to any click on the chart. As an argument it receives a vector of x and y coordinates of
 the click (based on the current axes scales). If one of the axes is categorical, then the function will

@@ -622,7 +622,8 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
     if(is.null(layer))
       stop(str_c("Layer with ID ", layerId, " is not defined."))
     
-    for(prop in names(data))
+    
+    for(prop in names(data)){
       if(prop %in% private$props[[layer$type]] | prop %in% private$props$layer) {
         layer$setProperty(prop, data[[prop]])
       } else {
@@ -632,7 +633,8 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
           warning(str_c("In chart '", chart$id, "': Property '", prop, "' doesn't exist."))
         }
       }
-    
+    }
+
     invisible(self)
   },
   
@@ -686,7 +688,7 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
     #lame. This also must go to jrc with the nearest update
     if(!is.null(d))
       d <- type.convert(d, as.is = TRUE)
-    if(is.numeric(d)) d <- d + 1
+    if(is.numeric(d) & event != "clickPosition") d <- d + 1
     # should we move that to jrc? And add some parameter, like 'flatten'?
     if(is.list(d))
       if(all(sapply(d, function(el) length(el) == 1)))
@@ -1204,8 +1206,7 @@ Chart <- R6Class("Chart", public = list(
             d$ticksX <- t(d$ticksX)
           if(!is.null(d$ticksY) & !is.vector(d$ticksY))
             d$ticksY <- t(d$ticksY)
-          
-          if(!is.null(d$on_click)) {
+          if(!is.null(d[["on_click"]])) {
             layer$on_click <- d$on_click
             d$on_click <- NULL
           }
@@ -1835,7 +1836,7 @@ closePage <- function() {
 #' \itemize{
 #'  \item \code{on_click} - function, to be called, when one of the points is clicked. Gets an
 #'  index of the clicked point as an argument.
-#'  \item \code{on_positionClick} - function, to be called, when any point of the chart is clicked. Unlike
+#'  \item \code{on_clickPosition} - function, to be called, when any point of the chart is clicked. Unlike
 #'  \code{on_click} which is called only when an element of the chart (point, line, etc.) is clicked, this
 #'  function reacts to any click on the chart. As an argument it receives a vector of x and y coordinates of
 #'  the click (based on the current axes scales). If one of the axes is categorical, then the function will
@@ -1994,7 +1995,7 @@ lc_beeswarm <- function(data = list(), place = NULL, ..., chartId = NULL, layerI
 #' \itemize{
 #'  \item \code{on_click} - function, to be called, when one of the lines is clicked. Gets an
 #'  index of the clicked line as an argument.
-#'  \item \code{on_positionClick} - function, to be called, when any point of the chart is clicked. Unlike
+#'  \item \code{on_clickPosition} - function, to be called, when any point of the chart is clicked. Unlike
 #'  \code{on_click} which is called only when an element of the chart (point, line, etc.) is clicked, this
 #'  function reacts to any click on the chart. As an argument it receives a vector of x and y coordinates of
 #'  the click (based on the current axes scales). If one of the axes is categorical, then the function will
@@ -2164,7 +2165,7 @@ lc_ribbon <- function(data = list(), place = NULL, ..., chartId = NULL, layerId 
 #' \itemize{
 #'  \item \code{on_click} - function, to be called, when one of the bars is clicked. Gets an
 #'  index of the clicked bar as an argument.
-#'  \item \code{on_positionClick} - function, to be called, when any point of the chart is clicked. Unlike
+#'  \item \code{on_clickPosition} - function, to be called, when any point of the chart is clicked. Unlike
 #'  \code{on_click} which is called only when an element of the chart (point, line, etc.) is clicked, this
 #'  function reacts to any click on the chart. As an argument it receives a vector of x and y coordinates of
 #'  the click (based on the current axes scales). If one of the axes is categorical, then the function will
