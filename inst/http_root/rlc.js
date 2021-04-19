@@ -18,6 +18,10 @@ rlc.addTable = function(rows, cols) {
     })
     .enter().append("td")
       .attr("id", function(d) {return d});
+
+  table.selectAll("td").nodes()
+    .forEach(function(el) {delete el.__data__ });
+
 }
 
 rlc.prepareContainer = function(place) {
