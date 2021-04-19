@@ -701,6 +701,8 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
     layer <- chart$getLayer(layerId)
     if(is.null(layer))
       stop(str_interp("Chart ${id} doesn't have layer ${layerId}"))
+    if(names(layer$type) == "hist" & event != "clickPosition")
+      d <- d[1] - 1
     
     session <- super$getSession(sessionId)
     if(is.null(session))
