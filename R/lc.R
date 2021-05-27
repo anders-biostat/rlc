@@ -886,7 +886,7 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
     if(is.null(chart)) {
       chart <- private$addChart(chartId, place)
       if(is.null(layerId) || layerId != "main"){
-        layer <- chart$addLayer("main", "axesChart")
+        layer <- chart$addLayer("main", c("axesChart" = "axesChart"))
         layer$dataFun <- pkg.env$dataFun$axesChart
       }
     }
