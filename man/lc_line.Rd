@@ -192,6 +192,17 @@ Gets an index of the clicked line as an argument.
 or deselected. Use \code{\link{getMarked}} function to get the IDs of the currently marked lines. To mark lines,
 select them with your mouse while holding the \emph{Shift} key.}
 
+Legend settings
+\itemize{
+\item \code{legend_width} - width of the legend in pixels. The default value is 200.
+\item \code{legend_height} - height of the legend in pixels. By default, it is equal to the height of the chart.
+\item \code{legend_sampleHeight} - height of a single key of the legend in pixels. The default value is 20.
+\item \code{legend_ncol} - number of columns to order several legends. By default, this is defined from the number
+of legends to reach close to square shape.
+\item \code{legend_container} - a DOM element of the web page where to place the legend. By default, the legend is
+positioned to the right from the chart in a table cell specifically made for it. This should be a valid CSS selector.
+If the specified element does not exist, the legend will be added to the body of the web page.}\
+
 Global chart settings
 \itemize{
 \item \code{width} - width of the chart in pixels.
