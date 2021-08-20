@@ -163,6 +163,8 @@ rlc.setProperty = function(name) {
       charts[id].reorder("Col", function(a, b) {
         return orderCol[a] - orderCol[b];
       })
+    } else if(pr.substring(0, 7) == "legend_") {
+      charts[id].legend[pr.substring(7)](window[name][pr]);
     } else if(Array.isArray(window[name][pr]) && window[name][pr].length == 1)
       charts[id][pr](window[name][pr][0])
     else  
