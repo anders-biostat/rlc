@@ -5,3 +5,5 @@ LICENSE
 api.md
 test
 cran-comments.md
+^.*\.Rproj$
+^\.Rproj\.user$
