@@ -597,8 +597,11 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
   },
 
   setProperties = function(data, chartId, layerId = NULL, with = NULL){
-    if(!is.null(with) && !is.language(with)) with <- substitute(with)
-    
+    #if(!is.null(with) && !is.language(with)) with <- with
+
+    if(!is.null(with) && is.list(with) && is.language(with[[1]]))
+      with <- with[[1]]
+
     chart <- self$getChart(chartId)
     if(is.null(chart))
       stop(str_c("Chart with ID ", chartId, " is not defined."))
@@ -851,7 +854,7 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
 #      super$openPage()
     }
 
-    if(!is.null(with) && !is.language(with)) with <- substitute(with)
+    if(!is.null(with) && !is.language(with)) with <- with
     
     if(length(chartType) > 1){
       warning("Attempt supply several types for one chart. Only the first one will be used.")
@@ -1417,7 +1420,7 @@ removeLayer <- function(chartId, layerId) {
 #' @importFrom plyr rename
 setProperties <- function(data, chartId, layerId = NULL, with = NULL) {
   workWith <- getAppAndSession()
-  workWith$app$setProperties(data, chartId, layerId, substitute(with))
+  workWith$app$setProperties(data, chartId, layerId, with)
 }
 
 #' Update a chart
@@ -1907,7 +1910,7 @@ lc_scatter <- function(data = list(), place = NULL, ..., chartId = NULL, layerId
   }
   
   pkg.env$app$setChart("scatter", data, ...,  place = place, chartId = chartId, layerId = layerId, addLayer = addLayer,
-           with = substitute(with), pacerStep = pacerStep)
+           with = with, pacerStep = pacerStep)
 }
 
 #' @describeIn lc_scatter creates a special kind of scatterplot, where the points are spread along one of 
@@ -1920,7 +1923,7 @@ lc_beeswarm <- function(data = list(), place = NULL, ..., chartId = NULL, layerI
     pkg.env$app$setEnvironment(parent.frame())
   }
   
-  pkg.env$app$setChart("beeswarm", data, ..., place = place, chartId = chartId, layerId = layerId, with = substitute(with),
+  pkg.env$app$setChart("beeswarm", data, ..., place = place, chartId = chartId, layerId = layerId, with = with,
                        addLayer = addLayer, pacerStep = pacerStep)
 }
 
@@ -2089,7 +2092,7 @@ lc_line <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = 
   }
   
   pkg.env$app$setChart("line", data, ..., place = place, chartId = chartId, layerId = layerId, 
-                       with = substitute(with), addLayer = addLayer, pacerStep = pacerStep)
+                       with = with, addLayer = addLayer, pacerStep = pacerStep)
 }
 
 #' @describeIn lc_line connects points in the order they are given.
@@ -2102,7 +2105,7 @@ lc_path <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = 
   }
   
   pkg.env$app$setChart("path", data, ..., place = place, chartId = chartId, layerId = layerId, 
-                       with = substitute(with), addLayer = addLayer, pacerStep = pacerStep)
+                       with = with, addLayer = addLayer, pacerStep = pacerStep)
 }
 
 #' @describeIn lc_line displays a filled area, defined by \code{ymax} and \code{ymin} values.
@@ -2113,7 +2116,7 @@ lc_ribbon <- function(data = list(), place = NULL, ..., chartId = NULL, layerId 
     pkg.env$app$setEnvironment(parent.frame())
   }
   
-  pkg.env$app$setChart("ribbon", data, ...,  place = place, chartId = chartId, layerId = layerId, with = substitute(with), addLayer = addLayer)
+  pkg.env$app$setChart("ribbon", data, ...,  place = place, chartId = chartId, layerId = layerId, with = with, addLayer = addLayer)
 }
 
 #' Create a barplot
@@ -2267,7 +2270,7 @@ lc_bars <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = 
     pkg.env$app$setEnvironment(parent.frame())
   }
   
-  pkg.env$app$setChart("bars", data, ..., place = place, chartId = chartId, layerId = layerId, with = substitute(with), addLayer = addLayer)
+  pkg.env$app$setChart("bars", data, ..., place = place, chartId = chartId, layerId = layerId, with = with, addLayer = addLayer)
 }
 
 #' Histograms and density plots
@@ -2321,7 +2324,7 @@ lc_hist <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = 
     pkg.env$app$setEnvironment(parent.frame())
   }
   
-  pkg.env$app$setChart("hist", data, ..., place = place, chartId = chartId, layerId = layerId, with = substitute(with), addLayer = addLayer)
+  pkg.env$app$setChart("hist", data, ..., place = place, chartId = chartId, layerId = layerId, with = with, addLayer = addLayer)
 }
 
 #' @describeIn lc_hist makes a density plot. Is an extension of \code{\link{lc_line}}.
@@ -2333,7 +2336,7 @@ lc_dens <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = 
     pkg.env$app$setEnvironment(parent.frame())
   }
   
-  pkg.env$app$setChart("dens", data, ..., place = place, chartId = chartId, layerId = layerId, with = substitute(with), addLayer = addLayer)
+  pkg.env$app$setChart("dens", data, ..., place = place, chartId = chartId, layerId = layerId, with = with, addLayer = addLayer)
 }
 
 #' Create a heatmap
@@ -2454,7 +2457,7 @@ lc_heatmap <- function(data = list(), place = NULL, ..., chartId = NULL, with = 
     pkg.env$app$setEnvironment(parent.frame())
   }
   
-  pkg.env$app$setChart("heatmap", data, ..., place = place, chartId = chartId, layerId = "main", with = substitute(with), pacerStep = pacerStep)
+  pkg.env$app$setChart("heatmap", data, ..., place = place, chartId = chartId, layerId = "main", with = with, pacerStep = pacerStep)
 }
 
 #' Add a colour slider
@@ -2521,7 +2524,7 @@ lc_colourSlider <- function(data = list(), place = NULL, ..., chartId = NULL, wi
     pkg.env$app$setEnvironment(parent.frame())
   }
 
-  pkg.env$app$setChart(chartType = "colourSlider", data = data, ..., place = place, chartId = chartId, layerId = "main", with = substitute(with))
+  pkg.env$app$setChart(chartType = "colourSlider", data = data, ..., place = place, chartId = chartId, layerId = "main", with = with)
 }
 
 #' @describeIn lc_line creates straight lines by intercept and slope values
@@ -2535,7 +2538,7 @@ lc_abLine <- function(data = list(), place = NULL, ..., chartId = NULL, layerId 
   }
   
   pkg.env$app$setChart("abLine", data, ..., place = place, chartId = chartId, 
-                       layerId = layerId, with = substitute(with), addLayer = addLayer, pacerStep = pacerStep)
+                       layerId = layerId, with = with, addLayer = addLayer, pacerStep = pacerStep)
 }
 
 #' @describeIn lc_line creates horizontal lines by y-intercept values
@@ -2548,7 +2551,7 @@ lc_hLine <- function(data = list(), place = NULL, ..., chartId = NULL,
   }
   
   pkg.env$app$setChart("hLine", data, ..., place = place, chartId = chartId, layerId = layerId, 
-                       with = substitute(with), addLayer = addLayer, pacerStep = pacerStep)
+                       with = with, addLayer = addLayer, pacerStep = pacerStep)
 }
 
 #' @describeIn lc_line creates vertical lines by x-intercept values
@@ -2561,7 +2564,7 @@ lc_vLine <- function(data = list(), place = NULL, ..., chartId = NULL, layerId =
   }
   
   pkg.env$app$setChart("vLine", data, ..., place = place, chartId = chartId, 
-                       layerId = layerId, with = substitute(with), addLayer = addLayer, pacerStep = pacerStep)
+                       layerId = layerId, with = with, addLayer = addLayer, pacerStep = pacerStep)
 }
 
 #' Add HTML code to the page
@@ -2614,7 +2617,7 @@ lc_html <- function(data = list(), place = NULL, ..., chartId = NULL, with = NUL
     pkg.env$app$setEnvironment(parent.frame())
   }
   
-  pkg.env$app$setChart("html", data, ..., place = place, chartId = chartId, layerId = "main", with = substitute(with))
+  pkg.env$app$setChart("html", data, ..., place = place, chartId = chartId, layerId = "main", with = with)
 }
 
 #' Add input forms to the page
@@ -2687,7 +2690,7 @@ lc_input <- function(data = list(), place = NULL, ..., chartId = NULL, with = NU
     pkg.env$app$setEnvironment(parent.frame())
   }
   
-  pkg.env$app$setChart("input", data, ..., place = place, chartId = chartId, layerId = "main", with = substitute(with))
+  pkg.env$app$setChart("input", data, ..., place = place, chartId = chartId, layerId = "main", with = with)
 }
 
 #' Add static plot or custom image to the page
@@ -2748,6 +2751,6 @@ lc_image <- function(data = list(), place = NULL, ..., chartId = NULL, with = NU
     pkg.env$app$setEnvironment(parent.frame())
   }
   
-  pkg.env$app$setChart("image", data, ..., place = place, chartId = chartId, layerId = "main", with = substitute(with))
+  pkg.env$app$setChart("image", data, ..., place = place, chartId = chartId, layerId = "main", with = with)
 }
 

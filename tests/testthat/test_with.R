@@ -32,7 +32,7 @@ test_that("Changes in the data set also influence the chart", {
   data("iris")
   
   openPage(allowedVariables = "n")
-  lc_scatter(dat(x = Sepal.Length, y = Petal.Length), with = iris)
+  lc_scatter(dat(x = Sepal.Length, y = Petal.Length), with = dat(iris))
   
   iris <- iris[1:10, ]
   updateCharts()
