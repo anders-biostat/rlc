@@ -56,7 +56,10 @@ panel.
 an SVG or Canvas object. \code{"default"} mode switches between the two, turning heatmap into Canvas
 image, when there are too many cell, and into SVG object otherwise.
 \item \code{heatmapRow, heatmapCol} - default order of rows and columns of the heatmap.
-\item \code{showValue} - if \code{TRUE}, values will be shown as text in each cell.}
+\item \code{showValue} - if \code{TRUE}, values will be shown as text in each cell.
+\item \code{informText} - text that appears when the mouse cursor moves over an element. Unlike \code{label},
+completely overwrites the tooltip content with a custom HTML code. Must be a matrix of characters (HTML code
+for each cell).}
 
 Style settings
 \itemize{

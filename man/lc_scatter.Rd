@@ -81,7 +81,10 @@ You can read more about different properties
 \item \code{opacity} - opacity of each point in the range from 0 to 1.
 \item \code{label} - vector of text labels for each point (labels by default are shown, when mouse hovers over a point).
 \item \code{valueAxis} - (for \code{lc_beeswarm} only) defines axis with values that will
-not be changed. Must be \code{"x"} or \code{"y"} (default).}
+not be changed. Must be \code{"x"} or \code{"y"} (default).
+\item \code{informText} - text that appears when the mouse cursor moves over an element. Unlike \code{label},
+completely overwrites the tooltip content with a custom HTML code. Must be a vector of characters (HTML code
+for each element).}
 
 Colour and shape settings
 \itemize{

@@ -138,7 +138,10 @@ vectors for a single line or \code{m x n} matrix for \code{n} lines.
 \item \code{lineWidth} - (nor for \code{lc_ribbon}) width of each line.
 \item \code{opacity} - opacity of each line in the range from 0 to 1.
 \item \code{label} - vector of text labels for each line (labels by default are shown, when mouse hovers over a line).
-\item \code{dasharray} - defines pattern of dashes and gaps for each line. }
+\item \code{dasharray} - defines pattern of dashes and gaps for each line.
+\item \code{informText} - text that appears when the mouse cursor moves over an element. Unlike \code{label},
+completely overwrites the tooltip content with a custom HTML code. Must be a vector of characters (HTML code
+for each element).}
 
 Colour settings
 \itemize{

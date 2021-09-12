@@ -1010,7 +1010,7 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
                        "logScaleX", "logScaleY", "ticksRotateX", "ticksRotateY", "globalColourScale", "aspectRatio",
                        "rankRows", "rankCols", "ticksX", "ticksY", "showDendogramCol", "on_labelClickCol", "on_labelClickRow",
                        "axisTitlePosX", "axisTitlePosY", "legend_width", "legend_height", "legend_sampleHeight", "legend_ncol",
-                       "legend_titles", "legend_container")),
+                       "legend_titles", "legend_container", "informText")),
   nameList = c("labels" = "label", "color" = "colour", "colorValue" = "colourValue",
                "colourValues" = "colourValue", "colorValues" = "colourValue", "colorDomain" = "colourDomain",
                "colorLegendTitle" = "colourLegendTitle", "addColorScaleToLegend" = "addColourScaleToLegend",
@@ -1792,7 +1792,10 @@ closePage <- function() {
 #'  \item \code{opacity} - opacity of each point in the range from 0 to 1.
 #'  \item \code{label} - vector of text labels for each point (labels by default are shown, when mouse hovers over a point).
 #'  \item \code{valueAxis} - (for \code{lc_beeswarm} only) defines axis with values that will
-#'  not be changed. Must be \code{"x"} or \code{"y"} (default).} 
+#'  not be changed. Must be \code{"x"} or \code{"y"} (default).
+#'  \item \code{informText} - text that appears when the mouse cursor moves over an element. Unlike \code{label},
+#'  completely overwrites the tooltip content with a custom HTML code. Must be a vector of characters (HTML code
+#'  for each element).} 
 #' 
 #' Colour and shape settings
 #' \itemize{
@@ -1970,7 +1973,10 @@ lc_beeswarm <- function(data = list(), place = NULL, ..., chartId = NULL, layerI
 #'  \item \code{lineWidth} - (nor for \code{lc_ribbon}) width of each line.
 #'  \item \code{opacity} - opacity of each line in the range from 0 to 1.
 #'  \item \code{label} - vector of text labels for each line (labels by default are shown, when mouse hovers over a line).
-#'  \item \code{dasharray} - defines pattern of dashes and gaps for each line. }
+#'  \item \code{dasharray} - defines pattern of dashes and gaps for each line.
+#'  \item \code{informText} - text that appears when the mouse cursor moves over an element. Unlike \code{label},
+#'  completely overwrites the tooltip content with a custom HTML code. Must be a vector of characters (HTML code
+#'  for each element).}
 #' 
 #' Colour settings
 #' \itemize{
@@ -2376,7 +2382,10 @@ lc_dens <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = 
 #'  an SVG or Canvas object. \code{"default"} mode switches between the two, turning heatmap into Canvas 
 #'  image, when there are too many cell, and into SVG object otherwise.
 #'  \item \code{heatmapRow, heatmapCol} - default order of rows and columns of the heatmap.
-#'  \item \code{showValue} - if \code{TRUE}, values will be shown as text in each cell.} 
+#'  \item \code{showValue} - if \code{TRUE}, values will be shown as text in each cell.
+#'  \item \code{informText} - text that appears when the mouse cursor moves over an element. Unlike \code{label},
+#'  completely overwrites the tooltip content with a custom HTML code. Must be a matrix of characters (HTML code
+#'  for each cell).}
 #' 
 #' Style settings
 #' \itemize{
