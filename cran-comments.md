@@ -1,5 +1,21 @@
 ## Resubmission
 
+This is a new version of the package. It fixes multiple bugs, adds a way to control legend's size and location and to specify the tooltip content with custom HTML.
+
+## Test environments
+
+* local ubuntu 20.04 LST, R 4.1.1
+* win-builder: R-devel
+* Ubuntu 20.04.1 LTS, R-release, Windows Server 2008 R2 SP1, R-devel, Fedora Linux, R-devel (R-hub)
+
+## R CMD check results
+
+There were no ERRORS, WARNINGS or NOTES
+
+# Previous cran-comments
+
+## Resubmission
+
 > Please change http --> https, add trailing slashes, or follow moved content as appropriate.
 
 > Please fix and resubmit.
@@ -15,9 +31,6 @@ Done.
 ## R CMD check results
 
 There were no ERRORS, WARNINGS or NOTES
-
-
-#Previous cran-comments
 
 ## Resubmission
 

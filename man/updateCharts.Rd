@@ -30,7 +30,7 @@ to date with the current state of the environment variables.
 Linked charts of the \emph{rlc} package are based on the idea that the variables that are
 used to define a chart are not constant, but can change as a result of user's
 actions. Each time the \code{updateCharts} function is called, all the properties that were set inside
-the \code{\link{dat}} function are reevaluated and the chart is redrawn in accordance with the
+the \code{\link{dat}} function are re-evaluated and the chart is redrawn in accordance with the
 new state.
 
 If this function is called from the R session, changes will be applied

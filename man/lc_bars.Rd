@@ -16,7 +16,7 @@ lc_bars(
 }
 \arguments{
 \item{data}{Name value pairs of properties, passed through the \code{\link{dat}} function. These
-properties will be reevaluated on each \code{\link{updateCharts}} call.}
+properties will be re-evaluated on each \code{\link{updateCharts}} call.}
 
 \item{place}{ID of a container, where to place new chart. Will be ignored if the chart already
 exists. If not defined, the chart will be appended to the body of the web pages.}
@@ -129,7 +129,7 @@ Global chart settings
 \item \code{titleX, titleY} - coordinates of the chart title.
 \item \code{titleSize} - font-size of the chart title.
 \item \code{showLegend} - whether or not to show the legend.
-\item \code{showPanel} - whether of not to show the instrument panel (gray triangle in the upper-left corner of the chart).
+\item \code{showPanel} - whether of not to show the instrument panel (grey triangle in the upper-left corner of the chart).
 \item \code{transitionDuration} - duration of the transitions between any two states of the chart. If 0,
 no animated transition is shown. It can be useful to turn the transition off, when lots of frequent
 changes happen to the chart.}

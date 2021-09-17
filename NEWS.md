@@ -1,3 +1,28 @@
+# rlc 0.4.0
+
+* A set of properties to control charts' legends added: `legend_width`, `legend_height`, `lgend_sampleHeight`, `legend_ncol`, `legend_container`.
+
+* Property `informText` added. It allows to specify the content of the tooltip text for each element.
+
+* data.frames and lists provided to the `with` argument are no longer re-evaluated automatically. By default, they are considered static. To treat them as dynamic arguments, they should be put inside the `dat` function.
+
+* Some styling changes.
+
+### Bug fixes
+
+* `on_clickPosition` no longer adds extra 1 to the reported values
+
+* `lc_input` values no longer get stuck
+
+* In the table layout, unnecessary D3 data are no longer propagated to the children elements.
+
+* `on_click` for histograms now gets a proper index value.
+
+* NAs values for `lc_input` don't cause problems any more.
+
+* Issue with colour scale get stuck in the legend fixed.
+
+
 # rlc 0.3.0
 
 * New function `lc_image` added. It can add to the web page a graphic R object or a locally stored image.

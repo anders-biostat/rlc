@@ -8,7 +8,7 @@ lc_image(data = list(), place = NULL, ..., chartId = NULL, with = NULL)
 }
 \arguments{
 \item{data}{Name value pairs of properties, passed through the \code{\link{dat}} function. These
-properties will be reevaluated on each \code{\link{updateCharts}} call.}
+properties will be re-evaluated on each \code{\link{updateCharts}} call.}
 
 \item{place}{ID of a container, where to place new chart. Will be ignored if the chart already
 exists. If not defined, the chart will be appended to the body of the web pages.}
@@ -27,7 +27,7 @@ a data.frame or a list.}
 }
 \description{
 \code{lc_image} adds a graphical object to the page. It can be any graphical R object (for example,
-objects of class 'ggplot') or image that is stored locally. Note: currently works only on Linux and iOS.
+objects of class \code{ggplot}) or image that is stored locally. Note: currently works only on Linux and iOS.
 }
 \section{Available properties}{
 

@@ -12,8 +12,8 @@ dat(...)
 \description{
 \code{dat} allows to link variables from the current environment to chart's properties.
 On every \code{\link{updateCharts}} call all the data provided via the \code{dat} function
-will be automatically reevaluated and the chart will be changed accordingly. One can also
-put properties outside of the \code{dat} function to prevent their reevaluation.
+will be automatically re-evaluated and the chart will be changed accordingly. One can also
+put properties outside of the \code{dat} function to prevent their re-evaluation.
 }
 \examples{
 \donttest{lc_scatter(dat(x = rnorm(30)), y = rnorm(30))

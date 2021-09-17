@@ -1431,7 +1431,7 @@ setProperties <- function(data, chartId, layerId = NULL, with = NULL) {
 #' Linked charts of the \emph{rlc} package are based on the idea that the variables that are
 #' used to define a chart are not constant, but can change as a result of user's
 #' actions. Each time the \code{updateCharts} function is called, all the properties that were set inside
-#' the \code{\link{dat}} function are reevaluated and the chart is redrawn in accordance with the
+#' the \code{\link{dat}} function are re-evaluated and the chart is redrawn in accordance with the
 #' new state.
 #' 
 #' If this function is called from the R session, changes will be applied
@@ -1718,8 +1718,8 @@ getPage <- function(){
 #' 
 #' \code{dat} allows to link variables from the current environment to chart's properties.
 #' On every \code{\link{updateCharts}} call all the data provided via the \code{dat} function
-#' will be automatically reevaluated and the chart will be changed accordingly. One can also
-#' put properties outside of the \code{dat} function to prevent their reevaluation.
+#' will be automatically re-evaluated and the chart will be changed accordingly. One can also
+#' put properties outside of the \code{dat} function to prevent their re-evaluation.
 #' 
 #' @param ... List of name-value pairs to define the properties. 
 #' 
@@ -1761,7 +1761,7 @@ closePage <- function() {
 #' creates a new one.
 #' 
 #' @param data Name value pairs of properties, passed through the \code{\link{dat}} function. These
-#' properties will be reevaluated on each \code{\link{updateCharts}} call. 
+#' properties will be re-evaluated on each \code{\link{updateCharts}} call. 
 #' @param place ID of a container, where to place new chart. Will be ignored if the chart already
 #' exists. If not defined, the chart will be appended to the body of the web pages.
 #' @param ... Name-value pairs of properties that will be evaluated only once and then will remain 
@@ -1779,7 +1779,7 @@ closePage <- function() {
 #' @param addLayer if there is already a chart with the same ID, this argument defines whether to replace it or to add a
 #' new layer to it. This argument is ignored if both \code{place} and \code{chartId} are \code{NULL} or if there is no
 #' chart with the given ID. 
-#' @param pacerStep Time in ms between two consecutive calls of an \code{onmouseover} event. Prevents overqueuing in case
+#' @param pacerStep Time in ms between two consecutive calls of an \code{onmouseover} event. Prevents over-queueing in case
 #' of cumbersome computations. May be important when the chart works in canvas mode.
 #' 
 #' @section Available properties: 
@@ -1880,7 +1880,7 @@ closePage <- function() {
 #'  \item \code{titleX, titleY} - coordinates of the chart title.
 #'  \item \code{titleSize} - font-size of the chart title.
 #'  \item \code{showLegend} - whether or not to show the legend.
-#'  \item \code{showPanel} - whether of not to show the instrument panel (gray triangle in the upper-left corner of the chart).
+#'  \item \code{showPanel} - whether of not to show the instrument panel (grey triangle in the upper-left corner of the chart).
 #'  \item \code{transitionDuration} - duration of the transitions between any two states of the chart. If 0,
 #'  no animated transition is shown. It can be useful to turn the transition off, when lots of frequent 
 #'  changes happen to the chart.} 
@@ -1938,7 +1938,7 @@ lc_beeswarm <- function(data = list(), place = NULL, ..., chartId = NULL, layerI
 #' @describeIn lc_line connects points in the order of variables on the x axis.
 #' 
 #' @param data Name value pairs of properties, passed through the \code{\link{dat}} function. These
-#' properties will be reevaluated on each \code{\link{updateCharts}} call. 
+#' properties will be re-evaluated on each \code{\link{updateCharts}} call. 
 #' @param place ID of a container, where to place new chart. Will be ignored if the chart already
 #' exists. If not defined, the chart will be appended to the body of the web pages.
 #' @param ... Name-value pairs of properties that will be evaluated only once and then will remain 
@@ -1956,7 +1956,7 @@ lc_beeswarm <- function(data = list(), place = NULL, ..., chartId = NULL, layerI
 #' @param addLayer if there is already a chart with the same ID, this argument defines whether to replace it or to add a
 #' new layer to it. This argument is ignored if both \code{place} and \code{chartId} are \code{NULL} or if there is no
 #' chart with the given ID.
-#' @param pacerStep Time in ms between two consecutive calls of an \code{on_mouseover} event. Prevents overqueuing in case
+#' @param pacerStep Time in ms between two consecutive calls of an \code{on_mouseover} event. Prevents over-queueing in case
 #' of cumbersome computations. May be important when the chart works in canvas mode. 
 #' 
 #' @section Available properties: 
@@ -2053,7 +2053,7 @@ lc_beeswarm <- function(data = list(), place = NULL, ..., chartId = NULL, layerI
 #'  \item \code{titleX, titleY} - coordinates of the chart title.
 #'  \item \code{titleSize} - font-size of the chart title.
 #'  \item \code{showLegend} - whether or not to show the legend.
-#'  \item \code{showPanel} - whether of not to show the instrument panel (gray triangle in the upper-left corner of the chart).
+#'  \item \code{showPanel} - whether of not to show the instrument panel (grey triangle in the upper-left corner of the chart).
 #'  \item \code{transitionDuration} - duration of the transitions between any two states of the chart. If 0,
 #'  no animated transition is shown. It can be useful to turn the transition off, when lots of frequent 
 #'  changes happen to the chart.
@@ -2131,7 +2131,7 @@ lc_ribbon <- function(data = list(), place = NULL, ..., chartId = NULL, layerId 
 #' as a new chart or as a new layer of an existing chart.
 #' 
 #' @param data Name value pairs of properties, passed through the \code{\link{dat}} function. These
-#' properties will be reevaluated on each \code{\link{updateCharts}} call. 
+#' properties will be re-evaluated on each \code{\link{updateCharts}} call. 
 #' @param place ID of a container, where to place new chart. Will be ignored if the chart already
 #' exists. If not defined, the chart will be appended to the body of the web pages.
 #' @param ... Name-value pairs of properties that will be evaluated only once and then will remain 
@@ -2234,7 +2234,7 @@ lc_ribbon <- function(data = list(), place = NULL, ..., chartId = NULL, layerId 
 #'  \item \code{titleX, titleY} - coordinates of the chart title.
 #'  \item \code{titleSize} - font-size of the chart title.
 #'  \item \code{showLegend} - whether or not to show the legend. 
-#'  \item \code{showPanel} - whether of not to show the instrument panel (gray triangle in the upper-left corner of the chart).
+#'  \item \code{showPanel} - whether of not to show the instrument panel (grey triangle in the upper-left corner of the chart).
 #'  \item \code{transitionDuration} - duration of the transitions between any two states of the chart. If 0,
 #'  no animated transition is shown. It can be useful to turn the transition off, when lots of frequent 
 #'  changes happen to the chart.} 
@@ -2285,7 +2285,7 @@ lc_bars <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = 
 #' and either add them as a new layer to an existing chart or create a new chart.
 #' 
 #' @param data Name value pairs of properties, passed through the \code{\link{dat}} function. These
-#' properties will be reevaluated on each \code{\link{updateCharts}} call. 
+#' properties will be re-evaluated on each \code{\link{updateCharts}} call. 
 #' @param place ID of a container, where to place new chart. Will be ignored if the chart already
 #' exists. If not defined, the chart will be appended to the body of the web pages.
 #' @param ... Name-value pairs of properties that will be evaluated only once and then will remain 
@@ -2351,7 +2351,7 @@ lc_dens <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = 
 #' any layers.
 #' 
 #' @param data Name value pairs of properties, passed through the \code{\link{dat}} function. These
-#' properties will be reevaluated on each \code{\link{updateCharts}} call. 
+#' properties will be re-evaluated on each \code{\link{updateCharts}} call. 
 #' @param place ID of a container, where to place new chart. Will be ignored if the chart already
 #' exists. If not defined, the chart will be appended to the body of the web pages.
 #' @param ... Name-value pairs of properties that will be evaluated only once and then will remain 
@@ -2363,7 +2363,7 @@ lc_dens <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = 
 #' @param with A data set from which other properties should be taken. If the data set doesn't have a 
 #' column with the requested name, the variable will be searched for outside of the data set. Must be
 #' a data.frame or a list.
-#' @param pacerStep Time in ms between two consecutive calls of an \code{onmouseover} event. Prevents overqueuing in case
+#' @param pacerStep Time in ms between two consecutive calls of an \code{onmouseover} event. Prevents over-queueing in case
 #' of cumbersome computations. May be important when the chart works in canvas mode.
 #' 
 #' @section Available properties: 
@@ -2373,7 +2373,7 @@ lc_dens <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = 
 #' \itemize{
 #'  \item \code{value} - matrix of values that will be displayed as a heatmap.
 #'  \item \code{rowLabel, colLabel} - vector of labels for all rows or columns.
-#'  \item \code{showDendogramRow, showDendogramCol} - whether to show dendograms when rows or columns are
+#'  \item \code{showDendogramRow, showDendogramCol} - whether to show dendrograms when rows or columns are
 #'  clustered. Even if these properties are set to \code{FALSE}, rows and columns can still be clustered. 
 #'  \item \code{clusterRows, clusterCols} - whether rows or columns should be clustered. If these
 #'  properties are set to \code{FALSE}, rows and columns can still be clustered later using the instrument
@@ -2428,7 +2428,7 @@ lc_dens <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = 
 #'  \item \code{titleX, titleY} - coordinates of the chart title.
 #'  \item \code{titleSize} - font-size of the chart title.
 #'  \item \code{showLegend} - whether or not to show the legend.
-#'  \item \code{showPanel} - whether of not to show the instrument panel (gray triangle in the upper-left corner of the chart).
+#'  \item \code{showPanel} - whether of not to show the instrument panel (grey triangle in the upper-left corner of the chart).
 #'  \item \code{transitionDuration} - duration of the transitions between any two states of the chart. If 0,
 #'  no animated transition is shown. It can be useful to turn the transition off, when lots of frequent 
 #'  changes happen to the chart.} 
@@ -2477,7 +2477,7 @@ lc_heatmap <- function(data = list(), place = NULL, ..., chartId = NULL, with = 
 #' chart's colour scale.
 #' 
 #' @param data Name value pairs of properties, passed through the \code{\link{dat}} function. These
-#' properties will be reevaluated on each \code{\link{updateCharts}} call. 
+#' properties will be re-evaluated on each \code{\link{updateCharts}} call. 
 #' @param place ID of a container, where to place new chart. Will be ignored if the chart already
 #' exists. If not defined, the chart will be appended to the body of the web pages.
 #' @param ... Name-value pairs of properties that will be evaluated only once and then will remain 
@@ -2582,7 +2582,7 @@ lc_vLine <- function(data = list(), place = NULL, ..., chartId = NULL, layerId =
 #' to transform some data structures (e.g. data frames) to HTML tables.
 #'
 #' @param data Name value pairs of properties, passed through the \code{\link{dat}} function. These
-#' properties will be reevaluated on each \code{\link{updateCharts}} call. 
+#' properties will be re-evaluated on each \code{\link{updateCharts}} call. 
 #' @param place ID of a container, where to place new chart. Will be ignored if the chart already
 #' exists. If not defined, the chart will be appended to the body of the web pages.
 #' @param ... Name-value pairs of properties that will be evaluated only once and then will remain 
@@ -2636,7 +2636,7 @@ lc_html <- function(data = list(), place = NULL, ..., chartId = NULL, with = NUL
 #' \code{"checkbox"}, \code{"radio"} and \code{"button"}.
 #' 
 #' @param data Name value pairs of properties, passed through the \code{\link{dat}} function. These
-#' properties will be reevaluated on each \code{\link{updateCharts}} call. 
+#' properties will be re-evaluated on each \code{\link{updateCharts}} call. 
 #' @param place ID of a container, where to place new chart. Will be ignored if the chart already
 #' exists. If not defined, the chart will be appended to the body of the web pages.
 #' @param ... Name-value pairs of properties that will be evaluated only once and then will remain 
@@ -2705,10 +2705,10 @@ lc_input <- function(data = list(), place = NULL, ..., chartId = NULL, with = NU
 #' Add static plot or custom image to the page
 #'
 #' \code{lc_image} adds a graphical object to the page. It can be any graphical R object (for example,
-#' objects of class 'ggplot') or image that is stored locally. Note: currently works only on Linux and iOS. 
+#' objects of class \code{ggplot}) or image that is stored locally. Note: currently works only on Linux and iOS. 
 #' 
 #' @param data Name value pairs of properties, passed through the \code{\link{dat}} function. These
-#' properties will be reevaluated on each \code{\link{updateCharts}} call. 
+#' properties will be re-evaluated on each \code{\link{updateCharts}} call. 
 #' @param place ID of a container, where to place new chart. Will be ignored if the chart already
 #' exists. If not defined, the chart will be appended to the body of the web pages.
 #' @param ... Name-value pairs of properties that will be evaluated only once and then will remain 

@@ -27,7 +27,7 @@ lc_dens(
 }
 \arguments{
 \item{data}{Name value pairs of properties, passed through the \code{\link{dat}} function. These
-properties will be reevaluated on each \code{\link{updateCharts}} call.}
+properties will be re-evaluated on each \code{\link{updateCharts}} call.}
 
 \item{place}{ID of a container, where to place new chart. Will be ignored if the chart already
 exists. If not defined, the chart will be appended to the body of the web pages.}

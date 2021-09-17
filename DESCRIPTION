@@ -1,8 +1,8 @@
 Package: rlc
 Type: Package
 Title: Create Interactive Linked Charts with Minimal Code
-Version: 0.3.0
-Date: 2020-09-24
+Version: 0.4.0
+Date: 2021-09-17
 Authors@R: c(
 	person("Svetlana", "Ovchinnikova", role = c("aut", "cre"), email = "s.ovchinnikova@zmbh.uni-heidelberg.de"),
 	person("Simon", "Anders", role = c("aut"), email = "sanders@fs.tum.de")
@@ -12,7 +12,8 @@ Description: An easy-to-use tool to employ interactivity in every-day explorator
 	which can be linked to each other or to other interactive elements with just few lines of code.
 License: GPL-3
 Imports: jsonlite, stringr, hwriter, jrc(>= 0.4.0), plyr, stats, R6
-Suggests: 
+Suggests:
+    spelling, 
     magrittr,
     dplyr,
     tidyr,
@@ -21,5 +22,6 @@ Suggests:
     testthat (>= 2.1.0),
     httpuv
 NeedsCompilation: no
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 Roxygen: list(markdown = TRUE)
+Language: en-GB

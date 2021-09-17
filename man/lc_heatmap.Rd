@@ -15,7 +15,7 @@ lc_heatmap(
 }
 \arguments{
 \item{data}{Name value pairs of properties, passed through the \code{\link{dat}} function. These
-properties will be reevaluated on each \code{\link{updateCharts}} call.}
+properties will be re-evaluated on each \code{\link{updateCharts}} call.}
 
 \item{place}{ID of a container, where to place new chart. Will be ignored if the chart already
 exists. If not defined, the chart will be appended to the body of the web pages.}
@@ -32,7 +32,7 @@ where \code{N - 1} is the number of existing charts.}
 column with the requested name, the variable will be searched for outside of the data set. Must be
 a data.frame or a list.}
 
-\item{pacerStep}{Time in ms between two consecutive calls of an \code{onmouseover} event. Prevents overqueuing in case
+\item{pacerStep}{Time in ms between two consecutive calls of an \code{onmouseover} event. Prevents over-queueing in case
 of cumbersome computations. May be important when the chart works in canvas mode.}
 }
 \description{
@@ -47,7 +47,7 @@ You can read more about different properties
 \itemize{
 \item \code{value} - matrix of values that will be displayed as a heatmap.
 \item \code{rowLabel, colLabel} - vector of labels for all rows or columns.
-\item \code{showDendogramRow, showDendogramCol} - whether to show dendograms when rows or columns are
+\item \code{showDendogramRow, showDendogramCol} - whether to show dendrograms when rows or columns are
 clustered. Even if these properties are set to \code{FALSE}, rows and columns can still be clustered.
 \item \code{clusterRows, clusterCols} - whether rows or columns should be clustered. If these
 properties are set to \code{FALSE}, rows and columns can still be clustered later using the instrument
@@ -102,7 +102,7 @@ Global chart settings
 \item \code{titleX, titleY} - coordinates of the chart title.
 \item \code{titleSize} - font-size of the chart title.
 \item \code{showLegend} - whether or not to show the legend.
-\item \code{showPanel} - whether of not to show the instrument panel (gray triangle in the upper-left corner of the chart).
+\item \code{showPanel} - whether of not to show the instrument panel (grey triangle in the upper-left corner of the chart).
 \item \code{transitionDuration} - duration of the transitions between any two states of the chart. If 0,
 no animated transition is shown. It can be useful to turn the transition off, when lots of frequent
 changes happen to the chart.}
