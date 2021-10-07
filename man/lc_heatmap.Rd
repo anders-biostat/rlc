@@ -14,23 +14,23 @@ lc_heatmap(
 )
 }
 \arguments{
-\item{data}{Name value pairs of properties, passed through the \code{\link{dat}} function. These
+\item{data}{Name-value pairs of properties passed through the \code{\link{dat}} function. These
 properties will be re-evaluated on each \code{\link{updateCharts}} call.}
 
-\item{place}{ID of a container, where to place new chart. Will be ignored if the chart already
-exists. If not defined, the chart will be appended to the body of the web pages.}
+\item{place}{An ID of the container, where to place new chart. It will be ignored if the chart already
+exists. If not defined, the chart will be appended to the web page's bodys.}
 
 \item{...}{Name-value pairs of properties that will be evaluated only once and then will remain
 constant. These properties can still be changed later using the \code{\link{setProperties}} function.}
 
-\item{chartId}{ID for the chart. All charts must have unique IDs. If a chart with the same ID already
-exists, it will be replaced. If ID is not defined, it will be the same as
+\item{chartId}{An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
+exists, it will be replaced. If ID is not defined, it will be the same as the
 value of the \code{place} argument. And if both are not defined, the ID will be set to \code{ChartN},
 where \code{N - 1} is the number of existing charts.}
 
-\item{with}{A data set from which other properties should be taken. If the data set doesn't have a
-column with the requested name, the variable will be searched for outside of the data set. Must be
-a data.frame or a list.}
+\item{with}{A dataset or a list from which other properties should be taken. If the dataset doesn't have a
+column with the requested name, the variable will be searched for outside of the dataset. Must be
+a \code{data.frame} or a \code{list}.}
 
 \item{pacerStep}{Time in ms between two consecutive calls of an \code{onmouseover} event. Prevents over-queueing in case
 of cumbersome computations. May be important when the chart works in canvas mode.}
@@ -64,18 +64,18 @@ for each cell).}
 Style settings
 \itemize{
 \item \code{rowTitle, colTilte} - titles for rows and columns (similar to axes titles).
-\item \code{palette} - vector of colours to construct a colour scale.
+\item \code{palette} - a vector of colours to construct a colour scale.
 \item \code{colourDomain} - domain of the colour scale. All values outside it will
 be clamped to its edges.}
 
 Interactivity settings
 \itemize{
-\item \code{on_click} - function, to be called, when one of the cells is clicked. Gets a vector of row and column indices
+\item \code{on_click} - a function, to be called when one of the cells is clicked. Gets a vector of row and column indices
 of the clicked cell as its arguments.
-\item \code{on_mouseover} - function, to be called, when mouse hovers over one of the cells.
+\item \code{on_mouseover} - a function, to be called when the mouse hovers over one of the cells.
 Gets a vector of row and column indices of the clicked cell as its arguments.
-\item \code{on_mouseout} - function, to be called, when mouse moves away from one of the cells.
-\item \code{on_marked} - function, to be called, when any of the cells are selected (marked)
+\item \code{on_mouseout} - a function, to be called when the mouse moves away from one of the cells.
+\item \code{on_marked} - a function, to be called when any of the cells are selected (marked)
 or deselected. Use \code{\link{getMarked}} function to get the IDs of the currently marked cells. To mark cells,
 select them with your mouse while holding the \emph{Shift} key.}
 
@@ -85,10 +85,10 @@ Legend settings
 \item \code{legend_height} - height of the legend in pixels. By default, it is equal to the height of the chart.
 \item \code{legend_sampleHeight} - height of a single key of the legend in pixels. The default value is 20.
 \item \code{legend_ncol} - number of columns to order several legends. By default, this is defined from the number
-of legends to reach close to square shape.
+of legends to reach close to a square shape.
 \item \code{legend_container} - a DOM element of the web page where to place the legend. By default, the legend is
 positioned to the right from the chart in a table cell specifically made for it. This should be a valid CSS selector.
-If the specified element does not exist, the legend will be added to the body of the web page.}
+If the specified element does not exist, the legend will be added to the web page's body.}
 
 Global chart settings
 \itemize{
@@ -98,7 +98,7 @@ Global chart settings
 \item \code{plotHeight} - height of the plotting area in pixels.
 \item \code{paddings} - padding sizes in pixels. Must be a list with all the following fields:
 \code{"top", "bottom", "left", "right"}.
-\item \code{title} - title of the chart.
+\item \code{title} - a title of the chart.
 \item \code{titleX, titleY} - coordinates of the chart title.
 \item \code{titleSize} - font-size of the chart title.
 \item \code{showLegend} - whether or not to show the legend.

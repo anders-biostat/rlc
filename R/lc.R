@@ -1401,9 +1401,9 @@ removeLayer <- function(chartId, layerId) {
 #' @param chartId ID of the chart, for which to redefine properties.
 #' @param layerId ID of the layer, for which to redefine properties. If the chart has a single
 #' layer or doesn't have layers, default value (which is NULL) can be used.
-#' @param with A data set from which other properties should be taken. If the data set doesn't have a 
-#' column with the requested name, the variable will be searched for outside of the data set. Must be
-#' a data.frame or a list.
+#' @param with A dataset or a list from which other properties should be taken. If the dataset doesn't have a 
+#' column with the requested name, the variable will be searched for outside of the dataset. Must be
+#' a \code{data.frame} or a \code{list}.
 #' 
 #' @examples
 #' \donttest{data("iris")
@@ -1541,22 +1541,22 @@ updateCharts <- function(chartId = NULL, layerId = NULL, updateOnly = NULL) {
 #' even those triggered by non-existing elements. This function is a wrapper around method 
 #' \code{chartEvent} of class \code{\link{LCApp}}.
 #' 
-#' @param d Value that is used to identify interactive element or its state. A single numeric index for 
-#' a point or a line, vector or
-#' row and column indices of a cell for a heatmap, value for an input block (please, check \code{\link{lc_input}}
-#' for more details about input blocks and their values). Should be \code{NULL} for \code{mouseout} or \code{marked} events.
-#' N.B. This function is called from the web page and therefore all element indices start from zero as it is
-#' happens in JavaScript.
+#' @param d Value that is used to identify an interactive element or its state. 
+#' A single numeric index for a point or a line, vector or row and column indices 
+#' of a cell for a heatmap, value for an input block (please, check \code{\link{lc_input}} for more 
+#' details about input blocks and their values). It should be \code{NULL} for \code{mouseout} or 
+#' \code{marked} events. NB: This function is called from the web page, and therefore all element indices 
+#' start from zero as it happens in JavaScript.
 #' @param chartId ID of the chart.
 #' @param layerId ID of the layer. You can print IDs of all charts and their layers with \code{\link{listCharts}}.
 #' @param event Type of event. Must be one of \code{"click"}, \code{"mouseover"}, \code{"mouseout"}, \code{"marked"}, 
-#' \code{"labelClickRow"}, \code{"labelClickCol"}.
+#' \code{"labelClickRow"}, \code{"labelClickCol"}, \code{"clickPosition"}.
 #' @param sessionId ID of the session (opened client page) that triggered the event. The default value uses a local session
 #' variable. This must be a single session ID. You can get a list of IDs of all currently active with the
-#' method \code{getSessionIds} inherited from class \code{\link{App}} by \code{\link{LCApp}}. Possible errors in evaluation of 
+#' method \code{getSessionIds} inherited from class \code{\link{App}} by \code{\link{LCApp}}. Possible errors in the evaluation of 
 #' this argument are ignored.
 #' @param app Object of class \code{\link{LCApp}} for which the event was triggered. Note that this argument is here for
-#' internal use and its default value is a variable, stored in each session locally. If you are not using wrapper functions, 
+#' internal use, and its default value is a variable stored in each session locally. If you are not using wrapper functions, 
 #' it is preferred to call method \code{chartEvent} of an object of class \code{\link{LCApp}}.
 #' @examples 
 #' \donttest{x <- rnorm(50)
@@ -1609,15 +1609,15 @@ listCharts <- function() {
 #' Double click on the chart with the \emph{Shift} key pressed will deselect all the 
 #' elements. This function is a wrapper of method \code{getMarked} of class \code{\link{LCApp}}.
 #' 
-#' @param chartId An ID of the chart. This argument is optional, if there is only one chart.
-#' @param layerId An ID of the layer. This argument is optional, if there is only one chart.
-#' than one layer.
-#' @param sessionId An ID of the session from which to get the marked elements. Can be \code{NULL}
+#' @param chartId An ID of the chart. This argument is optional if there is only one chart.
+#' @param layerId An ID of the layer. This argument is optional if there is only one chart with
+#' a single layer.
+#' @param sessionId An ID of the session from which to get the marked elements. It can be \code{NULL}
 #' if there is only one active session. Otherwise must be a valid session ID. Check \code{\link[jrc]{Session}}
-#' for more information on client sessions. If a call to this function was triggered from an opened web page, ID of 
-#' the corresponding session will be used automatically.
+#' for more information on client sessions. If a call to this function was triggered from a web page, the ID of 
+#' the corresponding session would be used automatically.
 #' 
-#' @return a vector of indices or, in case of heatmaps, an \emph{n x 2} matrix were first and
+#' @return a vector of indices or, in the case of heatmaps, an \emph{n x 2} matrix where first and
 #' second columns contain row and column indices of the marked cells, respectively.
 #' 
 #' @examples
@@ -1694,20 +1694,20 @@ mark <- function(elements, chartId = NULL, layerId = NULL,
 #' 
 #' \code{rlc} offers two ways to control an interactive app. One is by using methods of class
 #' \code{\link{LCApp}}. This allows one to have any number of apps within one
-#' R session, but requires some understanding of object oriented programming. Another way is to use
+#' R session but requires some understanding of object oriented-programming. Another way is to use
 #' provided wrapper functions that are exported by the package. These functions internally work with 
-#' the \code{\link{LCApp}} object, which is stored in the package namespace upon initialization with 
-#' \code{\link{openPage}} function. \code{getPage} returns this object if any.
+#' the \code{\link{LCApp}} object stored in the package namespace upon initialization with the
+#' \code{\link{openPage}} function. \code{getPage} returns this object, if any.
 #' 
-#' Note that \code{rlc} package is based on \code{jrc} library. Both packages are organized in similar manner.
-#' Both have a central class that represents the entire app and can be fully managed with their methods (\code{\link{LCApp}}
-#' and \code{\link[jrc]{App}}, respectively). And both also provide a set of wrapper functions, that can be used instead of
-#' the methods. However, wrapper functions of the \code{jrc} package can't be use for \code{rlc} apps, while all the
-#' methods of class \code{\link[jrc]{App}} are inherited by \code{\link{LCApp}}. Therefore, if you want to get more low level
-#' control over your app, such as managing client sessions, local variables and memory usage, you should methods of 
+#' Note that the \code{rlc} package is based on the \code{jrc} library. Both packages are similarly organized.
+#' Both have a central class representing the entire app and can be fully managed with their methods (\code{\link{LCApp}}
+#' and \code{\link[jrc]{App}}, respectively). And both also provide a set of wrapper functions that can be used instead of
+#' the methods. However, wrapper functions of the \code{jrc} package can't be used for \code{rlc} apps, while \code{\link{LCApp}} 
+#' inherits all the methods of class \code{\link[jrc]{App}}. Therefore, if you want to get more low-level
+#' control over your app, such as managing client sessions, local variables and memory usage, you should use methods of the
 #' \code{\link[jrc]{App}} class. 
 #' 
-#' @return Object of class \code{\link{LCApp}} or \code{NULL} if there is no active app.
+#' @return An object of class \code{\link{LCApp}} or \code{NULL} if there is no active app.
 #' 
 #' @export
 getPage <- function(){
@@ -1716,17 +1716,26 @@ getPage <- function(){
 
 #' Link data to the chart
 #' 
-#' \code{dat} allows to link variables from the current environment to chart's properties.
-#' On every \code{\link{updateCharts}} call all the data provided via the \code{dat} function
-#' will be automatically re-evaluated and the chart will be changed accordingly. One can also
-#' put properties outside of the \code{dat} function to prevent their re-evaluation.
+#' \code{dat} allows linking variables from the current environment to chart's properties.
+#' On every \code{\link{updateCharts}} call, all the data provided via the \code{dat} function
+#' will be automatically re-evaluated, and the chart will be changed accordingly. One can also
+#' put properties outside of the \code{dat} function to prevent their re-evaluation. It
+#' can also be used to ensure re-evaluation of the \code{with} argument of any plotting function.
 #' 
 #' @param ... List of name-value pairs to define the properties. 
 #' 
 #' @examples 
 #' \donttest{lc_scatter(dat(x = rnorm(30)), y = rnorm(30))
 #' #note that the Y values remain the same after each updateCharts call
-#' updateCharts()}
+#' updateCharts()
+#' 
+#' #This way the dataset is not strored inside the chart and will be re-evaluated
+#' data("iris")
+#' lc_scatter(dat(x = Sepal.Length, y = Petal.Length), with = dat(iris))
+#' 
+#' iris <- iris[1:10, ]
+#' updateCharts()
+#' }
 #' 
 #' @export
 dat <- function( ... ) {
@@ -1736,7 +1745,7 @@ dat <- function( ... ) {
 #' Stop server
 #' 
 #' Stops the server and closes all currently opened pages (if any). This function is a 
-#' wrapper of \code{stopServer} method inherited by the \code{\link{LCApp}} class from the \code{\link[jrc]{App}} class.
+#' wrapper of the \code{stopServer} method inherited by the \code{\link{LCApp}} class from the \code{\link[jrc]{App}} class.
 #' 
 #' @examples 
 #' \donttest{openPage(useViewer = FALSE)
@@ -1760,23 +1769,23 @@ closePage <- function() {
 #' @describeIn lc_scatter creates a scatterplot and adds it as a new layer to an existing chart or
 #' creates a new one.
 #' 
-#' @param data Name value pairs of properties, passed through the \code{\link{dat}} function. These
+#' @param data Name-value pairs of properties passed through the \code{\link{dat}} function. These
 #' properties will be re-evaluated on each \code{\link{updateCharts}} call. 
-#' @param place ID of a container, where to place new chart. Will be ignored if the chart already
-#' exists. If not defined, the chart will be appended to the body of the web pages.
+#' @param place An ID of the container, where to place new chart. It will be ignored if the chart already
+#' exists. If not defined, the chart will be appended to the web page's bodys.
 #' @param ... Name-value pairs of properties that will be evaluated only once and then will remain 
 #' constant. These properties can still be changed later using the \code{\link{setProperties}} function.
-#' @param chartId ID for the chart. All charts must have unique IDs. If a chart with the same ID already
-#' exists, it will be replaced unless \code{addLayer = TRUE}. If ID is not defined, it will be the same as
+#' @param chartId An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
+#' exists, it will be replaced unless \code{addLayer = TRUE}. If ID is not defined, it will be the same as the
 #' value of the \code{place} argument. And if both are not defined, the ID will be set to \code{ChartN}, 
 #' where \code{N - 1} is the number of existing charts.
 #' @param layerId An ID for the new layer. All layers within one chart must have different IDs. If a layer with the same
-#' ID already exists, it will be replaced. If not defined, will be set to \code{LayerN}, where \code{N - 1} 
-#' is the number of currently existing layers in this chart.
-#' @param with A data set from which other properties should be taken. If the data set doesn't have a 
-#' column with the requested name, the variable will be searched for outside of the data set. Must be
-#' a data.frame or a list.
-#' @param addLayer if there is already a chart with the same ID, this argument defines whether to replace it or to add a
+#' ID already exists, it will be replaced. If not defined, it will be set to \code{LayerN}, where \code{N - 1} 
+#' is the current number of layers in this chart.
+#' @param with A dataset or a list from which other properties should be taken. If the dataset doesn't have a 
+#' column with the requested name, the variable will be searched for outside of the dataset. Must be
+#' a \code{data.frame} or a \code{list}.
+#' @param addLayer If there is already a chart with the same ID, this argument defines whether to replace it or to add a
 #' new layer to it. This argument is ignored if both \code{place} and \code{chartId} are \code{NULL} or if there is no
 #' chart with the given ID. 
 #' @param pacerStep Time in ms between two consecutive calls of an \code{onmouseover} event. Prevents over-queueing in case
@@ -1789,7 +1798,7 @@ closePage <- function() {
 #' \itemize{
 #'  \item \code{x, y} - vector of x and y coordinates of the points.
 #'  \item \code{size} - sizes of the points. Default size is 6.
-#'  \item \code{opacity} - opacity of each point in the range from 0 to 1.
+#'  \item \code{opacity} - a vector of opacity values for each point in the range from 0 to 1.
 #'  \item \code{label} - vector of text labels for each point (labels by default are shown, when mouse hovers over a point).
 #'  \item \code{valueAxis} - (for \code{lc_beeswarm} only) defines axis with values that will
 #'  not be changed. Must be \code{"x"} or \code{"y"} (default).
@@ -1799,19 +1808,19 @@ closePage <- function() {
 #' 
 #' Colour and shape settings
 #' \itemize{
-#'  \item \code{colour} - colour of the points. Must be a colour name or hexadecimal code.
+#'  \item \code{colour} - colour of the points. Must be a colour name or a hexadecimal code.
 #'  \item \code{colourValue} - grouping values for different colours. Can be numbers or characters.
-#'  \item \code{colourDomain} - vector of all possible values for discrete colour scales 
-#'  or range of all possible colour values for the continuous ones.
-#'  \item \code{palette} - vector of colours to construct the colour scale.
-#'  \item \code{colourLegendTitle} - title for the colour legend.
-#'  \item \code{addColourScaleToLegend} - whether or not to show colour legend for the current layer.
+#'  \item \code{colourDomain} - a vector of all possible values for discrete colour scales 
+#'  or a range of all possible colour values for the continuous ones.
+#'  \item \code{palette} - a vector of colours to construct the colour scale.
+#'  \item \code{colourLegendTitle} - a title for the colour legend.
+#'  \item \code{addColourScaleToLegend} - whether or not to show the colour legend for the current layer.
 #'  \item \code{globalColourScale} - whether or not to use one colour scale for all the layers.
 #'  \item \code{symbol} - shape of each point. Must be one of \code{"Circle"}, \code{"Cross"}, \code{"Diamond"}, 
 #'  \code{"Square"}, \code{"Star"}, \code{"Triangle"}, \code{"Wye"}.
 #'  \item \code{symbolValue} - grouping values for different symbols.
-#'  \item \code{symbolLegendTitle} - title for the symbol value.
-#'  \item \code{stroke} - stroke colour for each element. Must be a colour name or hexadecimal code.
+#'  \item \code{symbolLegendTitle} - a title for the symbol value.
+#'  \item \code{stroke} - stroke colour for each element. Must be a colour name or a hexadecimal code.
 #'  \item \code{strokeWidth} - width of the strokes for each point.} 
 #'  
 #' Axes settings
@@ -1828,32 +1837,32 @@ closePage <- function() {
 #'  of the logarithm), or between neighbouring ticks for categorical scale.
 #'  \item \code{layerDomainX, layerDomainY} - default axes ranges for the given layer.
 #'  \item \code{domainX, domainY} - default axes ranges for the entire chart. If not defined, 
-#'  is automatically set to include all layer domains.
+#'  it is automatically set to include all layer domains.
 #'  \item \code{contScaleX, contScaleY} - whether or not the axis should be continuous.
-#'  \item \code{aspectRatio} - aspect ratio.
-#'  \item \code{axisTitleX, axisTitleY} - axes titles.
-#'  \item \code{axisTitlePosX, axisTitlePosY} - position of axes titles. For each axis one can specify title position
+#'  \item \code{aspectRatio} - an aspect ratio for the chart.
+#'  \item \code{axisTitleX, axisTitleY} - axis titles.
+#'  \item \code{axisTitlePosX, axisTitlePosY} - positions of the axis titles. For each axis, one can specify a title position
 #'  across or along the corresponding axis. Possible options are \code{"up"} (for title inside the plotting area)
 #'  or \code{"down"} (outside the plotting area, under the axis), and
 #'  \code{"start"}, \code{"middle"}, \code{"end"}. This property must be a string with one or two of the aforementioned options
 #'  (e.g. \code{"middle down"}, \code{"start"}, etc.).
-#'  \item \code{ticksRotateX, ticksRotateY} - angle by which to rotate ticks (in degrees). Must be between 
+#'  \item \code{ticksRotateX, ticksRotateY} - angles by which to rotate ticks (in degrees). Must be between 
 #'  0 (horizontal ticks, default) and 90 (vertical ticks).
-#'  \item \code{ticksX, ticksY} - set of ticks for the axes.} 
+#'  \item \code{ticksX, ticksY} - sets of ticks for the axes.} 
 #'
 #' Interactivity settings
 #' \itemize{
-#'  \item \code{on_click} - function, to be called, when one of the points is clicked. Gets an
+#'  \item \code{on_click} - a function, to be called when one of the points is clicked. Gets an
 #'  index of the clicked point as an argument.
-#'  \item \code{on_clickPosition} - function, to be called, when any point of the chart is clicked. Unlike
-#'  \code{on_click} which is called only when an element of the chart (point, line, etc.) is clicked, this
-#'  function reacts to any click on the chart. As an argument it receives a vector of x and y coordinates of
-#'  the click (based on the current axes scales). If one of the axes is categorical, then the function will
+#'  \item \code{on_clickPosition} - a function, to be called when any point of the chart is clicked. Unlike
+#'  \code{on_click}, which is called only when an element of the chart (point, line, etc.) is clicked, this
+#'  function reacts to any click on the chart. As an argument, it receives a vector of x and y coordinates of
+#'  the click (based on the current axes scales). If one of the axes is categorical, the function will
 #'  get the closest tick to the clicked position.
-#'  \item \code{on_mouseover} - function, to be called, when mouse hovers over one of the points.
+#'  \item \code{on_mouseover} - a function, to be called when the mouse hovers over one of the points.
 #'  Gets an index of the clicked point as an argument.
-#'  \item \code{on_mouseout} - function, to be called, when mouse moves out of one of the points.
-#'  \item \code{on_marked} - function, to be called, when any of the points are selected (marked) 
+#'  \item \code{on_mouseout} - a function, to be called when the mouse moves out of one of the points.
+#'  \item \code{on_marked} - a function, to be called when any of the points are selected (marked) 
 #'  or deselected. Use \code{\link{getMarked}} function to get the IDs of the currently marked points. To mark points,
 #'  select them with your mouse while holding the \emph{Shift} key.} 
 #'
@@ -1863,10 +1872,10 @@ closePage <- function() {
 #'  \item \code{legend_height} - height of the legend in pixels. By default, it is equal to the height of the chart.
 #'  \item \code{legend_sampleHeight} - height of a single key of the legend in pixels. The default value is 20.
 #'  \item \code{legend_ncol} - number of columns to order several legends. By default, this is defined from the number 
-#'  of legends to reach close to square shape.
+#'  of legends to reach close to a square shape.
 #'  \item \code{legend_container} - a DOM element of the web page where to place the legend. By default, the legend is 
 #'  positioned to the right from the chart in a table cell specifically made for it. This should be a valid CSS selector.
-#'  If the specified element does not exist, the legend will be added to the body of the web page.} 
+#'  If the specified element does not exist, the legend will be added to the web page's body.} 
 #'    
 #' Global chart settings
 #' \itemize{
@@ -1876,7 +1885,7 @@ closePage <- function() {
 #'  \item \code{plotHeight} - height of the plotting area in pixels.
 #'  \item \code{paddings} - padding sizes in pixels. Must be a list with all the following fields: 
 #'  \code{"top", "bottom", "left", "right"}.
-#'  \item \code{title} - title of the chart.
+#'  \item \code{title} - a title of the chart.
 #'  \item \code{titleX, titleY} - coordinates of the chart title.
 #'  \item \code{titleSize} - font-size of the chart title.
 #'  \item \code{showLegend} - whether or not to show the legend.
@@ -1937,23 +1946,23 @@ lc_beeswarm <- function(data = list(), place = NULL, ..., chartId = NULL, layerI
 #' 
 #' @describeIn lc_line connects points in the order of variables on the x axis.
 #' 
-#' @param data Name value pairs of properties, passed through the \code{\link{dat}} function. These
+#' @param data Name-value pairs of properties passed through the \code{\link{dat}} function. These
 #' properties will be re-evaluated on each \code{\link{updateCharts}} call. 
-#' @param place ID of a container, where to place new chart. Will be ignored if the chart already
-#' exists. If not defined, the chart will be appended to the body of the web pages.
+#' @param place An ID of the container, where to place new chart. It will be ignored if the chart already
+#' exists. If not defined, the chart will be appended to the web page's bodys.
 #' @param ... Name-value pairs of properties that will be evaluated only once and then will remain 
 #' constant. These properties can still be changed later using the \code{\link{setProperties}} function.
-#' @param chartId ID for the chart. All charts must have unique IDs. If a chart with the same ID already
-#' exists, it will be replaced unless \code{addLayer = TRUE}. If ID is not defined, it will be the same as
+#' @param chartId An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
+#' exists, it will be replaced unless \code{addLayer = TRUE}. If ID is not defined, it will be the same as the
 #' value of the \code{place} argument. And if both are not defined, the ID will be set to \code{ChartN}, 
 #' where \code{N - 1} is the number of existing charts.
 #' @param layerId An ID for the new layer. All layers within one chart must have different IDs. If a layer with the same
-#' ID already exists, it will be replaced. If not defined, will be set to \code{LayerN}, where \code{N - 1} 
-#' is the number of currently existing layers in this chart.
-#' @param with A data set from which other properties should be taken. If the data set doesn't have a 
-#' column with the requested name, the variable will be searched for outside of the data set. Must be
-#' a data.frame or a list.
-#' @param addLayer if there is already a chart with the same ID, this argument defines whether to replace it or to add a
+#' ID already exists, it will be replaced. If not defined, it will be set to \code{LayerN}, where \code{N - 1} 
+#' is the current number of layers in this chart.
+#' @param with A dataset or a list from which other properties should be taken. If the dataset doesn't have a 
+#' column with the requested name, the variable will be searched for outside of the dataset. Must be
+#' a \code{data.frame} or a \code{list}.
+#' @param addLayer If there is already a chart with the same ID, this argument defines whether to replace it or to add a
 #' new layer to it. This argument is ignored if both \code{place} and \code{chartId} are \code{NULL} or if there is no
 #' chart with the given ID.
 #' @param pacerStep Time in ms between two consecutive calls of an \code{on_mouseover} event. Prevents over-queueing in case
@@ -1971,7 +1980,7 @@ lc_beeswarm <- function(data = list(), place = NULL, ..., chartId = NULL, layerI
 #'  \item \code{v} - (only for \code{lc_vLine}) vector of x-intercepts.
 #'  \item \code{h} - (only for \code{lc_hLine}) vector of y-intercepts.
 #'  \item \code{lineWidth} - (nor for \code{lc_ribbon}) width of each line.
-#'  \item \code{opacity} - opacity of each line in the range from 0 to 1.
+#'  \item \code{opacity} - a vector of opacity values for each line in the range from 0 to 1.
 #'  \item \code{label} - vector of text labels for each line (labels by default are shown, when mouse hovers over a line).
 #'  \item \code{dasharray} - defines pattern of dashes and gaps for each line.
 #'  \item \code{informText} - text that appears when the mouse cursor moves over an element. Unlike \code{label},
@@ -1980,19 +1989,19 @@ lc_beeswarm <- function(data = list(), place = NULL, ..., chartId = NULL, layerI
 #' 
 #' Colour settings
 #' \itemize{
-#'  \item \code{colour} - colour of the lines. Must be a colour name or hexadecimal code. For
+#'  \item \code{colour} - colour of the lines. Must be a colour name or a hexadecimal code. For
 #'  \code{lc_ribbon} this property defines colour of the ribbon, not the strokes.
 #'  \item \code{fill} - (not for \code{lc_ribbon}) colour with which to fill area inside the line. 
-#'  Must be a colour name or hexadecimal code.
+#'  Must be a colour name or a hexadecimal code.
 #'  \item \code{colourValue} - grouping values for different colours. Can be numbers or characters.
-#'  \item \code{colourDomain} - vector of all possible values for discrete colour scales 
-#'  or range of all possible colour values for the continuous ones.
-#'  \item \code{palette} - vector of colours to construct the colour scale.
-#'  \item \code{colourLegendTitle} - title for the colour legend.
-#'  \item \code{addColourScaleToLegend} - whether or not to show colour legend for the current layer.
+#'  \item \code{colourDomain} - a vector of all possible values for discrete colour scales 
+#'  or a range of all possible colour values for the continuous ones.
+#'  \item \code{palette} - a vector of colours to construct the colour scale.
+#'  \item \code{colourLegendTitle} - a title for the colour legend.
+#'  \item \code{addColourScaleToLegend} - whether or not to show the colour legend for the current layer.
 #'  \item \code{globalColourScale} - whether or not to use one colour scale for all the layers.
 #'  \item \code{stroke} - (only for \code{lc_ribbon}) stroke colour for each ribbon. 
-#'  Must be a colour name or hexadecimal code.
+#'  Must be a colour name or a hexadecimal code.
 #'  \item \code{strokeWidth} - (only for \code{lc_ribbon}) width of the strokes for each ribbon. }
 #'  
 #' Axes settings
@@ -2001,32 +2010,32 @@ lc_beeswarm <- function(data = list(), place = NULL, ..., chartId = NULL, layerI
 #'  If 0 or \code{FALSE} no transformation will be performed.
 #'  \item \code{layerDomainX, layerDomainY} - default axes ranges for the given layer.
 #'  \item \code{domainX, domainY} - default axes ranges for the entire chart. If not defined, 
-#'  is automatically set to include all layer domains.
+#'  it is automatically set to include all layer domains.
 #'  \item \code{contScaleX, contScaleY} - whether or not the axis should be continuous.
-#'  \item \code{aspectRatio} - aspect ratio.
-#'  \item \code{axisTitleX, axisTitleY} - axes titles.
-#'  \item \code{axisTitlePosX, axisTitlePosY} - position of axes titles. For each axis one can specify title position
+#'  \item \code{aspectRatio} - an aspect ratio for the chart.
+#'  \item \code{axisTitleX, axisTitleY} - axis titles.
+#'  \item \code{axisTitlePosX, axisTitlePosY} - positions of the axis titles. For each axis, one can specify a title position
 #'  across or along the corresponding axis. Possible options are \code{"up"} (for title inside the plotting area)
 #'  or \code{"down"} (outside the plotting area, under the axis), and
 #'  \code{"start"}, \code{"middle"}, \code{"end"}. This property must be a string with one or two of the aforementioned options
 #'  (e.g. \code{"middle down"}, \code{"start"}, etc.).
-#'  \item \code{ticksRotateX, ticksRotateY} - angle by which to rotate ticks (in degrees). Must be between 
+#'  \item \code{ticksRotateX, ticksRotateY} - angles by which to rotate ticks (in degrees). Must be between 
 #'  0 (horizontal ticks, default) and 90 (vertical ticks).
-#'  \item \code{ticksX, ticksY} - set of ticks for the axes.} 
+#'  \item \code{ticksX, ticksY} - sets of ticks for the axes.} 
 #'
 #' Interactivity settings
 #' \itemize{
-#'  \item \code{on_click} - function, to be called, when one of the lines is clicked. Gets an
+#'  \item \code{on_click} - a function, to be called when one of the lines is clicked. Gets an
 #'  index of the clicked line as an argument.
-#'  \item \code{on_clickPosition} - function, to be called, when any point of the chart is clicked. Unlike
-#'  \code{on_click} which is called only when an element of the chart (point, line, etc.) is clicked, this
-#'  function reacts to any click on the chart. As an argument it receives a vector of x and y coordinates of
-#'  the click (based on the current axes scales). If one of the axes is categorical, then the function will
+#'  \item \code{on_clickPosition} - a function, to be called when any point of the chart is clicked. Unlike
+#'  \code{on_click}, which is called only when an element of the chart (point, line, etc.) is clicked, this
+#'  function reacts to any click on the chart. As an argument, it receives a vector of x and y coordinates of
+#'  the click (based on the current axes scales). If one of the axes is categorical, the function will
 #'  get the closest tick to the clicked position.
-#'  \item \code{on_mouseover} - function, to be called, when mouse hovers over one of the lines.
+#'  \item \code{on_mouseover} - a function, to be called when the mouse hovers over one of the lines.
 #'  Gets an index of the clicked line as an argument.
-#'  \item \code{on_mouseout} - function, to be called, when mouse moves out of one of the lines.
-#'  \item \code{on_marked} - function, to be called, when any of the lines are selected (marked) 
+#'  \item \code{on_mouseout} - a function, to be called when the mouse moves out of one of the lines.
+#'  \item \code{on_marked} - a function, to be called when any of the lines are selected (marked) 
 #'  or deselected. Use \code{\link{getMarked}} function to get the IDs of the currently marked lines. To mark lines,
 #'  select them with your mouse while holding the \emph{Shift} key.} 
 #'  
@@ -2036,10 +2045,10 @@ lc_beeswarm <- function(data = list(), place = NULL, ..., chartId = NULL, layerI
 #'  \item \code{legend_height} - height of the legend in pixels. By default, it is equal to the height of the chart.
 #'  \item \code{legend_sampleHeight} - height of a single key of the legend in pixels. The default value is 20.
 #'  \item \code{legend_ncol} - number of columns to order several legends. By default, this is defined from the number 
-#'  of legends to reach close to square shape.
+#'  of legends to reach close to a square shape.
 #'  \item \code{legend_container} - a DOM element of the web page where to place the legend. By default, the legend is 
 #'  positioned to the right from the chart in a table cell specifically made for it. This should be a valid CSS selector.
-#'  If the specified element does not exist, the legend will be added to the body of the web page.}\
+#'  If the specified element does not exist, the legend will be added to the web page's body.}\
 #'  
 #' Global chart settings
 #' \itemize{
@@ -2049,7 +2058,7 @@ lc_beeswarm <- function(data = list(), place = NULL, ..., chartId = NULL, layerI
 #'  \item \code{plotHeight} - height of the plotting area in pixels.
 #'  \item \code{paddings} - padding sizes in pixels. Must be a list with all the following fields: 
 #'  \code{"top", "bottom", "left", "right"}.
-#'  \item \code{title} - title of the chart.
+#'  \item \code{title} - a title of the chart.
 #'  \item \code{titleX, titleY} - coordinates of the chart title.
 #'  \item \code{titleSize} - font-size of the chart title.
 #'  \item \code{showLegend} - whether or not to show the legend.
@@ -2127,26 +2136,26 @@ lc_ribbon <- function(data = list(), place = NULL, ..., chartId = NULL, layerId 
 
 #' Create a barplot
 #' 
-#' \code{lc_bars} creates a new barplot and adds it to the app and to the all currently opened pages
-#' as a new chart or as a new layer of an existing chart.
+#' \code{lc_bars} creates a new barplot and adds it to the app and all currently opened pages
+#' as a new chart or a new layer of an existing chart.
 #' 
-#' @param data Name value pairs of properties, passed through the \code{\link{dat}} function. These
+#' @param data Name-value pairs of properties passed through the \code{\link{dat}} function. These
 #' properties will be re-evaluated on each \code{\link{updateCharts}} call. 
-#' @param place ID of a container, where to place new chart. Will be ignored if the chart already
-#' exists. If not defined, the chart will be appended to the body of the web pages.
+#' @param place An ID of the container, where to place new chart. It will be ignored if the chart already
+#' exists. If not defined, the chart will be appended to the web page's bodys.
 #' @param ... Name-value pairs of properties that will be evaluated only once and then will remain 
 #' constant. These properties can still be changed later using the \code{\link{setProperties}} function.
-#' @param chartId ID for the chart. All charts must have unique IDs. If a chart with the same ID already
-#' exists, it will be replaced unless \code{addLayer = TRUE}. If ID is not defined, it will be the same as
+#' @param chartId An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
+#' exists, it will be replaced unless \code{addLayer = TRUE}. If ID is not defined, it will be the same as the
 #' value of the \code{place} argument. And if both are not defined, the ID will be set to \code{ChartN}, 
 #' where \code{N - 1} is the number of existing charts.
 #' @param layerId An ID for the new layer. All layers within one chart must have different IDs. If a layer with the same
-#' ID already exists, it will be replaced. If not defined, will be set to \code{LayerN}, where \code{N - 1} 
-#' is the number of currently existing layers in this chart.
-#' @param with A data set from which other properties should be taken. If the data set doesn't have a 
-#' column with the requested name, the variable will be searched for outside of the data set. Must be
-#' a data.frame or a list.
-#' @param addLayer if there is already a chart with the same ID, this argument defines whether to replace it or to add a
+#' ID already exists, it will be replaced. If not defined, it will be set to \code{LayerN}, where \code{N - 1} 
+#' is the current number of layers in this chart.
+#' @param with A dataset or a list from which other properties should be taken. If the dataset doesn't have a 
+#' column with the requested name, the variable will be searched for outside of the dataset. Must be
+#' a \code{data.frame} or a \code{list}.
+#' @param addLayer If there is already a chart with the same ID, this argument defines whether to replace it or to add a
 #' new layer to it. This argument is ignored if both \code{place} and \code{chartId} are \code{NULL} or if there is no
 #' chart with the given ID.
 #' 
@@ -2155,25 +2164,25 @@ lc_ribbon <- function(data = list(), place = NULL, ..., chartId = NULL, layerId 
 #' \href{https://anders-biostat.github.io/linked-charts/rlc/tutorials/props.html}{here}.
 #' 
 #' \itemize{
-#'  \item \code{value} - heights of bars/stacks.
+#'  \item \code{values} - heights of bars/stacks.
 #'  \item \code{stackIds} - IDs of all stacks (\emph{optional}). Must be the same size as \code{values}.
 #'  \item \code{barIds} - IDs of all bars (\emph{optional}). Must be the same size as \code{values}.
 #'  \item \code{groupIds} - IDs of all groups (\emph{optional}). Must be the same size as \code{values}.
-#'  \item \code{groupWidth} - ratio of width of a group of bars to the space, available to the group. }
+#'  \item \code{groupWidth} - a ratio of the width of a group of bars to the space available to the group. }
 #' 
 #' Style settings
 #' \itemize{
-#'  \item \code{opacity} - opacity of each bar|stack in the range from 0 to 1.
-#'  \item \code{colour} - colour of each bar|stack. Must be a colour name or hexadecimal code.
+#'  \item \code{opacity} - a vector of opacity values for each bar or stack in the range from 0 to 1.
+#'  \item \code{colour} - a vector of colours for each bar or stack. Must be a colour name or a hexadecimal code.
 #'  \item \code{colourValue} - grouping values for different colours. Can be numbers or characters.
-#'  \item \code{colourDomain} - vector of all possible values for discrete colour scales 
-#'  or range of all possible colour values for the continuous ones.
-#'  \item \code{palette} - vector of colours to construct the colour scale.
-#'  \item \code{colourLegendTitle} - title for the colour legend.
-#'  \item \code{addColourScaleToLegend} - whether or not to show colour legend for the current layer.
+#'  \item \code{colourDomain} - a vector of all possible values for discrete colour scales 
+#'  or a range of all possible colour values for the continuous ones.
+#'  \item \code{palette} - a vector of colours to construct the colour scale.
+#'  \item \code{colourLegendTitle} - a title for the colour legend.
+#'  \item \code{addColourScaleToLegend} - whether or not to show the colour legend for the current layer.
 #'  \item \code{globalColourScale} - whether or not to use one colour scale for all the layers.
-#'  \item \code{stroke} -  stroke colour of each bar|stack. Must be a colour name or hexadecimal code.
-#'  \item \code{strokeWidth} - width of the strokes of each bar|stack. }
+#'  \item \code{stroke} - a vector of stroke colours for each bar or stack. Must be a colour name or a hexadecimal code.
+#'  \item \code{strokeWidth} - a vector of stroke widths for each bar or stack. }
 #'  
 #' Axes settings
 #' \itemize{
@@ -2181,33 +2190,33 @@ lc_ribbon <- function(data = list(), place = NULL, ..., chartId = NULL, layerId 
 #'  If 0 or \code{FALSE} no transformation will be performed.
 #'  \item \code{layerDomainX, layerDomainY} - default axes ranges for the given layer.
 #'  \item \code{domainX, domainY} - default axes ranges for the entire chart. If not defined, 
-#'  is automatically set to include all layer domains.
+#'  it is automatically set to include all layer domains.
 #'  \item \code{contScaleX, contScaleY} - whether or not the axis should be continuous.
-#'  \item \code{aspectRatio} - aspect ratio.
-#'  \item \code{axisTitleX, axisTitleY} - axes titles.
-#'  \item \code{axisTitlePosX, axisTitlePosY} - position of axes titles. For each axis one can specify title position
+#'  \item \code{aspectRatio} - an aspect ratio for the chart.
+#'  \item \code{axisTitleX, axisTitleY} - axis titles.
+#'  \item \code{axisTitlePosX, axisTitlePosY} - positions of the axis titles. For each axis, one can specify a title position
 #'  across or along the corresponding axis. Possible options are \code{"up"} (for title inside the plotting area)
 #'  or \code{"down"} (outside the plotting area, under the axis), and
 #'  \code{"start"}, \code{"middle"}, \code{"end"}. This property must be a string with one or two of the aforementioned options
 #'  (e.g. \code{"middle down"}, \code{"start"}, etc.).
-#'  \item \code{ticksRotateX, ticksRotateY} - angle by which to rotate ticks (in degrees). Must be between 
+#'  \item \code{ticksRotateX, ticksRotateY} - angles by which to rotate ticks (in degrees). Must be between 
 #'  0 (horizontal ticks, default) and 90 (vertical ticks).
-#'  \item \code{ticksX, ticksY} - set of ticks for the axes.}
+#'  \item \code{ticksX, ticksY} - sets of ticks for the axes.}
 #'  
 #'
 #' Interactivity settings
 #' \itemize{
-#'  \item \code{on_click} - function, to be called, when one of the bars is clicked. Gets an
+#'  \item \code{on_click} - a function, to be called when one of the bars is clicked. Gets an
 #'  index of the clicked bar as an argument.
-#'  \item \code{on_clickPosition} - function, to be called, when any point of the chart is clicked. Unlike
-#'  \code{on_click} which is called only when an element of the chart (point, line, etc.) is clicked, this
-#'  function reacts to any click on the chart. As an argument it receives a vector of x and y coordinates of
-#'  the click (based on the current axes scales). If one of the axes is categorical, then the function will
+#'  \item \code{on_clickPosition} - a function, to be called when any point of the chart is clicked. Unlike
+#'  \code{on_click}, which is called only when an element of the chart (point, line, etc.) is clicked, this
+#'  function reacts to any click on the chart. As an argument, it receives a vector of x and y coordinates of
+#'  the click (based on the current axes scales). If one of the axes is categorical, the function will
 #'  get the closest tick to the clicked position.
-#'  \item \code{on_mouseover} - function, to be called, when mouse hovers over one of the bars.
+#'  \item \code{on_mouseover} - a function, to be called when the mouse hovers over one of the bars.
 #'  Gets an index of the clicked bar as an argument.
-#'  \item \code{on_mouseout} - function, to be called, when mouse moves out of one of the bars.
-#'  \item \code{on_marked} - function, to be called, when any of the bars are selected (marked) 
+#'  \item \code{on_mouseout} - a function, to be called when the mouse moves out of one of the bars.
+#'  \item \code{on_marked} - a function, to be called when any of the bars are selected (marked) 
 #'  or deselected. Use \code{\link{getMarked}} function to get the IDs of the currently marked bars. To mark bars,
 #'  select them with your mouse while holding the \emph{Shift} key.} 
 #'  
@@ -2217,10 +2226,10 @@ lc_ribbon <- function(data = list(), place = NULL, ..., chartId = NULL, layerId 
 #'  \item \code{legend_height} - height of the legend in pixels. By default, it is equal to the height of the chart.
 #'  \item \code{legend_sampleHeight} - height of a single key of the legend in pixels. The default value is 20.
 #'  \item \code{legend_ncol} - number of columns to order several legends. By default, this is defined from the number 
-#'  of legends to reach close to square shape.
+#'  of legends to reach close to a square shape.
 #'  \item \code{legend_container} - a DOM element of the web page where to place the legend. By default, the legend is 
 #'  positioned to the right from the chart in a table cell specifically made for it. This should be a valid CSS selector.
-#'  If the specified element does not exist, the legend will be added to the body of the web page.}
+#'  If the specified element does not exist, the legend will be added to the web page's body.}
 #'  
 #' Global chart settings
 #' \itemize{
@@ -2230,7 +2239,7 @@ lc_ribbon <- function(data = list(), place = NULL, ..., chartId = NULL, layerId 
 #'  \item \code{plotHeight} - height of the plotting area in pixels.
 #'  \item \code{paddings} - padding sizes in pixels. Must be a list with all the following fields: 
 #'  \code{"top", "bottom", "left", "right"}.
-#'  \item \code{title} - title of the chart.
+#'  \item \code{title} - a title of the chart.
 #'  \item \code{titleX, titleY} - coordinates of the chart title.
 #'  \item \code{titleSize} - font-size of the chart title.
 #'  \item \code{showLegend} - whether or not to show the legend. 
@@ -2284,23 +2293,23 @@ lc_bars <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = 
 #' These functions make either a histogram or a density plot of the given data 
 #' and either add them as a new layer to an existing chart or create a new chart.
 #' 
-#' @param data Name value pairs of properties, passed through the \code{\link{dat}} function. These
+#' @param data Name-value pairs of properties passed through the \code{\link{dat}} function. These
 #' properties will be re-evaluated on each \code{\link{updateCharts}} call. 
-#' @param place ID of a container, where to place new chart. Will be ignored if the chart already
-#' exists. If not defined, the chart will be appended to the body of the web pages.
+#' @param place An ID of the container, where to place new chart. It will be ignored if the chart already
+#' exists. If not defined, the chart will be appended to the web page's bodys.
 #' @param ... Name-value pairs of properties that will be evaluated only once and then will remain 
 #' constant. These properties can still be changed later using the \code{\link{setProperties}} function.
-#' @param chartId ID for the chart. All charts must have unique IDs. If a chart with the same ID already
-#' exists, it will be replaced unless \code{addLayer = TRUE}. If ID is not defined, it will be the same as
+#' @param chartId An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
+#' exists, it will be replaced unless \code{addLayer = TRUE}. If ID is not defined, it will be the same as the
 #' value of the \code{place} argument. And if both are not defined, the ID will be set to \code{ChartN}, 
 #' where \code{N - 1} is the number of existing charts.
 #' @param layerId An ID for the new layer. All layers within one chart must have different IDs. If a layer with the same
-#' ID already exists, it will be replaced. If not defined, will be set to \code{LayerN}, where \code{N - 1} 
-#' is the number of currently existing layers in this chart.
-#' @param with A data set from which other properties should be taken. If the data set doesn't have a 
-#' column with the requested name, the variable will be searched for outside of the data set. Must be
-#' a data.frame or a list.
-#' @param addLayer if there is already a chart with the same ID, this argument defines whether to replace it or to add a
+#' ID already exists, it will be replaced. If not defined, it will be set to \code{LayerN}, where \code{N - 1} 
+#' is the current number of layers in this chart.
+#' @param with A dataset or a list from which other properties should be taken. If the dataset doesn't have a 
+#' column with the requested name, the variable will be searched for outside of the dataset. It must be
+#' a \code{data.frame} or a \code{list}.
+#' @param addLayer If there is already a chart with the same ID, this argument defines whether to replace it or to add a
 #' new layer to it. This argument is ignored if both \code{place} and \code{chartId} are \code{NULL} or if there is no
 #' chart with the given ID. 
 #' 
@@ -2350,19 +2359,19 @@ lc_dens <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = 
 #' \code{lc_heatmap} creates a new heatmap. Unlike charts with axes, heatmaps do not have
 #' any layers.
 #' 
-#' @param data Name value pairs of properties, passed through the \code{\link{dat}} function. These
+#' @param data Name-value pairs of properties passed through the \code{\link{dat}} function. These
 #' properties will be re-evaluated on each \code{\link{updateCharts}} call. 
-#' @param place ID of a container, where to place new chart. Will be ignored if the chart already
-#' exists. If not defined, the chart will be appended to the body of the web pages.
+#' @param place An ID of the container, where to place new chart. It will be ignored if the chart already
+#' exists. If not defined, the chart will be appended to the web page's bodys.
 #' @param ... Name-value pairs of properties that will be evaluated only once and then will remain 
 #' constant. These properties can still be changed later using the \code{\link{setProperties}} function.
-#' @param chartId ID for the chart. All charts must have unique IDs. If a chart with the same ID already
-#' exists, it will be replaced. If ID is not defined, it will be the same as
+#' @param chartId An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
+#' exists, it will be replaced. If ID is not defined, it will be the same as the
 #' value of the \code{place} argument. And if both are not defined, the ID will be set to \code{ChartN}, 
 #' where \code{N - 1} is the number of existing charts.
-#' @param with A data set from which other properties should be taken. If the data set doesn't have a 
-#' column with the requested name, the variable will be searched for outside of the data set. Must be
-#' a data.frame or a list.
+#' @param with A dataset or a list from which other properties should be taken. If the dataset doesn't have a 
+#' column with the requested name, the variable will be searched for outside of the dataset. Must be
+#' a \code{data.frame} or a \code{list}.
 #' @param pacerStep Time in ms between two consecutive calls of an \code{onmouseover} event. Prevents over-queueing in case
 #' of cumbersome computations. May be important when the chart works in canvas mode.
 #' 
@@ -2390,18 +2399,18 @@ lc_dens <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = 
 #' Style settings
 #' \itemize{
 #'  \item \code{rowTitle, colTilte} - titles for rows and columns (similar to axes titles).
-#'  \item \code{palette} - vector of colours to construct a colour scale.
+#'  \item \code{palette} - a vector of colours to construct a colour scale.
 #'  \item \code{colourDomain} - domain of the colour scale. All values outside it will
 #'  be clamped to its edges.} 
 #'  
 #' Interactivity settings
 #' \itemize{
-#'  \item \code{on_click} - function, to be called, when one of the cells is clicked. Gets a vector of row and column indices 
+#'  \item \code{on_click} - a function, to be called when one of the cells is clicked. Gets a vector of row and column indices 
 #'  of the clicked cell as its arguments.
-#'  \item \code{on_mouseover} - function, to be called, when mouse hovers over one of the cells.
+#'  \item \code{on_mouseover} - a function, to be called when the mouse hovers over one of the cells.
 #'  Gets a vector of row and column indices of the clicked cell as its arguments.
-#'  \item \code{on_mouseout} - function, to be called, when mouse moves away from one of the cells.
-#'  \item \code{on_marked} - function, to be called, when any of the cells are selected (marked) 
+#'  \item \code{on_mouseout} - a function, to be called when the mouse moves away from one of the cells.
+#'  \item \code{on_marked} - a function, to be called when any of the cells are selected (marked) 
 #'  or deselected. Use \code{\link{getMarked}} function to get the IDs of the currently marked cells. To mark cells,
 #'  select them with your mouse while holding the \emph{Shift} key.}
 #'  
@@ -2411,10 +2420,10 @@ lc_dens <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = 
 #'  \item \code{legend_height} - height of the legend in pixels. By default, it is equal to the height of the chart.
 #'  \item \code{legend_sampleHeight} - height of a single key of the legend in pixels. The default value is 20.
 #'  \item \code{legend_ncol} - number of columns to order several legends. By default, this is defined from the number 
-#'  of legends to reach close to square shape.
+#'  of legends to reach close to a square shape.
 #'  \item \code{legend_container} - a DOM element of the web page where to place the legend. By default, the legend is 
 #'  positioned to the right from the chart in a table cell specifically made for it. This should be a valid CSS selector.
-#'  If the specified element does not exist, the legend will be added to the body of the web page.}
+#'  If the specified element does not exist, the legend will be added to the web page's body.}
 #'  
 #' Global chart settings
 #' \itemize{
@@ -2424,7 +2433,7 @@ lc_dens <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = 
 #'  \item \code{plotHeight} - height of the plotting area in pixels.
 #'  \item \code{paddings} - padding sizes in pixels. Must be a list with all the following fields: 
 #'  \code{"top", "bottom", "left", "right"}.
-#'  \item \code{title} - title of the chart.
+#'  \item \code{title} - a title of the chart.
 #'  \item \code{titleX, titleY} - coordinates of the chart title.
 #'  \item \code{titleSize} - font-size of the chart title.
 #'  \item \code{showLegend} - whether or not to show the legend.
@@ -2476,19 +2485,19 @@ lc_heatmap <- function(data = list(), place = NULL, ..., chartId = NULL, with = 
 #' link a colour slider and it will be automatically synchronized with your
 #' chart's colour scale.
 #' 
-#' @param data Name value pairs of properties, passed through the \code{\link{dat}} function. These
+#' @param data Name-value pairs of properties passed through the \code{\link{dat}} function. These
 #' properties will be re-evaluated on each \code{\link{updateCharts}} call. 
-#' @param place ID of a container, where to place new chart. Will be ignored if the chart already
-#' exists. If not defined, the chart will be appended to the body of the web pages.
+#' @param place An ID of the container, where to place new chart. It will be ignored if the chart already
+#' exists. If not defined, the chart will be appended to the web page's bodys.
 #' @param ... Name-value pairs of properties that will be evaluated only once and then will remain 
 #' constant. These properties can still be changed later using the \code{\link{setProperties}} function.
-#' @param chartId ID for the chart. All charts must have unique IDs. If a chart with the same ID already
-#' exists, it will be replaced. If ID is not defined, it will be the same as
+#' @param chartId An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
+#' exists, it will be replaced. If ID is not defined, it will be the same as the
 #' value of the \code{place} argument. And if both are not defined, the ID will be set to \code{ChartN}, 
 #' where \code{N - 1} is the number of existing charts.
-#' @param with A data set from which other properties should be taken. If the data set doesn't have a 
-#' column with the requested name, the variable will be searched for outside of the data set. Must be
-#' a data.frame or a list.
+#' @param with A dataset or a list from which other properties should be taken. If the dataset doesn't have a 
+#' column with the requested name, the variable will be searched for outside of the dataset. Must be
+#' a \code{data.frame} or a \code{list}.
 #' 
 #' @section Available properties: 
 #' You can read more about different properties
@@ -2505,7 +2514,7 @@ lc_heatmap <- function(data = list(), place = NULL, ..., chartId = NULL, with = 
 #'  \item \code{heigth} - height of the chart in pixels.
 #'  \item \code{paddings} - padding sizes in pixels. Must be a list with all the following fields: 
 #'  \code{"top", "bottom", "left", "right"}.
-#'  \item \code{title} - title of the chart.
+#'  \item \code{title} - a title of the chart.
 #'  \item \code{titleX, titleY} - coordinates of the chart title.
 #'  \item \code{titleSize} - font-size of the chart title.} 
 #' 
@@ -2581,26 +2590,26 @@ lc_vLine <- function(data = list(), place = NULL, ..., chartId = NULL, layerId =
 #' \code{lc_html} adds a block of HTML code. It uses \code{\link[hwriter]{hwrite}} function
 #' to transform some data structures (e.g. data frames) to HTML tables.
 #'
-#' @param data Name value pairs of properties, passed through the \code{\link{dat}} function. These
+#' @param data Name-value pairs of properties passed through the \code{\link{dat}} function. These
 #' properties will be re-evaluated on each \code{\link{updateCharts}} call. 
-#' @param place ID of a container, where to place new chart. Will be ignored if the chart already
-#' exists. If not defined, the chart will be appended to the body of the web pages.
+#' @param place An ID of the container, where to place new chart. It will be ignored if the chart already
+#' exists. If not defined, the chart will be appended to the web page's bodys.
 #' @param ... Name-value pairs of properties that will be evaluated only once and then will remain 
 #' constant. These properties can still be changed later using the \code{\link{setProperties}} function.
-#' @param chartId ID for the chart. All charts must have unique IDs. If a chart with the same ID already
-#' exists, it will be replaced. If ID is not defined, it will be the same as
+#' @param chartId An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
+#' exists, it will be replaced. If ID is not defined, it will be the same as the
 #' value of the \code{place} argument. And if both are not defined, the ID will be set to \code{ChartN}, 
 #' where \code{N - 1} is the number of existing charts.
-#' @param with A data set from which other properties should be taken. If the data set doesn't have a 
-#' column with the requested name, the variable will be searched for outside of the data set. Must be
-#' a data.frame or a list.
+#' @param with A dataset or a list from which other properties should be taken. If the dataset doesn't have a 
+#' column with the requested name, the variable will be searched for outside of the dataset. Must be
+#' a \code{data.frame} or a \code{list}.
 #'
 #' @section Available properties: 
 #' You can read more about different properties 
 #' \href{https://anders-biostat.github.io/linked-charts/rlc/tutorials/props.html}{here}.
 #' 
 #' \itemize{
-#'  \item \code{content} - HTML code to display on the page. Can also be a vector, data.frame or
+#'  \item \code{content} - HTML code to display on the page. Can also be a vector, \code{data.frame} or
 #'  any other structure, that can be transformed to HTML by \code{\link[hwriter]{hwrite}}. } 
 #'  
 #' Global chart settings
@@ -2635,19 +2644,19 @@ lc_html <- function(data = list(), place = NULL, ..., chartId = NULL, with = NUL
 #' HTML \code{<input>} tag. Five types of input are supported: \code{"text"}, \code{"range"},
 #' \code{"checkbox"}, \code{"radio"} and \code{"button"}.
 #' 
-#' @param data Name value pairs of properties, passed through the \code{\link{dat}} function. These
+#' @param data Name-value pairs of properties passed through the \code{\link{dat}} function. These
 #' properties will be re-evaluated on each \code{\link{updateCharts}} call. 
-#' @param place ID of a container, where to place new chart. Will be ignored if the chart already
-#' exists. If not defined, the chart will be appended to the body of the web pages.
+#' @param place An ID of the container, where to place new chart. It will be ignored if the chart already
+#' exists. If not defined, the chart will be appended to the web page's bodys.
 #' @param ... Name-value pairs of properties that will be evaluated only once and then will remain 
 #' constant. These properties can still be changed later using the \code{\link{setProperties}} function.
-#' @param chartId ID for the chart. All charts must have unique IDs. If a chart with the same ID already
-#' exists, it will be replaced. If ID is not defined, it will be the same as
+#' @param chartId An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
+#' exists, it will be replaced. If ID is not defined, it will be the same as the
 #' value of the \code{place} argument. And if both are not defined, the ID will be set to \code{ChartN}, 
 #' where \code{N - 1} is the number of existing charts.
-#' @param with A data set from which other properties should be taken. If the data set doesn't have a 
-#' column with the requested name, the variable will be searched for outside of the data set. Must be
-#' a data.frame or a list.
+#' @param with A dataset or a list from which other properties should be taken. If the dataset doesn't have a 
+#' column with the requested name, the variable will be searched for outside of the dataset. Must be
+#' a \code{data.frame} or a \code{list}.
 #' 
 #' @section Available properties: 
 #' You can read more about different properties 
@@ -2667,7 +2676,7 @@ lc_html <- function(data = list(), place = NULL, ..., chartId = NULL, with = NUL
 #'  
 #' Interactivity settings
 #' \itemize{
-#'   \item \code{on_click, on_change} - function, to be called, when user clicks on a button, enters text in a text field
+#'   \item \code{on_click, on_change} - a function, to be called when user clicks on a button, enters text in a text field
 #'   or moves a slider. The two properties are complete synonyms and can replace one another.
 #' }
 #'  
@@ -2707,19 +2716,19 @@ lc_input <- function(data = list(), place = NULL, ..., chartId = NULL, with = NU
 #' \code{lc_image} adds a graphical object to the page. It can be any graphical R object (for example,
 #' objects of class \code{ggplot}) or image that is stored locally. Note: currently works only on Linux and iOS. 
 #' 
-#' @param data Name value pairs of properties, passed through the \code{\link{dat}} function. These
+#' @param data Name-value pairs of properties passed through the \code{\link{dat}} function. These
 #' properties will be re-evaluated on each \code{\link{updateCharts}} call. 
-#' @param place ID of a container, where to place new chart. Will be ignored if the chart already
-#' exists. If not defined, the chart will be appended to the body of the web pages.
+#' @param place An ID of the container, where to place new chart. It will be ignored if the chart already
+#' exists. If not defined, the chart will be appended to the web page's bodys.
 #' @param ... Name-value pairs of properties that will be evaluated only once and then will remain 
 #' constant. These properties can still be changed later using the \code{\link{setProperties}} function.
-#' @param chartId ID for the chart. All charts must have unique IDs. If a chart with the same ID already
-#' exists, it will be replaced. If ID is not defined, it will be the same as
+#' @param chartId An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
+#' exists, it will be replaced. If ID is not defined, it will be the same as the
 #' value of the \code{place} argument. And if both are not defined, the ID will be set to \code{ChartN}, 
 #' where \code{N - 1} is the number of existing charts.
-#' @param with A data set from which other properties should be taken. If the data set doesn't have a 
-#' column with the requested name, the variable will be searched for outside of the data set. Must be
-#' a data.frame or a list.
+#' @param with A dataset or a list from which other properties should be taken. If the dataset doesn't have a 
+#' column with the requested name, the variable will be searched for outside of the dataset. Must be
+#' a \code{data.frame} or a \code{list}.
 #' 
 #' @section Available properties: 
 #' You can read more about different properties 

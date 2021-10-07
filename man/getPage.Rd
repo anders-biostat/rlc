@@ -7,22 +7,22 @@
 getPage()
 }
 \value{
-Object of class \code{\link{LCApp}} or \code{NULL} if there is no active app.
+An object of class \code{\link{LCApp}} or \code{NULL} if there is no active app.
 }
 \description{
 \code{rlc} offers two ways to control an interactive app. One is by using methods of class
 \code{\link{LCApp}}. This allows one to have any number of apps within one
-R session, but requires some understanding of object oriented programming. Another way is to use
+R session but requires some understanding of object oriented-programming. Another way is to use
 provided wrapper functions that are exported by the package. These functions internally work with
-the \code{\link{LCApp}} object, which is stored in the package namespace upon initialization with
-\code{\link{openPage}} function. \code{getPage} returns this object if any.
+the \code{\link{LCApp}} object stored in the package namespace upon initialization with the
+\code{\link{openPage}} function. \code{getPage} returns this object, if any.
 }
 \details{
-Note that \code{rlc} package is based on \code{jrc} library. Both packages are organized in similar manner.
-Both have a central class that represents the entire app and can be fully managed with their methods (\code{\link{LCApp}}
-and \code{\link[jrc]{App}}, respectively). And both also provide a set of wrapper functions, that can be used instead of
-the methods. However, wrapper functions of the \code{jrc} package can't be use for \code{rlc} apps, while all the
-methods of class \code{\link[jrc]{App}} are inherited by \code{\link{LCApp}}. Therefore, if you want to get more low level
-control over your app, such as managing client sessions, local variables and memory usage, you should methods of
+Note that the \code{rlc} package is based on the \code{jrc} library. Both packages are similarly organized.
+Both have a central class representing the entire app and can be fully managed with their methods (\code{\link{LCApp}}
+and \code{\link[jrc]{App}}, respectively). And both also provide a set of wrapper functions that can be used instead of
+the methods. However, wrapper functions of the \code{jrc} package can't be used for \code{rlc} apps, while \code{\link{LCApp}}
+inherits all the methods of class \code{\link[jrc]{App}}. Therefore, if you want to get more low-level
+control over your app, such as managing client sessions, local variables and memory usage, you should use methods of the
 \code{\link[jrc]{App}} class.
 }

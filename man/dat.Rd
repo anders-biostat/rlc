@@ -10,14 +10,23 @@ dat(...)
 \item{...}{List of name-value pairs to define the properties.}
 }
 \description{
-\code{dat} allows to link variables from the current environment to chart's properties.
-On every \code{\link{updateCharts}} call all the data provided via the \code{dat} function
-will be automatically re-evaluated and the chart will be changed accordingly. One can also
-put properties outside of the \code{dat} function to prevent their re-evaluation.
+\code{dat} allows linking variables from the current environment to chart's properties.
+On every \code{\link{updateCharts}} call, all the data provided via the \code{dat} function
+will be automatically re-evaluated, and the chart will be changed accordingly. One can also
+put properties outside of the \code{dat} function to prevent their re-evaluation. It
+can also be used to ensure re-evaluation of the \code{with} argument of any plotting function.
 }
 \examples{
 \donttest{lc_scatter(dat(x = rnorm(30)), y = rnorm(30))
 #note that the Y values remain the same after each updateCharts call
-updateCharts()}
+updateCharts()
+
+#This way the dataset is not strored inside the chart and will be re-evaluated
+data("iris")
+lc_scatter(dat(x = Sepal.Length, y = Petal.Length), with = dat(iris))
+
+iris <- iris[1:10, ]
+updateCharts()
+}
 
 }

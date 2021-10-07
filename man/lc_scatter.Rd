@@ -28,29 +28,29 @@ lc_beeswarm(
 )
 }
 \arguments{
-\item{data}{Name value pairs of properties, passed through the \code{\link{dat}} function. These
+\item{data}{Name-value pairs of properties passed through the \code{\link{dat}} function. These
 properties will be re-evaluated on each \code{\link{updateCharts}} call.}
 
-\item{place}{ID of a container, where to place new chart. Will be ignored if the chart already
-exists. If not defined, the chart will be appended to the body of the web pages.}
+\item{place}{An ID of the container, where to place new chart. It will be ignored if the chart already
+exists. If not defined, the chart will be appended to the web page's bodys.}
 
 \item{...}{Name-value pairs of properties that will be evaluated only once and then will remain
 constant. These properties can still be changed later using the \code{\link{setProperties}} function.}
 
-\item{chartId}{ID for the chart. All charts must have unique IDs. If a chart with the same ID already
-exists, it will be replaced unless \code{addLayer = TRUE}. If ID is not defined, it will be the same as
+\item{chartId}{An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
+exists, it will be replaced unless \code{addLayer = TRUE}. If ID is not defined, it will be the same as the
 value of the \code{place} argument. And if both are not defined, the ID will be set to \code{ChartN},
 where \code{N - 1} is the number of existing charts.}
 
 \item{layerId}{An ID for the new layer. All layers within one chart must have different IDs. If a layer with the same
-ID already exists, it will be replaced. If not defined, will be set to \code{LayerN}, where \code{N - 1}
-is the number of currently existing layers in this chart.}
+ID already exists, it will be replaced. If not defined, it will be set to \code{LayerN}, where \code{N - 1}
+is the current number of layers in this chart.}
 
-\item{with}{A data set from which other properties should be taken. If the data set doesn't have a
-column with the requested name, the variable will be searched for outside of the data set. Must be
-a data.frame or a list.}
+\item{with}{A dataset or a list from which other properties should be taken. If the dataset doesn't have a
+column with the requested name, the variable will be searched for outside of the dataset. Must be
+a \code{data.frame} or a \code{list}.}
 
-\item{addLayer}{if there is already a chart with the same ID, this argument defines whether to replace it or to add a
+\item{addLayer}{If there is already a chart with the same ID, this argument defines whether to replace it or to add a
 new layer to it. This argument is ignored if both \code{place} and \code{chartId} are \code{NULL} or if there is no
 chart with the given ID.}
 
@@ -78,7 +78,7 @@ You can read more about different properties
 \itemize{
 \item \code{x, y} - vector of x and y coordinates of the points.
 \item \code{size} - sizes of the points. Default size is 6.
-\item \code{opacity} - opacity of each point in the range from 0 to 1.
+\item \code{opacity} - a vector of opacity values for each point in the range from 0 to 1.
 \item \code{label} - vector of text labels for each point (labels by default are shown, when mouse hovers over a point).
 \item \code{valueAxis} - (for \code{lc_beeswarm} only) defines axis with values that will
 not be changed. Must be \code{"x"} or \code{"y"} (default).
@@ -88,19 +88,19 @@ for each element).}
 
 Colour and shape settings
 \itemize{
-\item \code{colour} - colour of the points. Must be a colour name or hexadecimal code.
+\item \code{colour} - colour of the points. Must be a colour name or a hexadecimal code.
 \item \code{colourValue} - grouping values for different colours. Can be numbers or characters.
-\item \code{colourDomain} - vector of all possible values for discrete colour scales
-or range of all possible colour values for the continuous ones.
-\item \code{palette} - vector of colours to construct the colour scale.
-\item \code{colourLegendTitle} - title for the colour legend.
-\item \code{addColourScaleToLegend} - whether or not to show colour legend for the current layer.
+\item \code{colourDomain} - a vector of all possible values for discrete colour scales
+or a range of all possible colour values for the continuous ones.
+\item \code{palette} - a vector of colours to construct the colour scale.
+\item \code{colourLegendTitle} - a title for the colour legend.
+\item \code{addColourScaleToLegend} - whether or not to show the colour legend for the current layer.
 \item \code{globalColourScale} - whether or not to use one colour scale for all the layers.
 \item \code{symbol} - shape of each point. Must be one of \code{"Circle"}, \code{"Cross"}, \code{"Diamond"},
 \code{"Square"}, \code{"Star"}, \code{"Triangle"}, \code{"Wye"}.
 \item \code{symbolValue} - grouping values for different symbols.
-\item \code{symbolLegendTitle} - title for the symbol value.
-\item \code{stroke} - stroke colour for each element. Must be a colour name or hexadecimal code.
+\item \code{symbolLegendTitle} - a title for the symbol value.
+\item \code{stroke} - stroke colour for each element. Must be a colour name or a hexadecimal code.
 \item \code{strokeWidth} - width of the strokes for each point.}
 
 Axes settings
@@ -117,32 +117,32 @@ axes. 0 means no shift. 1 stands for distance between \code{x} and
 of the logarithm), or between neighbouring ticks for categorical scale.
 \item \code{layerDomainX, layerDomainY} - default axes ranges for the given layer.
 \item \code{domainX, domainY} - default axes ranges for the entire chart. If not defined,
-is automatically set to include all layer domains.
+it is automatically set to include all layer domains.
 \item \code{contScaleX, contScaleY} - whether or not the axis should be continuous.
-\item \code{aspectRatio} - aspect ratio.
-\item \code{axisTitleX, axisTitleY} - axes titles.
-\item \code{axisTitlePosX, axisTitlePosY} - position of axes titles. For each axis one can specify title position
+\item \code{aspectRatio} - an aspect ratio for the chart.
+\item \code{axisTitleX, axisTitleY} - axis titles.
+\item \code{axisTitlePosX, axisTitlePosY} - positions of the axis titles. For each axis, one can specify a title position
 across or along the corresponding axis. Possible options are \code{"up"} (for title inside the plotting area)
 or \code{"down"} (outside the plotting area, under the axis), and
 \code{"start"}, \code{"middle"}, \code{"end"}. This property must be a string with one or two of the aforementioned options
 (e.g. \code{"middle down"}, \code{"start"}, etc.).
-\item \code{ticksRotateX, ticksRotateY} - angle by which to rotate ticks (in degrees). Must be between
+\item \code{ticksRotateX, ticksRotateY} - angles by which to rotate ticks (in degrees). Must be between
 0 (horizontal ticks, default) and 90 (vertical ticks).
-\item \code{ticksX, ticksY} - set of ticks for the axes.}
+\item \code{ticksX, ticksY} - sets of ticks for the axes.}
 
 Interactivity settings
 \itemize{
-\item \code{on_click} - function, to be called, when one of the points is clicked. Gets an
+\item \code{on_click} - a function, to be called when one of the points is clicked. Gets an
 index of the clicked point as an argument.
-\item \code{on_clickPosition} - function, to be called, when any point of the chart is clicked. Unlike
-\code{on_click} which is called only when an element of the chart (point, line, etc.) is clicked, this
-function reacts to any click on the chart. As an argument it receives a vector of x and y coordinates of
-the click (based on the current axes scales). If one of the axes is categorical, then the function will
+\item \code{on_clickPosition} - a function, to be called when any point of the chart is clicked. Unlike
+\code{on_click}, which is called only when an element of the chart (point, line, etc.) is clicked, this
+function reacts to any click on the chart. As an argument, it receives a vector of x and y coordinates of
+the click (based on the current axes scales). If one of the axes is categorical, the function will
 get the closest tick to the clicked position.
-\item \code{on_mouseover} - function, to be called, when mouse hovers over one of the points.
+\item \code{on_mouseover} - a function, to be called when the mouse hovers over one of the points.
 Gets an index of the clicked point as an argument.
-\item \code{on_mouseout} - function, to be called, when mouse moves out of one of the points.
-\item \code{on_marked} - function, to be called, when any of the points are selected (marked)
+\item \code{on_mouseout} - a function, to be called when the mouse moves out of one of the points.
+\item \code{on_marked} - a function, to be called when any of the points are selected (marked)
 or deselected. Use \code{\link{getMarked}} function to get the IDs of the currently marked points. To mark points,
 select them with your mouse while holding the \emph{Shift} key.}
 
@@ -152,10 +152,10 @@ Legend settings
 \item \code{legend_height} - height of the legend in pixels. By default, it is equal to the height of the chart.
 \item \code{legend_sampleHeight} - height of a single key of the legend in pixels. The default value is 20.
 \item \code{legend_ncol} - number of columns to order several legends. By default, this is defined from the number
-of legends to reach close to square shape.
+of legends to reach close to a square shape.
 \item \code{legend_container} - a DOM element of the web page where to place the legend. By default, the legend is
 positioned to the right from the chart in a table cell specifically made for it. This should be a valid CSS selector.
-If the specified element does not exist, the legend will be added to the body of the web page.}
+If the specified element does not exist, the legend will be added to the web page's body.}
 
 Global chart settings
 \itemize{
@@ -165,7 +165,7 @@ Global chart settings
 \item \code{plotHeight} - height of the plotting area in pixels.
 \item \code{paddings} - padding sizes in pixels. Must be a list with all the following fields:
 \code{"top", "bottom", "left", "right"}.
-\item \code{title} - title of the chart.
+\item \code{title} - a title of the chart.
 \item \code{titleX, titleY} - coordinates of the chart title.
 \item \code{titleSize} - font-size of the chart title.
 \item \code{showLegend} - whether or not to show the legend.

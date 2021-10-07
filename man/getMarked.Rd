@@ -7,18 +7,18 @@
 getMarked(chartId = NULL, layerId = NULL, sessionId = NULL)
 }
 \arguments{
-\item{chartId}{An ID of the chart. This argument is optional, if there is only one chart.}
+\item{chartId}{An ID of the chart. This argument is optional if there is only one chart.}
 
-\item{layerId}{An ID of the layer. This argument is optional, if there is only one chart.
-than one layer.}
+\item{layerId}{An ID of the layer. This argument is optional if there is only one chart with
+a single layer.}
 
-\item{sessionId}{An ID of the session from which to get the marked elements. Can be \code{NULL}
+\item{sessionId}{An ID of the session from which to get the marked elements. It can be \code{NULL}
 if there is only one active session. Otherwise must be a valid session ID. Check \code{\link[jrc]{Session}}
-for more information on client sessions. If a call to this function was triggered from an opened web page, ID of
-the corresponding session will be used automatically.}
+for more information on client sessions. If a call to this function was triggered from a web page, the ID of
+the corresponding session would be used automatically.}
 }
 \value{
-a vector of indices or, in case of heatmaps, an \emph{n x 2} matrix were first and
+a vector of indices or, in the case of heatmaps, an \emph{n x 2} matrix where first and
 second columns contain row and column indices of the marked cells, respectively.
 }
 \description{

@@ -7,23 +7,23 @@
 lc_colourSlider(data = list(), place = NULL, ..., chartId = NULL, with = NULL)
 }
 \arguments{
-\item{data}{Name value pairs of properties, passed through the \code{\link{dat}} function. These
+\item{data}{Name-value pairs of properties passed through the \code{\link{dat}} function. These
 properties will be re-evaluated on each \code{\link{updateCharts}} call.}
 
-\item{place}{ID of a container, where to place new chart. Will be ignored if the chart already
-exists. If not defined, the chart will be appended to the body of the web pages.}
+\item{place}{An ID of the container, where to place new chart. It will be ignored if the chart already
+exists. If not defined, the chart will be appended to the web page's bodys.}
 
 \item{...}{Name-value pairs of properties that will be evaluated only once and then will remain
 constant. These properties can still be changed later using the \code{\link{setProperties}} function.}
 
-\item{chartId}{ID for the chart. All charts must have unique IDs. If a chart with the same ID already
-exists, it will be replaced. If ID is not defined, it will be the same as
+\item{chartId}{An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
+exists, it will be replaced. If ID is not defined, it will be the same as the
 value of the \code{place} argument. And if both are not defined, the ID will be set to \code{ChartN},
 where \code{N - 1} is the number of existing charts.}
 
-\item{with}{A data set from which other properties should be taken. If the data set doesn't have a
-column with the requested name, the variable will be searched for outside of the data set. Must be
-a data.frame or a list.}
+\item{with}{A dataset or a list from which other properties should be taken. If the dataset doesn't have a
+column with the requested name, the variable will be searched for outside of the dataset. Must be
+a \code{data.frame} or a \code{list}.}
 }
 \description{
 Colour slider provides an easy way to change any continuous colour scale
@@ -47,7 +47,7 @@ Global chart settings
 \item \code{heigth} - height of the chart in pixels.
 \item \code{paddings} - padding sizes in pixels. Must be a list with all the following fields:
 \code{"top", "bottom", "left", "right"}.
-\item \code{title} - title of the chart.
+\item \code{title} - a title of the chart.
 \item \code{titleX, titleY} - coordinates of the chart title.
 \item \code{titleSize} - font-size of the chart title.}
 }

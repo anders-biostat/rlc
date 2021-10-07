@@ -26,29 +26,29 @@ lc_dens(
 )
 }
 \arguments{
-\item{data}{Name value pairs of properties, passed through the \code{\link{dat}} function. These
+\item{data}{Name-value pairs of properties passed through the \code{\link{dat}} function. These
 properties will be re-evaluated on each \code{\link{updateCharts}} call.}
 
-\item{place}{ID of a container, where to place new chart. Will be ignored if the chart already
-exists. If not defined, the chart will be appended to the body of the web pages.}
+\item{place}{An ID of the container, where to place new chart. It will be ignored if the chart already
+exists. If not defined, the chart will be appended to the web page's bodys.}
 
 \item{...}{Name-value pairs of properties that will be evaluated only once and then will remain
 constant. These properties can still be changed later using the \code{\link{setProperties}} function.}
 
-\item{chartId}{ID for the chart. All charts must have unique IDs. If a chart with the same ID already
-exists, it will be replaced unless \code{addLayer = TRUE}. If ID is not defined, it will be the same as
+\item{chartId}{An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
+exists, it will be replaced unless \code{addLayer = TRUE}. If ID is not defined, it will be the same as the
 value of the \code{place} argument. And if both are not defined, the ID will be set to \code{ChartN},
 where \code{N - 1} is the number of existing charts.}
 
 \item{layerId}{An ID for the new layer. All layers within one chart must have different IDs. If a layer with the same
-ID already exists, it will be replaced. If not defined, will be set to \code{LayerN}, where \code{N - 1}
-is the number of currently existing layers in this chart.}
+ID already exists, it will be replaced. If not defined, it will be set to \code{LayerN}, where \code{N - 1}
+is the current number of layers in this chart.}
 
-\item{with}{A data set from which other properties should be taken. If the data set doesn't have a
-column with the requested name, the variable will be searched for outside of the data set. Must be
-a data.frame or a list.}
+\item{with}{A dataset or a list from which other properties should be taken. If the dataset doesn't have a
+column with the requested name, the variable will be searched for outside of the dataset. It must be
+a \code{data.frame} or a \code{list}.}
 
-\item{addLayer}{if there is already a chart with the same ID, this argument defines whether to replace it or to add a
+\item{addLayer}{If there is already a chart with the same ID, this argument defines whether to replace it or to add a
 new layer to it. This argument is ignored if both \code{place} and \code{chartId} are \code{NULL} or if there is no
 chart with the given ID.}
 }

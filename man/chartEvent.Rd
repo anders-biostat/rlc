@@ -7,27 +7,27 @@
 chartEvent(d, chartId, layerId = "main", event, sessionId = .id, app = .app)
 }
 \arguments{
-\item{d}{Value that is used to identify interactive element or its state. A single numeric index for
-a point or a line, vector or
-row and column indices of a cell for a heatmap, value for an input block (please, check \code{\link{lc_input}}
-for more details about input blocks and their values). Should be \code{NULL} for \code{mouseout} or \code{marked} events.
-N.B. This function is called from the web page and therefore all element indices start from zero as it is
-happens in JavaScript.}
+\item{d}{Value that is used to identify an interactive element or its state.
+A single numeric index for a point or a line, vector or row and column indices
+of a cell for a heatmap, value for an input block (please, check \code{\link{lc_input}} for more
+details about input blocks and their values). It should be \code{NULL} for \code{mouseout} or
+\code{marked} events. NB: This function is called from the web page, and therefore all element indices
+start from zero as it happens in JavaScript.}
 
 \item{chartId}{ID of the chart.}
 
 \item{layerId}{ID of the layer. You can print IDs of all charts and their layers with \code{\link{listCharts}}.}
 
 \item{event}{Type of event. Must be one of \code{"click"}, \code{"mouseover"}, \code{"mouseout"}, \code{"marked"},
-\code{"labelClickRow"}, \code{"labelClickCol"}.}
+\code{"labelClickRow"}, \code{"labelClickCol"}, \code{"clickPosition"}.}
 
 \item{sessionId}{ID of the session (opened client page) that triggered the event. The default value uses a local session
 variable. This must be a single session ID. You can get a list of IDs of all currently active with the
-method \code{getSessionIds} inherited from class \code{\link{App}} by \code{\link{LCApp}}. Possible errors in evaluation of
+method \code{getSessionIds} inherited from class \code{\link{App}} by \code{\link{LCApp}}. Possible errors in the evaluation of
 this argument are ignored.}
 
 \item{app}{Object of class \code{\link{LCApp}} for which the event was triggered. Note that this argument is here for
-internal use and its default value is a variable, stored in each session locally. If you are not using wrapper functions,
+internal use, and its default value is a variable stored in each session locally. If you are not using wrapper functions,
 it is preferred to call method \code{chartEvent} of an object of class \code{\link{LCApp}}.}
 }
 \description{
