@@ -1010,13 +1010,13 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
                        "logScaleX", "logScaleY", "ticksRotateX", "ticksRotateY", "globalColourScale", "aspectRatio",
                        "rankRows", "rankCols", "ticksX", "ticksY", "showDendogramCol", "on_labelClickCol", "on_labelClickRow",
                        "axisTitlePosX", "axisTitlePosY", "legend_width", "legend_height", "legend_sampleHeight", "legend_ncol",
-                       "legend_titles", "legend_container", "informText")),
+                       "legend_titles", "legend_container", "informText", "valueTextColour")),
   nameList = c("labels" = "label", "color" = "colour", "colorValue" = "colourValue",
                "colourValues" = "colourValue", "colorValues" = "colourValue", "colorDomain" = "colourDomain",
                "colorLegendTitle" = "colourLegendTitle", "addColorScaleToLegend" = "addColourScaleToLegend",
                "symbols" = "symbol", "symbolValues" = "symbolValue", "strokes" = "stroke", "values" = "value",
                "heatmapRows" = "heatmapRow", "heatmapCols" = "heatmapCol", "showValues" = "showValue",
-               "globalColorScale" = "globalColourScale", "steps" = "step"),
+               "globalColorScale" = "globalColourScale", "steps" = "step", "valueTextColor" = "valueTextColour"),
   jsTypes = c(scatter = "scatter", beeswarm = "beeswarm", line = "pointLine", path = "pointLine",
               ribbon = "pointRibbon", bars = "barchart", hist = "barchart", dens = "pointLine",
               heatmap = "heatmap", colourSlider = "colourSlider", abLine = "xLine", hLine = "xLine",
@@ -2390,8 +2390,12 @@ lc_dens <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = 
 #'  \item \code{mode} - one of \code{"default", "svg", "canvas"}. Defines, whether to display heatmap as
 #'  an SVG or Canvas object. \code{"default"} mode switches between the two, turning heatmap into Canvas 
 #'  image, when there are too many cell, and into SVG object otherwise.
-#'  \item \code{heatmapRow, heatmapCol} - default order of rows and columns of the heatmap.
+#'  \item \code{rankRows, rankCols} - rank of rows and columns of the heatmap. This should be a vector with a
+#'  numeric value for each row or column.
 #'  \item \code{showValue} - if \code{TRUE}, values will be shown as text in each cell.
+#'  \item \code{valueTextColour} - of the value text in each cell. By default, the colour is defined individually
+#'  based on the cell colour. For Google Chrome v.89 and older and for heatmaps in \code{"canvas"} mode, default
+#'  colour is black. This should be a colour name or hexadecimal colour code.
 #'  \item \code{informText} - text that appears when the mouse cursor moves over an element. Unlike \code{label},
 #'  completely overwrites the tooltip content with a custom HTML code. Must be a matrix of characters (HTML code
 #'  for each cell).}
@@ -2412,7 +2416,9 @@ lc_dens <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = 
 #'  \item \code{on_mouseout} - a function, to be called when the mouse moves away from one of the cells.
 #'  \item \code{on_marked} - a function, to be called when any of the cells are selected (marked) 
 #'  or deselected. Use \code{\link{getMarked}} function to get the IDs of the currently marked cells. To mark cells,
-#'  select them with your mouse while holding the \emph{Shift} key.}
+#'  select them with your mouse while holding the \emph{Shift} key.
+#'  \item \code{on_labelClickRow, on_labelClickCol} - functions, to be called when a row or a column label is clicked.
+#'  By default, a click on a, for instance, row label sorts all columns of the heatmap based on their value in the selected row.}
 #'  
 #' Legend settings
 #' \itemize{

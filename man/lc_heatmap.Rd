@@ -55,8 +55,12 @@ panel.
 \item \code{mode} - one of \code{"default", "svg", "canvas"}. Defines, whether to display heatmap as
 an SVG or Canvas object. \code{"default"} mode switches between the two, turning heatmap into Canvas
 image, when there are too many cell, and into SVG object otherwise.
-\item \code{heatmapRow, heatmapCol} - default order of rows and columns of the heatmap.
+\item \code{rankRows, rankCols} - rank of rows and columns of the heatmap. This should be a vector with a
+numeric value for each row or column.
 \item \code{showValue} - if \code{TRUE}, values will be shown as text in each cell.
+\item \code{valueTextColour} - of the value text in each cell. By default, the colour is defined individually
+based on the cell colour. For Google Chrome v.89 and older and for heatmaps in \code{"canvas"} mode, default
+colour is black. This should be a colour name or hexadecimal colour code.
 \item \code{informText} - text that appears when the mouse cursor moves over an element. Unlike \code{label},
 completely overwrites the tooltip content with a custom HTML code. Must be a matrix of characters (HTML code
 for each cell).}
@@ -77,7 +81,9 @@ Gets a vector of row and column indices of the clicked cell as its arguments.
 \item \code{on_mouseout} - a function, to be called when the mouse moves away from one of the cells.
 \item \code{on_marked} - a function, to be called when any of the cells are selected (marked)
 or deselected. Use \code{\link{getMarked}} function to get the IDs of the currently marked cells. To mark cells,
-select them with your mouse while holding the \emph{Shift} key.}
+select them with your mouse while holding the \emph{Shift} key.
+\item \code{on_labelClickRow, on_labelClickCol} - functions, to be called when a row or a column label is clicked.
+By default, a click on a, for instance, row label sorts all columns of the heatmap based on their value in the selected row.}
 
 Legend settings
 \itemize{
