@@ -59,8 +59,7 @@ image, when there are too many cell, and into SVG object otherwise.
 numeric value for each row or column.
 \item \code{showValue} - if \code{TRUE}, values will be shown as text in each cell.
 \item \code{valueTextColour} - of the value text in each cell. By default, the colour is defined individually
-based on the cell colour. For Google Chrome v.89 and older and for heatmaps in \code{"canvas"} mode, default
-colour is black. This should be a colour name or hexadecimal colour code.
+based on the cell colour.
 \item \code{informText} - text that appears when the mouse cursor moves over an element. Unlike \code{label},
 completely overwrites the tooltip content with a custom HTML code. Must be a matrix of characters (HTML code
 for each cell).}
