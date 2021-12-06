@@ -1000,7 +1000,7 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
                layer = c("nelements", "elementIds", "label", "layerDomainX", "layerDomainY", "contScaleX", "contScaleY",
                          "colour", "colourValue", "palette", "colourDomain", "colourLegendTitle", "addColourScaleToLegend", "opacity", "on_click",
                          "informText", "on_mouseover", "on_mouseout", "on_marked", "on_clickPosition"),
-               input = c("step", "min", "max"),
+               input = c("step", "min", "max", "ncols", "nrows", "fontSize"),
                image = c("img", "src", "paths"),
                all = c("width", "height", "plotWidth", "plotHeight", "paddings", "title", "titleX", "titleY", "titleSize",
                        "showLegend", "showPanel", "transitionDuration", "value", "rowLabel", "colLabel", "showDendogramRow",
