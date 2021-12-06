@@ -2677,6 +2677,9 @@ lc_html <- function(data = list(), place = NULL, ..., chartId = NULL, with = NUL
 #'  Must be a numeric vector with one value for each slider in the input block.
 #'  \item \code{min, max} (only for \code{type = "range"}) - minimal and maximal values that can be selected with the slider.
 #'  Must be a numeric vector with one value for each slider in the input block.
+#'  \item \code{fontSize} - changes font size of the labels. The default size is 17.
+#'  \item \code{nrows} - number of rows in the table of input elements. By default is defined by the number of elements.
+#'  \item \code{ncols} - number of columns of input elements. The default value is 1.
 #'  }
 #'  
 #' Interactivity settings
