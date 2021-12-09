@@ -784,7 +784,7 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
     marked
   },
   
-  mark = function(elements, chartId = NULL, layerId = NULL, 
+  mark = function(elements = NULL, chartId = NULL, layerId = NULL, 
                   preventEvent = TRUE, clear = FALSE, sessionId = NULL) {
     session <- super$getSession(sessionId)
     if(is.null(session))
@@ -999,7 +999,7 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
                pointRibbon = c("lineWidth", "dasharray", "x", "ymax", "ymin", "nsteps"),
                layer = c("nelements", "elementIds", "label", "layerDomainX", "layerDomainY", "contScaleX", "contScaleY",
                          "colour", "colourValue", "palette", "colourDomain", "colourLegendTitle", "addColourScaleToLegend", "opacity", "on_click",
-                         "informText", "on_mouseover", "on_mouseout", "on_marked", "on_clickPosition"),
+                         "informText", "on_mouseover", "on_mouseout", "on_marked", "on_clickPosition", "mode"),
                input = c("step", "min", "max", "ncols", "nrows", "fontSize"),
                image = c("img", "src", "paths"),
                all = c("width", "height", "plotWidth", "plotHeight", "paddings", "title", "titleX", "titleY", "titleSize",
@@ -1683,7 +1683,7 @@ getMarked <- function(chartId = NULL, layerId = NULL, sessionId = NULL) {
 #' ), "A2")}
 #'
 #' @export
-mark <- function(elements, chartId = NULL, layerId = NULL, 
+mark <- function(elements = NULL, chartId = NULL, layerId = NULL, 
                  preventEvent = TRUE, clear = FALSE, sessionId = NULL) {
   workWith <- getAppAndSession(sessionId)
 
