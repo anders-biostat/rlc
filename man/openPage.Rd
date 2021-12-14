@@ -11,6 +11,7 @@ openPage(
   layout = NULL,
   port = NULL,
   browser = NULL,
+  onlyServer = FALSE,
   ...
 )
 }
@@ -41,6 +42,8 @@ If not defined, default browser will be used. For more information check \code{\
 If this argument is specified, \code{useViewer} will be ignored.}
 
 \item{...}{Further arguments passed to \code{\link[jrc]{openPage}}. Check details for more information.}
+
+\item{onlySever}{If \code{TRUE}, then an app will initialise without trying to open a new page in a browser.}
 }
 \value{
 A new instance of class \code{\link{LCApp}}.

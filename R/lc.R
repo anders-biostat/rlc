@@ -1297,6 +1297,7 @@ Chart <- R6Class("Chart", public = list(
 #' @param browser A browser in which to open a new web page.
 #' If not defined, default browser will be used. For more information check \code{\link[utils]{browseURL}}.
 #' If this argument is specified, \code{useViewer} will be ignored.
+#' @param onlySever If \code{TRUE}, then an app will initialise without trying to open a new page in a browser.
 #' @param ... Further arguments passed to \code{\link[jrc]{openPage}}. Check details for more information.
 #' 
 #' @return A new instance of class \code{\link{LCApp}}.
@@ -1308,13 +1309,14 @@ Chart <- R6Class("Chart", public = list(
 #' 
 #' @export
 openPage <- function(useViewer = TRUE, rootDirectory = NULL, startPage = NULL, layout = NULL, port = NULL, 
-                     browser = NULL, ...) {
+                     browser = NULL, onlyServer = FALSE, ...) {
   if(!is.null(pkg.env$app)) 
     closePage()
   
   app <- LCApp$new(rootDirectory = rootDirectory, startPage = startPage, layout = layout, ...)
   app$startServer(port)
-  app$openPage(useViewer, browser)
+  if(!onlyServer)
+    app$openPage(useViewer, browser)
   app$setEnvironment(parent.frame())
   
   pkg.env$app <- app

@@ -5,7 +5,7 @@
 \title{Mark elements of a chart}
 \usage{
 mark(
-  elements,
+  elements = NULL,
   chartId = NULL,
   layerId = NULL,
   preventEvent = TRUE,
