@@ -8,8 +8,8 @@ pkg.env <- new.env()
 
 pkg.env$dataFun <- list(
   scatter = function(l) {
-    if(is.null(l$x) && is.null(l$y))
-      stop("Required properties 'x' and 'y' are not defined.")
+    # if(is.null(l$x) && is.null(l$y))
+    #   stop("Required properties 'x' and 'y' are not defined.")
     
     if(is.factor(l$x))
       l$layerDomainX <- levels(l$x)
@@ -849,7 +849,7 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
   },
   
   setChart = function(chartType, data = list(), ..., place = NULL, chartId = NULL, layerId = NULL, addLayer = FALSE, with = NULL, pacerStep = 50) {
-    if(is.null(super$serverHandle)){
+    if(is.null(private$serverHandle)){
       super$startServer()
 #      super$openPage()
     }
@@ -1162,7 +1162,7 @@ Chart <- R6Class("Chart", public = list(
         if(layer$id != "main")
           message(str_interp("Layer '${layer$id}' is added to chart '${self$id}'."))
         session$sendCommand(str_interp("rlc.addChart('${self$id}', '${layer$type}', '${self$place}', '${layer$id}');"))
-        layer$init <- c(session$id, layer$init)
+        layer$init <- intersect(c(session$id, layer$init), private$app$getSessionIds())
       }
     })
   },  
