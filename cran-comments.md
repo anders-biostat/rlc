@@ -1,5 +1,25 @@
 ## Resubmission
 
+This is a new version of the package. It fixes some bugs, updates styling, adjusts some default parameters and also adds some minor functionality to customise user input blocks.
+
+## Test environments
+
+* local Ubuntu 21.10, R 4.0.4
+* win-builder: R-devel
+* Ubuntu Linux 20.04.1 LTS, R-release; Windows Server 2022, R-devel, 64 bit; Fedora Linux, R-devel (R-hub)
+
+There is a NOTE when testing for Windows Server (R-hub): 
+```
+* checking for detritus in the temp directory ... NOTE
+Found the following files/directories:
+  'lastMiKTeXException'
+```
+But this note does not appear neither locally (Windows 10, 64 bit, R 4.0.2), nor in the win-builder checks.
+
+# Previous cran-comments
+
+## Resubmission
+
 This is a new version of the package. It fixes multiple bugs, adds a way to control legend's size and location and to specify the tooltip content with custom HTML.
 
 ## Test environments
@@ -11,8 +31,6 @@ This is a new version of the package. It fixes multiple bugs, adds a way to cont
 ## R CMD check results
 
 There were no ERRORS, WARNINGS or NOTES
-
-# Previous cran-comments
 
 ## Resubmission
 

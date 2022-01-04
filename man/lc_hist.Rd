@@ -30,7 +30,7 @@ lc_dens(
 properties will be re-evaluated on each \code{\link{updateCharts}} call.}
 
 \item{place}{An ID of the container, where to place new chart. It will be ignored if the chart already
-exists. If not defined, the chart will be appended to the web page's bodys.}
+exists. If not defined, the chart will be appended to the web page's body.}
 
 \item{...}{Name-value pairs of properties that will be evaluated only once and then will remain
 constant. These properties can still be changed later using the \code{\link{setProperties}} function.}

@@ -1297,7 +1297,7 @@ Chart <- R6Class("Chart", public = list(
 #' @param browser A browser in which to open a new web page.
 #' If not defined, default browser will be used. For more information check \code{\link[utils]{browseURL}}.
 #' If this argument is specified, \code{useViewer} will be ignored.
-#' @param onlySever If \code{TRUE}, then an app will initialise without trying to open a new page in a browser.
+#' @param onlyServer If \code{TRUE}, then an app will initialise without trying to open a new page in a browser.
 #' @param ... Further arguments passed to \code{\link[jrc]{openPage}}. Check details for more information.
 #' 
 #' @return A new instance of class \code{\link{LCApp}}.
@@ -1774,7 +1774,7 @@ closePage <- function() {
 #' @param data Name-value pairs of properties passed through the \code{\link{dat}} function. These
 #' properties will be re-evaluated on each \code{\link{updateCharts}} call. 
 #' @param place An ID of the container, where to place new chart. It will be ignored if the chart already
-#' exists. If not defined, the chart will be appended to the web page's bodys.
+#' exists. If not defined, the chart will be appended to the web page's body.
 #' @param ... Name-value pairs of properties that will be evaluated only once and then will remain 
 #' constant. These properties can still be changed later using the \code{\link{setProperties}} function.
 #' @param chartId An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
@@ -1951,7 +1951,7 @@ lc_beeswarm <- function(data = list(), place = NULL, ..., chartId = NULL, layerI
 #' @param data Name-value pairs of properties passed through the \code{\link{dat}} function. These
 #' properties will be re-evaluated on each \code{\link{updateCharts}} call. 
 #' @param place An ID of the container, where to place new chart. It will be ignored if the chart already
-#' exists. If not defined, the chart will be appended to the web page's bodys.
+#' exists. If not defined, the chart will be appended to the web page's body.
 #' @param ... Name-value pairs of properties that will be evaluated only once and then will remain 
 #' constant. These properties can still be changed later using the \code{\link{setProperties}} function.
 #' @param chartId An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
@@ -2144,7 +2144,7 @@ lc_ribbon <- function(data = list(), place = NULL, ..., chartId = NULL, layerId 
 #' @param data Name-value pairs of properties passed through the \code{\link{dat}} function. These
 #' properties will be re-evaluated on each \code{\link{updateCharts}} call. 
 #' @param place An ID of the container, where to place new chart. It will be ignored if the chart already
-#' exists. If not defined, the chart will be appended to the web page's bodys.
+#' exists. If not defined, the chart will be appended to the web page's body.
 #' @param ... Name-value pairs of properties that will be evaluated only once and then will remain 
 #' constant. These properties can still be changed later using the \code{\link{setProperties}} function.
 #' @param chartId An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
@@ -2298,7 +2298,7 @@ lc_bars <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = 
 #' @param data Name-value pairs of properties passed through the \code{\link{dat}} function. These
 #' properties will be re-evaluated on each \code{\link{updateCharts}} call. 
 #' @param place An ID of the container, where to place new chart. It will be ignored if the chart already
-#' exists. If not defined, the chart will be appended to the web page's bodys.
+#' exists. If not defined, the chart will be appended to the web page's body.
 #' @param ... Name-value pairs of properties that will be evaluated only once and then will remain 
 #' constant. These properties can still be changed later using the \code{\link{setProperties}} function.
 #' @param chartId An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
@@ -2364,7 +2364,7 @@ lc_dens <- function(data = list(), place = NULL, ..., chartId = NULL, layerId = 
 #' @param data Name-value pairs of properties passed through the \code{\link{dat}} function. These
 #' properties will be re-evaluated on each \code{\link{updateCharts}} call. 
 #' @param place An ID of the container, where to place new chart. It will be ignored if the chart already
-#' exists. If not defined, the chart will be appended to the web page's bodys.
+#' exists. If not defined, the chart will be appended to the web page's body.
 #' @param ... Name-value pairs of properties that will be evaluated only once and then will remain 
 #' constant. These properties can still be changed later using the \code{\link{setProperties}} function.
 #' @param chartId An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
@@ -2495,7 +2495,7 @@ lc_heatmap <- function(data = list(), place = NULL, ..., chartId = NULL, with = 
 #' @param data Name-value pairs of properties passed through the \code{\link{dat}} function. These
 #' properties will be re-evaluated on each \code{\link{updateCharts}} call. 
 #' @param place An ID of the container, where to place new chart. It will be ignored if the chart already
-#' exists. If not defined, the chart will be appended to the web page's bodys.
+#' exists. If not defined, the chart will be appended to the web page's body.
 #' @param ... Name-value pairs of properties that will be evaluated only once and then will remain 
 #' constant. These properties can still be changed later using the \code{\link{setProperties}} function.
 #' @param chartId An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
@@ -2600,7 +2600,7 @@ lc_vLine <- function(data = list(), place = NULL, ..., chartId = NULL, layerId =
 #' @param data Name-value pairs of properties passed through the \code{\link{dat}} function. These
 #' properties will be re-evaluated on each \code{\link{updateCharts}} call. 
 #' @param place An ID of the container, where to place new chart. It will be ignored if the chart already
-#' exists. If not defined, the chart will be appended to the web page's bodys.
+#' exists. If not defined, the chart will be appended to the web page's body.
 #' @param ... Name-value pairs of properties that will be evaluated only once and then will remain 
 #' constant. These properties can still be changed later using the \code{\link{setProperties}} function.
 #' @param chartId An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
@@ -2654,7 +2654,7 @@ lc_html <- function(data = list(), place = NULL, ..., chartId = NULL, with = NUL
 #' @param data Name-value pairs of properties passed through the \code{\link{dat}} function. These
 #' properties will be re-evaluated on each \code{\link{updateCharts}} call. 
 #' @param place An ID of the container, where to place new chart. It will be ignored if the chart already
-#' exists. If not defined, the chart will be appended to the web page's bodys.
+#' exists. If not defined, the chart will be appended to the web page's body.
 #' @param ... Name-value pairs of properties that will be evaluated only once and then will remain 
 #' constant. These properties can still be changed later using the \code{\link{setProperties}} function.
 #' @param chartId An ID for the chart. All charts must have unique IDs. If a chart with the same ID already
@@ -2729,7 +2729,7 @@ lc_input <- function(data = list(), place = NULL, ..., chartId = NULL, with = NU
 #' @param data Name-value pairs of properties passed through the \code{\link{dat}} function. These
 #' properties will be re-evaluated on each \code{\link{updateCharts}} call. 
 #' @param place An ID of the container, where to place new chart. It will be ignored if the chart already
-#' exists. If not defined, the chart will be appended to the web page's bodys.
+#' exists. If not defined, the chart will be appended to the web page's body.
 #' @param ... Name-value pairs of properties that will be evaluated only once and then will remain 
 #' constant. These properties can still be changed later using the \code{\link{setProperties}} function.
 #' @param chartId An ID for the chart. All charts must have unique IDs. If a chart with the same ID already

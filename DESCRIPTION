@@ -1,8 +1,8 @@
 Package: rlc
 Type: Package
 Title: Create Interactive Linked Charts with Minimal Code
-Version: 0.4.0
-Date: 2021-09-17
+Version: 0.4.1
+Date: 2022-01-04
 Authors@R: c(
 	person("Svetlana", "Ovchinnikova", role = c("aut", "cre"), email = "s.ovchinnikova@zmbh.uni-heidelberg.de"),
 	person("Simon", "Anders", role = c("aut"), email = "sanders@fs.tum.de")

@@ -1,3 +1,21 @@
+# rlc 0.4.1
+
+* `lc_input` now has `fontSize`, `nrows` and `ncols` properties, bugs with assigning labels to wrong check boxes/radio buttons fixed.
+
+* `lc_heatmap` now has `valueTextColour` property, also the way how text values are shown (`textValue = TRUE`) is changed.
+
+* in heatmaps, marked cells are now highlighted differently to make them more visible.
+
+* `elements` argument in the `mark` function is now optional.
+
+* RGBA colours are now accepted (for example, in `palette` argument), however the value of alpha is ignored.
+
+* `onlyServer` argument added to the `openPage` function to prevent opening a browser tab.
+
+* A bug that caused restarting a local server multiple times fixed.
+
+* minor styling changes.
+
 # rlc 0.4.0
 
 * A set of properties to control charts' legends added: `legend_width`, `legend_height`, `lgend_sampleHeight`, `legend_ncol`, `legend_container`.
