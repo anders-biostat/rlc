@@ -70,77 +70,56 @@ rlc.addChart = function(id, type, place, layerId) {
     )
 }
 
-rlc.setCustomClickPosition = function(id) {
-  if(charts[id].clickPosition) {
-    charts[id].on_clickPosition(function(x, y) {
-      jrc.callFunction("chartEvent", {d: [x, y], chartId: id, layerId: "main", event: "clickPosition", sessionId: jrc.id}, null, "rlc");
-    })
+rlc.setCustomEvent = function(type, chartId, layerId, dNull, pacerStep) {
+  var obj = {}, args = {};
+  if(pacerStep !== undefined ) 
+    charts[id].pacer = lc.call_pacer(pacerStep)    
+  
+  if(layerId == "main") {
+    obj = charts[chartId]
+  } else {
+    obj = charts[chartId].get_layer(layerId);
   }
+
+  if(obj.customEvent === undefined)
+    obj.customEvent = {};
+  if(!obj.customEvent[type]) {
+    obj["on_" + type](function() {
+      if(dNull) {
+        args.d = "NULL"
+      } else {
+        args.d = Object.values(arguments);
+      }
+      args.chartId = chartId;
+      args.layerId = layerId;
+      args.event = type;
+      args.sessionId = jrc.id;
+      
+      jrc.callFunction("chartEvent", args, null, "rlc")
+    })
+    obj.customEvent[type] = true;
+  }
+}
+
+rlc.setCustomClickPosition = function(id) {
+  if(charts[id].clickPosition)
+    rlc.setCustomEvent("clickPosition", id, "main", false);
 }
 
 rlc.setCustomMouseOver = function(id, layerId, pacerStep) {
-  if(!charts[id].customMouseOver){
-    if(!charts[id].pacer)
-      charts[id].pacer = lc.call_pacer(pacerStep); 
-
-    if(layerId != "main")
-      charts[id].get_layer(layerId)
-        .on_mouseover(function(d) {
-          charts[id].pacer.do(function() {jrc.callFunction("chartEvent", {d: d, chartId: id, layerId: layerId, event: "mouseover", sessionId: jrc.id}, null, "rlc")})
-        });
-    else
-      charts[id]
-        .on_mouseover(function(d) {
-          charts[id].pacer.do(function() {jrc.callFunction("chartEvent", {d: d, chartId: id, layerId: layerId, event: "mouseover", sessionId: jrc.id}, null, "rlc")}); 
-        });
-    charts[id].customMouseOver = true;
-  }
+  rlc.setCustomEvent("mouseover", id, layerId, false, pacerStep);
 }
 
 rlc.setCustomMouseOut = function(id, layerId, pacerStep) {
-  if(!charts[id].customMouseOut){
-    if(!charts[id].pacer)
-      charts[id].pacer = lc.call_pacer(pacerStep); 
-
-    if(!charts[id].customMouseOut)
-      if(layerId != "main")
-        charts[id].get_layer(layerId)
-          .on_mouseout(function() {
-            charts[id].pacer.do(function() {jrc.callFunction("chartEvent", {d: "NULL", chartId: id, layerId: layerId, event: "mouseout", sessionId: jrc.id}, null, "rlc")});
-          })
-      else
-        charts[id]
-          .on_mouseout(function() {
-            charts[id].pacer.do(function() {jrc.callFunction("chartEvent", {d: "NULL", chartId: id, layerId: layerId, event: "mouseout", sessionId: jrc.id}, null, "rlc")});
-          });      
-      charts[id].customMouseOut = true;
-  }
+  rlc.setCustomEvent("mouseout", id, layerId, true, pacerStep);
 }
 
 rlc.setCustomOnMarked = function(id, layerId) {
-  if(!charts[id].customOnMarked){
-    if(layerId != "main")
-      charts[id].get_layer(layerId)
-        .on_marked(function() {
-          jrc.callFunction("chartEvent", {d: "NULL", chartId: id, layerId: layerId, event: "marked", sessionId: jrc.id}, null, "rlc");
-        })
-    else
-      charts[id]
-        .on_marked(function(d) {
-          jrc.callFunction("chartEvent", {d: "NULL", chartId: id, layerId: layerId, event: "marked", sessionId: jrc.id}, null, "rlc");
-        });      
-    charts[id].customOnMarked = true;
-  }
+  rlc.setCustomEvent("marked", id, layerId, true)
 }
 
 rlc.setCustomClickLabel = function(id, type) {
-  if(!charts[id]["customClickLabel" + type]){
-    charts[id]
-      ["on_labelClick" + type](function(d) {
-        jrc.callFunction("chartEvent", {d: d, chartId: id, layerId: "main", event: "labelClick" + type, sessionId: jrc.id}, null, "rlc")
-      });      
-    charts[id]["customClickLabel" + type] = true;
-  }
+  rlc.setCustomEvent("labelClick" + type, id, "main", true);
 }
 
 rlc.setProperty = function(name) {

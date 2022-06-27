@@ -907,7 +907,6 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
         layerId <- chart$getLayerIds()[2]
       }
     }
-
     if(!is.null(chart$getLayer(layerId)))
       chart$removeLayer(layerId)
     
