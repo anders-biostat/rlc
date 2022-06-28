@@ -63,8 +63,25 @@ test_that("on_marked event is working", {
   })
   
   mark(15, "ch1", preventEvent = FALSE)
+
   expect_equal(getMarked("ch1"), 15)
   expect_equal(getMarked("ch2"), 15)
+
+  closePage()
+})
+
+test_that("on_marked can be redefined", {
+  count <- 0
+  lc_scatter(x = 1:10, y = 1:10, chartId = "ch", on_marked = function() {count <<- 1})
+  app <- getPage()
+  ses <- app$getSession()
+
+  ses$sendCommand("charts.ch.layers.Layer1.mark([0], false)", wait = 3)
+  expect_equal(count, 1)
+  
+  lc_scatter(x = 1:10, y = 1:10, chartId = "ch", on_marked = function() {count <<- 3})
+  ses$sendCommand("charts.ch.layers.Layer1.mark([0], false)", wait = 3)
+  expect_equal(count, 3)
 
   closePage()
 })
