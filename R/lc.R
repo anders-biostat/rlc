@@ -199,7 +199,7 @@ pkg.env$dataFun <- list(
     if(is.null(l$groupIds)) l$groupIds <- rep("group", length(l$value))
     if(is.null(l$barIds)) l$barIds <- rep(1, length(l$value))
     if(is.null(l$stackIds)) l$stackIds <- rep(1, length(l$value))
-    
+
     ngroups <- length(unique(l$groupIds))
     nbars <- length(unique(l$barIds))
     nstacks <- length(unique(l$stackIds))
@@ -213,6 +213,14 @@ pkg.env$dataFun <- list(
       inds <- unique(l$groupIds)
       l$groupIds <- match(l$groupIds, inds)
     }
+    
+    if(!(length(l$barIds) == 1 && l$barIds == 1)) l$barLabel <- unique(l$barIds)
+    if(!(length(l$stackIds) == 1 && l$stackIds == 1)) l$stackLabel <- unique(l$stackIds)
+    if(!(length(l$groupIds) == 1 && l$groupIds == "group")) l$groupLabel <- unique(l$groupIds)
+    
+    l$barIds <- as.numeric(as.factor(l$barIds)) - 1
+    l$stackIds <- as.numeric(as.factor(l$stackIds)) - 1
+    l$groupIds <- as.numeric(as.factor(l$groupIds)) - 1    
     
     vals <- list()
     
