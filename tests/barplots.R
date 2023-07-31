@@ -4,11 +4,13 @@ load("barplots.RData")
 
 fitPvals <- apply(fitPvals, 2, p.adjust, method = "BH")
 
-lc_bars(dat(value = colSums(resPvals < 0.01, na.rm = T), height = 250))
+lc_bars(dat(value = colSums(resPvals < 0.01, na.rm = T), height = 250),
+        on_click = function(d) print(d))
 
 lc_bars(dat(value = c(colSums(resPvals < 0.1, na.rm = T), colSums(fitPvals < 0.1, na.rm = T)), 
             barIds = rep(c("res", "fit"), each = 5),
-            groupIds = c(colnames(resPvals), colnames(fitPvals)), height = 250))
+            groupIds = c(colnames(resPvals), colnames(fitPvals)), height = 250),
+        on_click = function(d) print(d))
 
 values <- c(colSums(resPvals < 0.1, na.rm = T), colSums(fitPvals < 0.1, na.rm = T))
 inCommon <- sapply(1:5, function(i) {
@@ -21,6 +23,7 @@ lc_bars(dat(value = c(rep(inCommon, times = 2), values),
             barIds = rep(rep(c("res", "fit"), each = 5), times = 2),
             groupIds = rep(c(colnames(resPvals), colnames(fitPvals)), times = 2), 
             stackIds = rep(c("in common", "not in common"), each = 10),
-            height = 250))
+            height = 250),
+        on_click = function(d) print(d))
 
 closePage()
