@@ -123,7 +123,7 @@ rlc.setCustomOnMarked = function(id, layerId) {
 }
 
 rlc.setCustomClickLabel = function(id, type) {
-  rlc.setCustomEvent("labelClick" + type, id, "main", true);
+  rlc.setCustomEvent("labelClick" + type, id, "main", false);
 }
 
 rlc.setProperty = function(name) {
