@@ -1014,7 +1014,7 @@ LCApp <- R6Class("LCApp", inherit = App, public = list(
                        "logScaleX", "logScaleY", "ticksRotateX", "ticksRotateY", "globalColourScale", "aspectRatio",
                        "rankRows", "rankCols", "ticksX", "ticksY", "showDendogramCol", "on_labelClickCol", "on_labelClickRow",
                        "axisTitlePosX", "axisTitlePosY", "legend_width", "legend_height", "legend_sampleHeight", "legend_ncol",
-                       "legend_titles", "legend_container", "informText", "valueTextColour")),
+                       "legend_titles", "legend_container", "informText", "valueTextColour", "legendTitle")),
   nameList = c("labels" = "label", "color" = "colour", "colorValue" = "colourValue",
                "colourValues" = "colourValue", "colorValues" = "colourValue", "colorDomain" = "colourDomain",
                "colorLegendTitle" = "colourLegendTitle", "addColorScaleToLegend" = "addColourScaleToLegend",
