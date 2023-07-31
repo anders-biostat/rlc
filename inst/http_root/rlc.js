@@ -52,7 +52,6 @@ rlc.addChart = function(id, type, place, layerId) {
         d3 = undefined;
       if(d2 !== undefined && d2.type !== undefined)
         d2 = undefined;      
-      console.log({d, d2, d3})
       if(d2 != undefined)
         d = [d, d2];
       if(d3 != undefined)
