@@ -48,6 +48,11 @@ rlc.addChart = function(id, type, place, layerId) {
   charts[id] = lc[type](layerId, charts[id]);
   if(charts[id].on_click)
     charts[id].on_click(function(d, d2, d3) {
+      if(d3 !== undefined && d3.type !== undefined)
+        d3 = undefined;
+      if(d2 !== undefined && d2.type !== undefined)
+        d2 = undefined;      
+      console.log({d, d2, d3})
       if(d2 != undefined)
         d = [d, d2];
       if(d3 != undefined)

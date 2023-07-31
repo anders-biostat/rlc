@@ -306,10 +306,7 @@ pkg.env$dataFun <- list(
       if(is.null(l$colLabel) & !is.null(colnames(l$value)))
         l$colLabel <- colnames(l$value)
     }
-    
-    if(is.null(l$colourLegendTitle))
-      l$colourLegendTitle <- ""    
-    
+
     l
   },
   

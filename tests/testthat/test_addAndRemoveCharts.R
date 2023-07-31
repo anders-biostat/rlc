@@ -87,13 +87,13 @@ test_that("Each layer uses its own callback function", {
   
   s <- getPage()$getSession()
   
-  s$sendCommand('f = d3.select("#pLayer1_4").on("click")')
+  s$sendCommand('f = (d) => d3.select("#pLayer1_4").on("click")(new Event("click"), d)')
   s$callFunction('f', list(4), wait = 3)
   
   expect_equal(n1, 5)
   expect_equal(n2, -1)
 
-  s$sendCommand('f = d3.select("#pLayer2_4").on("click")')
+  s$sendCommand('f = (d) => d3.select("#pLayer2_4").on("click")(new Event("click"), d)')
   s$callFunction('f', list(8), wait = 3)
   
   expect_equal(n1, 5)
@@ -116,7 +116,7 @@ test_that("Only one session is updated on click", {
   s1 <- app$getSession()
   s2 <- app$openPage(FALSE)
   
-  s1$sendCommand('f = d3.select("#pLayer1_4").on("click")')
+  s1$sendCommand('f = (d) => d3.select("#pLayer1_4").on("click")(new Event("click"), d)')
   s1$callFunction('f', list(4), wait = 3)
   expect_equal(clicked, 5)
   
@@ -147,7 +147,7 @@ test_that("Session states are stored independently", {
   s1 <- app$getSession()
   s2 <- app$openPage(FALSE)
   
-  s1$sendCommand('f = d3.select("#pLayer1_4").on("click")')
+  s1$sendCommand('f = (d) => d3.select("#pLayer1_4").on("click")(new Event("click"), d)')
   s1$callFunction('f', list(4), wait = 3)
   
   expect_false(exists("clicked", inherits = FALSE))
