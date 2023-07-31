@@ -77,7 +77,7 @@ rlc.addChart = function(id, type, place, layerId) {
 rlc.setCustomEvent = function(type, chartId, layerId, dNull, pacerStep) {
   var obj = {}, args = {};
   if(pacerStep !== undefined ) 
-    charts[id].pacer = lc.call_pacer(pacerStep)    
+    charts[chartId].pacer = lc.call_pacer(pacerStep)    
   
   if(layerId == "main") {
     obj = charts[chartId]
@@ -92,7 +92,7 @@ rlc.setCustomEvent = function(type, chartId, layerId, dNull, pacerStep) {
       if(dNull) {
         args.d = "NULL"
       } else {
-        args.d = Object.values(arguments);
+        args.d = Object.values(arguments).filter(e => e.type === undefined);
       }
       args.chartId = chartId;
       args.layerId = layerId;
