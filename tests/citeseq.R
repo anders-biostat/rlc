@@ -87,7 +87,7 @@ lc_scatter(dat(x = tsne_res$Y[, 1], y = tsne_res$Y[, 2], title = "TSNE",
                on_mouseover = function(k) {
                  activeCell <<- k
                  updateCharts(c("tsne", "umap"))
-               }), chartId = "tsne", place = "A1", parcerStep = 200)
+               }), chartId = "tsne", place = "A1", pacerStep = 200)
 
 lc_scatter(dat(x = umap_res[, 1], y = umap_res[, 2], title = "UMAP", 
                colourValue = distsFrom(activeCell), opacity = 0.2, size = 3,
@@ -95,4 +95,4 @@ lc_scatter(dat(x = umap_res[, 1], y = umap_res[, 2], title = "UMAP",
                on_mouseover = function(k) {
                  activeCell <<- k
                  updateCharts(c("tsne", "umap"))
-               }), chartId = "umap", place = "A2", parcerStep = 300)
+               }), chartId = "umap", place = "A2", pacerStep = 300)

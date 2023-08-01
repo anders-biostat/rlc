@@ -2,7 +2,7 @@ library(rlc)
 
 openPage(useViewer = F)
 
-lc_hist(dat(value = rnorm(1000), nbins = 30, height = 300))
+lc_hist(dat(value = rnorm(1000), nbins = 30, height = 300), on_click = function(d) print(d))
 
 lc_dens(dat(value = rnorm(1000), height = 300))
 

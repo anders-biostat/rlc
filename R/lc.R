@@ -214,13 +214,17 @@ pkg.env$dataFun <- list(
       l$groupIds <- match(l$groupIds, inds)
     }
     
-    if(!(length(l$barIds) == 1 && l$barIds == 1)) l$barLabel <- unique(l$barIds)
-    if(!(length(l$stackIds) == 1 && l$stackIds == 1)) l$stackLabel <- unique(l$stackIds)
-    if(!(length(l$groupIds) == 1 && l$groupIds == "group")) l$groupLabel <- unique(l$groupIds)
-    
-    l$barIds <- as.numeric(as.factor(l$barIds)) - 1
-    l$stackIds <- as.numeric(as.factor(l$stackIds)) - 1
-    l$groupIds <- as.numeric(as.factor(l$groupIds)) - 1    
+    if(is.null(l$hist)) {
+      if(!(length(l$barIds) == 1 && l$barIds == 1)) l$barLabel <- unique(l$barIds)
+      if(!(length(l$stackIds) == 1 && l$stackIds == 1)) l$stackLabel <- unique(l$stackIds)
+      if(!(length(l$groupIds) == 1 && l$groupIds == "group")) l$groupLabel <- unique(l$groupIds)
+      
+      l$barIds <- as.numeric(as.factor(l$barIds)) - 1
+      l$stackIds <- as.numeric(as.factor(l$stackIds)) - 1
+      l$groupIds <- as.numeric(as.factor(l$groupIds)) - 1    
+    } else {
+      l$hist <- NULL
+    }
     
     vals <- list()
     
@@ -263,6 +267,8 @@ pkg.env$dataFun <- list(
     l$contScaleX <- TRUE
     l$addColourScaleToLegend <- FALSE
     l$groupWidth <- 1
+    
+    l$hist <- TRUE
     
     if(!is.null(l$value)) {
       minV <- min(l$value, na.rm = TRUE)
