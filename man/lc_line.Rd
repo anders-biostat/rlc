@@ -110,19 +110,19 @@ create filled areas with customized border. Each layer may have one or several l
 }
 \section{Functions}{
 \itemize{
-\item \code{lc_line}: connects points in the order of variables on the x axis.
+\item \code{lc_line()}: connects points in the order of variables on the x axis.
 
-\item \code{lc_path}: connects points in the order they are given.
+\item \code{lc_path()}: connects points in the order they are given.
 
-\item \code{lc_ribbon}: displays a filled area, defined by \code{ymax} and \code{ymin} values.
+\item \code{lc_ribbon()}: displays a filled area, defined by \code{ymax} and \code{ymin} values.
 
-\item \code{lc_abLine}: creates straight lines by intercept and slope values
+\item \code{lc_abLine()}: creates straight lines by intercept and slope values
 
-\item \code{lc_hLine}: creates horizontal lines by y-intercept values
+\item \code{lc_hLine()}: creates horizontal lines by y-intercept values
 
-\item \code{lc_vLine}: creates vertical lines by x-intercept values
+\item \code{lc_vLine()}: creates vertical lines by x-intercept values
+
 }}
-
 \section{Available properties}{
 
 You can read more about different properties

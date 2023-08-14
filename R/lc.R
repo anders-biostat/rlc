@@ -1726,6 +1726,31 @@ getPage <- function(){
   pkg.env$app
 }
 
+#' Listen to the server
+#' 
+#' When R session is not interactive, messages from the server are not processed automatically. In this case, one needs to 
+#' keep this function running.
+#' This function, is a wrapper around \code{\link[jrc]{listen}}.
+#' 
+#' @param time Time (in seconds), during which the R session should listen to the server. By default, the function runs until
+#' it is not interrupted (\code{time = Inf}).
+#' @param activeSessions The function runs, until there is at least one active session in the provided app. If there is only
+#' one active app, this argument can be set to \code{TRUE} for the same effect.
+#' @param condition Custom condition. This argument must be a function that returns \code{TRUE} or \code{FALSE}. R session will 
+#' listen to the server, while the condition function returns \code{TRUE}.
+#' 
+#' @importFrom jrc listen
+#' @export
+listen <- function(time = Inf, activeSessions = NULL, condition = NULL) {
+  if(isTRUE(activeSessions)) {
+    if(is.null(pkg.env$app)) 
+      stop("There is no opened page. Please, use 'openPage()' function to create one.")
+    activeSessions <- pkg.env$app
+  }
+  
+  jrc::listen(time = time, activeSessions = activeSessions, condition = condition)
+}
+
 #' Link data to the chart
 #' 
 #' \code{dat} allows linking variables from the current environment to chart's properties.
