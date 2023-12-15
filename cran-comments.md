@@ -20,6 +20,20 @@ Old maintainer(s):
   Svetlana Ovchinnikova <s.ovchinnikova@zmbh.uni-heidelberg.de>
 ```
 
+Also, when testing for Windows Server (R-hub), appears the same NOT as in the previous submission:
+```
+* checking for detritus in the temp directory ... NOTE
+Found the following files/directories:
+  'lastMiKTeXException'
+```
+As before, it doesn't appear neither locally (Windows 11, 64 bit, R 4.3.2), nor when checking with `check_win_devel()`
+
+Another NOTE appears only in Ubuntu and Fedora when checking with R-hub and refers to the software that is not installed
+```
+* checking HTML version of manual ... NOTE
+Skipping checking HTML validation: no command 'tidy' found
+```
+
 # Previous cran-comments
 
 ## Resubmission
