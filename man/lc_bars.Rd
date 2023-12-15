@@ -136,7 +136,7 @@ changes happen to the chart.}
 }
 
 \examples{
-\donttest{data("esoph")
+\dontrun{data("esoph")
 
 lc_bars(dat(value = tapply(esoph$ncases, esoph$agegp, sum), 
             title = "Number of cases per age group",

@@ -68,7 +68,7 @@ If height is defined and it's smaller than content's height, scrolling will be p
 }
 
 \examples{
-\donttest{lc_input(type = "checkbox", labels = paste0("el", 1:5), on_click = function(value) print(value),
+\dontrun{lc_input(type = "checkbox", labels = paste0("el", 1:5), on_click = function(value) print(value),
 value = TRUE)
 lc_input(type = "radio", labels = paste0("el", 1:5), on_click = function(value) print(value),
          value = 1)

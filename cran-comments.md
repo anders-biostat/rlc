@@ -1,5 +1,29 @@
 ## Resubmission
 
+This version of the package now relies on the updated version of D3 (v7.8.5 instead of v4.10.0). Following the update of the underlying `jrc` package, the `listen` function has been added to make the use of rlc apps from Jupyter Notebooks more convenient. Also, some bugs were fixed (see NEWS.md).
+
+## Test environments
+
+* local Ubuntu 23.10, R 4.3.1
+* win-builder: R-devel
+* Ubuntu Linux 20.04.1 LTS, R-release; Windows Server 2022, R-devel, 64 bit; Fedora Linux, R-devel (R-hub)
+
+There is a NOTE, since I've updated my email address.
+```
+* checking CRAN incoming feasibility ... [5s/28s] NOTE
+Maintainer: ‘Svetlana Ovchinnikova <svetlana.ovchinnikova@bioquant.uni-heidelberg.de>’
+
+New maintainer:
+  Svetlana Ovchinnikova
+    <svetlana.ovchinnikova@bioquant.uni-heidelberg.de>
+Old maintainer(s):
+  Svetlana Ovchinnikova <s.ovchinnikova@zmbh.uni-heidelberg.de>
+```
+
+# Previous cran-comments
+
+## Resubmission
+
 This is a new version of the package. It fixes some bugs, updates styling, adjusts some default parameters and also adds some minor functionality to customise user input blocks.
 
 ## Test environments
@@ -15,8 +39,6 @@ Found the following files/directories:
   'lastMiKTeXException'
 ```
 But this note does not appear neither locally (Windows 10, 64 bit, R 4.0.2), nor in the win-builder checks.
-
-# Previous cran-comments
 
 ## Resubmission
 

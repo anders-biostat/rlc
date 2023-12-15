@@ -1,3 +1,15 @@
+# rlc 0.5.0
+
+* The package is now base on the current D3 version (v7.8.5) rather then the outdated one (v4.10.0)
+
+* listen function (a wrapper around `httpuv::service` or `later::run_now`) added to for more convenient use of RLC apps in Jupyter Notebooks.
+
+* Bug with saving plots as png in Firefox fixed.
+
+* Marking behaviour in heatmap changed: consecutive selection of cells now only adds to the list of marked cells.
+
+* Some minor bug fixes.
+
 # rlc 0.4.1
 
 * `lc_input` now has `fontSize`, `nrows` and `ncols` properties, bugs with assigning labels to wrong check boxes/radio buttons fixed.

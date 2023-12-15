@@ -114,7 +114,7 @@ changes happen to the chart.}
 }
 
 \examples{
-\donttest{
+\dontrun{
 library(RColorBrewer)
 #create a test matrix
 test <- cbind(sapply(1:10, function(i) c(rnorm(10, mean = 1, sd = 3), 

@@ -49,7 +49,7 @@ If height is defined and it's smaller than content's height, scrolling will be p
 }
 
 \examples{
-\donttest{lc_html(content = "Some <b>HTML</b> <br> <i>code</i>.")
+\dontrun{lc_html(content = "Some <b>HTML</b> <br> <i>code</i>.")
 lc_html(dat(content = matrix(1:12, nrow = 4)))
 data(iris)
 lc_html(content = iris, height = 200)}

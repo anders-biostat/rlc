@@ -226,7 +226,7 @@ changes happen to the chart.
 }
 
 \examples{
-\donttest{x <- seq(0, 8, 0.2)
+\dontrun{x <- seq(0, 8, 0.2)
 lc_line(dat(x = x, y = cbind(cos(x), sin(x)),
             aspectRatio = 1,
             colour = c("blue", "red"),

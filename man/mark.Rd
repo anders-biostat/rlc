@@ -40,7 +40,7 @@ while holding the \code{Shift} key. This function is a wrapper of method \code{m
 class \code{\link{LCApp}}.
 }
 \examples{
-\donttest{data("iris")
+\dontrun{data("iris")
 openPage(FALSE, layout = "table1x2")
 
 #brushing example

@@ -17,7 +17,7 @@ This function is a wrapper around method \code{removeLayer} of
 class \code{\link{LCApp}}.
 }
 \examples{
-\donttest{lc_scatter(dat(x = 1:10, y = 1:10 * 2), chartId = "scatter")
+\dontrun{lc_scatter(dat(x = 1:10, y = 1:10 * 2), chartId = "scatter")
 lc_abLine(a = 2, b = 0, chartId = "scatter", addLayer = TRUE)
 removeLayer("scatter", "Layer1")}
 

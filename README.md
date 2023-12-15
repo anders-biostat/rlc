@@ -1,4 +1,4 @@
-[![Travis Build Status](https://travis-ci.org/anders-biostat/rlc.svg?branch=master)](https://travis-ci.org/anders-biostat/rlc)
+[![Travis Build Status](https://app.travis-ci.com/anders-biostat/rlc.svg?branch=master)](https://app.travis-ci.com/anders-biostat/rlc)
 [![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version/rlc)](https://cran.r-project.org/package=rlc)
 [![Downloads](https://cranlogs.r-pkg.org/badges/rlc?color=brightgreen)](https://www.r-pkg.org/pkg/rlc)
 

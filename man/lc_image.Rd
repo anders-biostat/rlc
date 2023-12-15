@@ -54,7 +54,7 @@ If height is defined and it's smaller than content's height, scrolling will be p
 }
 
 \examples{
-\donttest{
+\dontrun{
 library(ggplot2)
 pl <- ggplot() + geom_point(aes(1:10, 1:10))
 

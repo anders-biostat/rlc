@@ -1,17 +1,17 @@
 Package: rlc
 Type: Package
 Title: Create Interactive Linked Charts with Minimal Code
-Version: 0.4.1
-Date: 2022-01-04
+Version: 0.5.0
+Date: 2023-12-15
 Authors@R: c(
-	person("Svetlana", "Ovchinnikova", role = c("aut", "cre"), email = "s.ovchinnikova@zmbh.uni-heidelberg.de"),
+	person("Svetlana", "Ovchinnikova", role = c("aut", "cre"), email = "svetlana.ovchinnikova@bioquant.uni-heidelberg.de"),
 	person("Simon", "Anders", role = c("aut"), email = "sanders@fs.tum.de")
 	)
 Description: An easy-to-use tool to employ interactivity in every-day exploratory analysis. It contains 
 	a collection of most commonly used types of charts (such as scatter plots, line plots, heatmaps, bar charts),
 	which can be linked to each other or to other interactive elements with just few lines of code.
 License: GPL-3
-Imports: jsonlite, stringr, hwriter, jrc(>= 0.4.0), plyr, stats, R6
+Imports: jsonlite, stringr, hwriter, jrc(>= 0.6.0), plyr, stats, R6
 Suggests:
     spelling, 
     magrittr,

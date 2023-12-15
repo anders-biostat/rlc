@@ -68,7 +68,7 @@ This function initializes a new instance of class \code{\link{LCApp}} and wraps 
 \code{startServer} and \code{openPage} of its parent class \code{\link[jrc]{App}}.
 }
 \examples{
-\donttest{openPage()
+\dontrun{openPage()
 
 openPage(useViewer = FALSE, layout = "table2x3")}
 
